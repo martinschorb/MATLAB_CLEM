@@ -1,6 +1,7 @@
 function im=conv8to16bit(im)
 
 %converts an image from 8bit to 16 bit
+% Version 101019 Martin Schorb
 
 s=size(im,3);
 
