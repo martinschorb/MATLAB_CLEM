@@ -1,3 +1,5 @@
+adfvadsfvg
+
 function digitize07(varargin)
 %DIGITIZE07  Digitze points on an image using the mouse  
 %   DIGITIZE07(filename) displays an image and allows the user to 
