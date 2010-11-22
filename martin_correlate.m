@@ -338,7 +338,7 @@ end
 
 % runs fluorescence image drift correction
 
-[bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,outfileroot);
+[bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,fluorsel,outfileroot);
 if isequal(fluospot,ones(2))
     k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
     uiwait(k);
