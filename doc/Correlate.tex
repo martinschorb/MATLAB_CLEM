@@ -1,0 +1,318 @@
+\documentclass[10pt,a4paper,DIV17]{scrartcl}
+% \areaset{210mm}{297mm}
+\usepackage[T1]{fontenc}        %k.A.
+\usepackage[latin1]{inputenc} %k.A.
+%\usepackage{ngerman}   %Deutsch
+\usepackage{amssymb,amsmath,amsthm}     %Mathe
+\usepackage[pdftex]{graphicx} %Bilder
+% \usepackage[german]{babel}
+\usepackage[usenames,dvipsnames,pdftex]{color}
+\usepackage[english]{babel}
+\usepackage[font=small,labelfont=bf]{caption}
+%\usepackage{bibgerm}
+%\usepackage{subfig}
+%\usepackage[subfigure]{tocloft}
+\setlength{\headheight}{15pt}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{svn-multi}
+\svnidlong
+{$HeadURL: https://svn.structures.embl.de/repo/schorb:Corr/doc/Correlate.tex $}
+{$LastChangedDate: 2010-10-28 10:56:42 +0200 (Thu, 28 Oct 2010) $}
+{$LastChangedRevision: 8 $}
+{$LastChangedBy: schorb $}
+\usepackage{url}
+
+
+
+\usepackage{multicol}
+\lstset{language=Matlab
+, basicstyle=\ttfamily\scriptsize\bfseries
+, keywordstyle=\color{Blue}\pmb
+, breaklines=true
+, commentstyle=\color{OliveGreen} 
+, 
+}
+\lstset{numbers=left, stepnumber=2, numberstyle=\tiny, numbersep=5pt
+%, frame=tb
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead[\thepage]{\rightmark}
+\rhead[\leftmark]{\thepage}
+
+\title{Endocytosis Analysis - Algorithm overview}
+\author{\small{corresponds to revision \svnrev\; commited at \svndate}\\\small{ of \url{martin_correlate.m} at \svnkw{HeadURL}}
+}
+
+\setlength{\columnsep}{10pt}
+
+\begin{document}
+ \maketitle
+
+\section*{Vesicles}
+\setcounter{section}{29} 
+\begin{itemize}
+ \item ellipsoid fit of vesicle coordinates using \url{ellipsoid_fit.m} (line 165)
+ \item spherical fit of plasma membrane clicker using least quares fit (lines 198--201)
+\end{itemize}
+\section{Distance Vesicle Center - Membrane}
+\begin{multicols}{2}
+\lstinputlisting[firstline=225,
+  lastline=235]{./martin_clickeranalysis1.m}
+
+\columnbreak
+
+\includegraphics*[width=.46\textwidth]{./sketches/ves_dist_mem.png}
+\end{multicols}
+
+\section{Vesicle surface area}
+\vspace*{-4mm}\section{Vesicle volume}
+\begin{multicols}{2}
+\lstinputlisting[firstline=185,
+  lastline=188]{./martin_clickeranalysis1.m}
+
+  Thomsen approximation:\\ $      A\approx 4\pi\!\left(\frac{ (r_1 r_2)^{1.6}+(r_1 r_3)^{1.6}+(r_2 r_3)^{1.6} }{3}\right)^{0.625} $
+
+   $ V = \frac{4}{3} \pi r_1 r_2 r_3$ 
+
+\columnbreak
+
+\includegraphics*[width=.46\textwidth]{./sketches/ves_surf_area.png}
+\end{multicols}
+
+\section{Teardrop presence?}\pagebreak
+\section{Angle major axis - cell membrane}
+\begin{multicols}{2}
+\lstinputlisting[firstline=237,
+  lastline=242]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[width=.46\textwidth]{./sketches/ves_ang_mjax_cm.png}
+\end{multicols}
+
+\section{Vesicle Axes, r\textsubscript{1} - \addtocounter{section}{1}\arabic{section}: r\textsubscript{2} - \addtocounter{section}{1}\arabic{section}: r\textsubscript{3} - \addtocounter{section}{1}\arabic{section}: Ellipticity $\frac{\mathbf{r_1}}{\mathbf{r_3}}$}
+% \begin{lstlisting}
+\begin{multicols}{4}\includegraphics*[width=.31\textwidth]{./sketches/ves_r1.png}\columnbreak
+\includegraphics*[width=.31\textwidth]{./sketches/ves_r2.png}\columnbreak
+\includegraphics*[width=.31\textwidth]{./sketches/ves_r3.png}
+\end{multicols}
+
+\section{Distance Vesicle center - transformed GFP position}
+\begin{multicols}{2}
+\lstinputlisting[firstline=289,
+  lastline=294]{./martin_clickeranalysis1.m}
+\vspace*{-24mm}
+\lstinputlisting[firstline=305,
+  lastline=306]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[width=.46\textwidth]{./sketches/ves_gfp_vesc.png}
+\end{multicols}
+
+\section{Angle Vesicle-GFP - major axis}
+\begin{multicols}{2}
+\lstinputlisting[firstline=307,
+  lastline=308]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[width=.46\textwidth]{./sketches/ves_gfp_axis.png}
+\end{multicols}
+
+\section{Distance Vesicle center - transformed RFP position\\\addtocounter{section}{1}\arabic{section}\hspace{1mm} Angle Vesicle-RFP - major axis}\vspace*{-4mm}
+
+\section{Angle teardrop - membrane axis}
+\begin{multicols}{2}
+\lstinputlisting[firstline=247,
+  lastline=254]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[width=.46\textwidth]{./sketches/ves_trd_ang.png}
+\end{multicols}
+\section{- \addtocounter{section}{5}\arabic{section}\hspace{2mm} Likelihoods}
+\begin{multicols}{2}
+\lstinputlisting[linerange={259-287,310-319,375-382}]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[width=.46\textwidth]{./sketches/ves_likelihoods.png}\\\includegraphics*[width=.46\textwidth]{./sketches/ves_likelihoods2.png}
+\end{multicols}
+
+
+\newpage
+\section*{Invaginations}
+\setcounter{section}{49} 
+\subsection*{Alignment(Code lines 426--618)}
+\begin{itemize}
+ \item Plasma membrane defined by first and last 3 points in clicker file
+ \item Rotation 3D $\rightarrow$ flat plane (435--476)
+ \item Rotation plasma membrane $\rightarrow x$-Axis, tip pointing up (478--476)
+ \item Gaussian fit $\rightarrow$ height measure and centering of the profile
+ \item Spline-fit to fill gaps
+ \item local 2nd order polynomial fit
+\end{itemize}
+
+\subsection*{Key points}
+\begin{center}\includegraphics[viewport=255 165 605 452,width=.50\textwidth]{./sketches/inv_sketch.pdf}
+\end{center}
+
+\subsubsection*{Neck}
+To exclude the tip from the neck search, all points having a curvature $> -0.2$ are neglected.
+Then the closest point of both left and right slopes is determined as "neck"
+\lstinputlisting[firstline=660,
+  lastline=670]{./martin_clickeranalysis1.m}
+
+\subsubsection*{Cap}
+Cap is defined by all points having a curvature $> -0.4$ and sit above half the invagination height.
+\lstinputlisting[firstline=700,
+  lastline=705]{./martin_clickeranalysis1.m}
+
+\subsection*{Tip}
+The point from within the cap subset located furthest apart from the center of the neck points is defined as tip.
+\lstinputlisting[firstline=724,
+  lastline=726]{./martin_clickeranalysis1.m}
+
+
+
+
+
+\section{Invagination height}
+\begin{multicols}{2}
+\lstinputlisting[firstline=566,
+  lastline=577]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=255 165 605 442,width=.40\textwidth]{./sketches/inv_height2.pdf}
+\end{multicols}
+
+\section{Neck presence}
+\vspace*{-4mm}
+\section{Neck height - \addtocounter{section}{1}\arabic{section}\hspace{1mm} Neck width}
+\begin{multicols}{2}
+\lstinputlisting[firstline=660,
+  lastline=677]{./martin_clickeranalysis1.m}
+
+To exclude the tip from the neck search, all points having a curvature $> -0.2$ are neglected.
+Then the closest point of both left and right slopes is determined as "neck".
+\columnbreak\\
+\includegraphics*[viewport=232 169 582 446,width=.40\textwidth]{./sketches/inv_h_neck.pdf}
+\newline\includegraphics*[viewport=232 169 582 446,width=.40\textwidth]{./sketches/inv_w_neck.pdf}
+\end{multicols}
+\pagebreak
+
+\section{Distance neck to tip}
+\begin{multicols}{2}
+\lstinputlisting[firstline=700,
+  lastline=727]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_neck2tip.pdf}\\
+Cap is defined by all points having a curvature $> -0.4$ and sit above half the invagination height.
+\end{multicols}
+
+\section{Curvature at neck}
+\begin{multicols}{2}
+\lstinputlisting[firstline=686,
+  lastline=691]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_neckcurv.pdf}
+\end{multicols}
+
+\section{Average height of points of maximum curvature}
+\begin{multicols}{2}
+\lstinputlisting[firstline=694,
+  lastline=698]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_maxcurv.png}
+\end{multicols}
+
+\pagebreak
+\section{Axis angle}
+\begin{multicols}{2}
+\lstinputlisting[firstline=728,
+  lastline=735]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_axis_angle.pdf}
+\end{multicols}
+
+\section{Distance transformed (subtomo) GFP-coordinate - Neck / \addtocounter{section}{1}\arabic{section}\hspace{1mm} Tip / \addtocounter{section}{1}\arabic{section}\hspace{1mm} Membrane }
+\begin{multicols}{2}
+\lstinputlisting[firstline=970,
+  lastline=973]{./martin_clickeranalysis1.m}
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_dist_gfp_neck.pdf}
+
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_dist_gfp_tip.pdf}\\
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_dist_gfp_mem.pdf}
+\end{multicols}
+\pagebreak
+\section{Average curvature at the tip}
+\begin{multicols}{2}
+\lstinputlisting[firstline=726,
+  lastline=733]{./martin_clickeranalysis1.m}
+\columnbreak
+Averages the curvature of the tip $\pm$ 10 datapoints to the respective right and left. (Not Gaussian curvature)
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_curv.pdf}
+\end{multicols}
+
+\section{Surface area above neck positions}
+\begin{multicols}{2}
+\lstinputlisting[firstline=762,
+  lastline=785]{./martin_clickeranalysis1.m}
+\columnbreak
+Calculates the surface area of the membrane patch residing above the neck position (here set to $y=0$)
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_area.pdf}
+\end{multicols}
+
+\section{relative width at neck}
+\begin{multicols}{2}
+\lstinputlisting[firstline=787,
+  lastline=796]{./martin_clickeranalysis1.m}
+\columnbreak
+Compares the neck width to the average width of the upper half of the invagination profile.
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_area.pdf}
+\end{multicols}
+
+\section{Gaussian curvature at neck}
+\begin{multicols}{2}
+\lstinputlisting[firstline=918,
+  lastline=932]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_gaussneckcurv.pdf}
+\end{multicols}
+\pagebreak
+
+\section{Height of vesicle surface area delimiters}
+\begin{multicols}{2}
+\lstinputlisting[firstline=867,
+  lastline=892]{./martin_clickeranalysis1.m}
+\columnbreak
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_curv.pdf}
+\end{multicols}
+
+\section{Cap curvature}
+\begin{multicols}{2}
+\lstinputlisting[firstline=700,
+  lastline=707]{./martin_clickeranalysis1.m}
+\columnbreak
+\includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_curv.pdf}
+\end{multicols}
+
+\section{Curvature Standard deviation at Cap - \addtocounter{section}{1}\arabic{section}\hspace{1mm} for entire profile}
+\begin{multicols}{2}
+\lstinputlisting[linerange={708-709}]{./martin_clickeranalysis1.m}
+\columnbreak
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_curv.pdf}
+\end{multicols}
+
+\section{Cap height - \addtocounter{section}{1}\arabic{section}\hspace{1mm} Cap width}
+\begin{multicols}{2}
+\lstinputlisting[firstline=717,
+  lastline=718]{./martin_clickeranalysis1.m}
+\columnbreak
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_curv.pdf}
+\end{multicols}
+
+\section{GFP likelihood at neck, \addtocounter{section}{1}\arabic{section}\hspace{1mm} Tip, \addtocounter{section}{1}\arabic{section}\hspace{1mm} plasma embrane}
+\begin{multicols}{2}
+\lstinputlisting[firstline=970,
+  lastline=976]{./martin_clickeranalysis1.m}
+\columnbreak
+% \includegraphics*[viewport=232 169 582 446,width=.46\textwidth]{./sketches/inv_cap_curv.pdf}
+\end{multicols}
+
+
+\end{document}
