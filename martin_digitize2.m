@@ -45,7 +45,6 @@ function martin_digitize2(varargin)
 %   Author:
 %   Todd C Pataky (0todd0@gmail.com)  ['zero' todd 'zero'@gmail.com]
 %   18-April-2007
-%   Refined and made slim according to purposes, Martin Schorb July 2010
 
 
 %IMPLEMENTATION NOTES:

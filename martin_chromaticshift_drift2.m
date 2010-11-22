@@ -27,8 +27,8 @@ gfl=0.1;
             rgb(:,:,2)=imadjust(im);
             % rgb(:,:,3)=imadjust(bm);
             rgb(1,2,3)=0;
-            imwrite(rgb,[outfileroot,'rgbtmp.tif'],'Compression','none');
-            martin_digitize([outfileroot,'rgbtmp.tif']);
+%             imwrite(rgb,[outfileroot,'rgbtmp.tif'],'Compression','none');
+            martin_digitize2(rgb);
             disp('Press a key to continue...')
             pause;
             XY=evalin('base', 'XY');
