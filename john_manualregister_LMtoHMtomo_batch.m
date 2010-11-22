@@ -1,4 +1,4 @@
-function john_manualregister_LMtoHMtomo3(hmf,smf,outfileroot)
+function john_manualregister_LMtoHMtomo_batch()
 
 %version MartinSchorb 100222
 %
@@ -26,7 +26,7 @@ load([pathname,filename]);
 % gm=imread([outfileroot,file,'_gm.tif']);
 % rm=imread([outfileroot,file,'_rm.tif']);
 
-fluorsel1 = questdlg('What fluorescence signal are you interested in?','Signal Selector','GFP','RFP','Cancel');
+% fluorsel1 = questdlg('What fluorescence signal are you interested in?','Signal Selector','GFP','RFP','Cancel');
 
 
 slice=0;
@@ -39,27 +39,44 @@ file1=file(1:s(end)-1);
 dpod=strfind(filename,'.appl');
 namebase=filename(1:dpod-1);
 
+fluorsel='RFP';
+% switch fluorsel1
+%     case ''
+%         return
+%     case 'GFP'
+% %         im=gm;
+%         imtxt='gm';
+%     case 'RFP'
+% %         im=rm;
+%         imtxt='rm';
+% end
+% 
 
-switch fluorsel1
-    case ''
-        return
-    case 'GFP'
-%         im=gm;
-        imtxt='gm';
-    case 'RFP'
-%         im=rm;
-        imtxt='rm';
-end
-
-
-if ~isequal(fluorsel1,fluorsel)
-    k=msgbox('different fluorescence channel than in source transformation selected!','Error','modal');
-    uiwait(k);
-    fluorsel1 = questdlg('confirm fluorescence signal selection','Signal Selector','GFP','RFP','Cancel');
-    circle1=imread([outfileroot,file,'_',fluorsel,'_prediction.tif']);
-end
+% if ~isequal(fluorsel1,fluorsel)
+%     k=msgbox('different fluorescence channel than in source transformation selected!','Error','modal');
+%     uiwait(k);
+%     fluorsel1 = questdlg('confirm fluorescence signal selection','Signal Selector','GFP','RFP','Cancel');
+%     circle1=imread([outfileroot,file,'_',fluorsel,'_prediction.tif']);
+% end
 
    
+
+
+% if exist([outfileroot,file1,'.lmhmcoos.mat'])
+%     load([outfileroot,file1,'.lmhmcoos.mat'])
+%     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
+% else
+    [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads','/struct/briggs/wanda/DataLightMicroscopy/100119');%,'/struct/briggs/wanda/DataLightMicroscopy');
+    if ~isstr(filename1)
+%         [ip,bp]=cpselect(lm,hm,'Wait',true);
+    elseif exist([pathname1,filename1])==2    
+        load([pathname1,filename1]);
+%         [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
+    else
+%         [ip,bp]=cpselect(lm,hm,'Wait',true);
+    end
+% end
+outfileroot=[pathname,namebase];
 
  lm=imread([pathname,namebase,'_em.tif']);
 
@@ -85,27 +102,11 @@ sm=imadjust(sm);
 
 % fm=im;
 
-if exist([outfileroot,file1,'.lmhmcoos.mat'])
-    load([outfileroot,file1,'.lmhmcoos.mat'])
-    [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
-else
-    [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads','/struct/briggs/wanda/DataLightMicroscopy/100119');%,'/struct/briggs/wanda/DataLightMicroscopy');
-    if ~isstr(filename1)
-        [ip,bp]=cpselect(lm,hm,'Wait',true);
-    elseif exist([pathname1,filename1])==2    
-        load([pathname1,filename1]);
-%         [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
-    else
-        [ip,bp]=cpselect(lm,hm,'Wait',true);
-    end
-end
-
-
 
 while size(ip,1) <4
     k=msgbox('you need at least 4 pairs for fit','Error','modal');
     uiwait(k);
-    [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
+%     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
 end
 save([outfileroot,file1,'.lmhmcoos.mat'],'ip','bp', 'hmf','smf')
 %fit beads to get subpixel centres
@@ -120,51 +121,52 @@ fmF=fspecial('gaussian',fmsir-5,fmsir/5);
 ip=round(ip);
 bp=round(bp);
 
-for si=1:size(ip,1)
-    sixe=lm(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
-    sixe=double(sixe);
-   
-%     imshow(imadjust(sixe));pause
-    sixe=(imfilter(sixe,emF)); 
-    [max_f, imax] = max(abs(sixe(:)));
-    [ypeak, xpeak] = ind2sub(size(sixe),imax(1));
-    
-    
-    
-    sixf=hm(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
-    sixf=(sixf.*-1)+max(max(sixf));
-%     imshow(imadjust(sixf));pause 
-    sixf=double(imfilter(sixf,fmF));   
-
-    
-    
-    % last argument enables interactive mode to score sub pixel fitting...
-    if (ypeak>round(emsir/2)*2-5 & ypeak<emsir+5)&(xpeak>round(emsir/2)*2-3 & xpeak<emsir+5)
-    a=cntrd1(sixe,[ypeak, xpeak],round(emsir/2)*2-5,0);
-    else
-    a=cntrd1(sixe,[emsir, emsir],round(emsir/2)*2-5,0);
-    end
-%     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
-     ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
-    
-     
-%     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
-
-    [max_f, imax] = max(abs(sixf(:)));
-    [ypeak, xpeak] =ind2sub(size(sixe),imax(1));
-    if (ypeak>round(fmsir/2)*2-5 & ypeak<fmsir+8)&(xpeak>round(fmsir/2)*2-5 & xpeak<fmsir+8)
-    b=cntrd1(sixf,[ypeak, xpeak],round(fmsir/2)*2+7,0);
-    else
-    b=cntrd1(sixf,[fmsir, fmsir],round(fmsir/2)*2+7,0);
-    end
-     
-    bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
-end
+% for si=1:size(ip,1)
+%     sixe=lm(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
+%     sixe=double(sixe);
+%    
+% %     imshow(imadjust(sixe));pause
+%     sixe=(imfilter(sixe,emF)); 
+%     [max_f, imax] = max(abs(sixe(:)));
+%     [ypeak, xpeak] = ind2sub(size(sixe),imax(1));
+%     
+%     
+%     
+%     sixf=hm(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
+%     sixf=(sixf.*-1)+max(max(sixf));
+% %     imshow(imadjust(sixf));pause 
+%     sixf=double(imfilter(sixf,fmF));   
+% 
+%     
+%     
+%     % last argument enables interactive mode to score sub pixel fitting...
+%     if (ypeak>round(emsir/2)*2-5 & ypeak<emsir+5)&(xpeak>round(emsir/2)*2-3 & xpeak<emsir+5)
+%     a=cntrd1(sixe,[ypeak, xpeak],round(emsir/2)*2-5,0);
+%     else
+%     a=cntrd1(sixe,[emsir, emsir],round(emsir/2)*2-5,0);
+%     end
+% %     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
+%      ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
+%     
+%      
+% %     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
+% 
+%     [max_f, imax] = max(abs(sixf(:)));
+%     [ypeak, xpeak] =ind2sub(size(sixe),imax(1));
+%     if (ypeak>round(fmsir/2)*2-5 & ypeak<fmsir+8)&(xpeak>round(fmsir/2)*2-5 & xpeak<fmsir+8)
+%     b=cntrd1(sixf,[ypeak, xpeak],round(fmsir/2)*2+7,0);
+%     else
+%     b=cntrd1(sixf,[fmsir, fmsir],round(fmsir/2)*2+7,0);
+%     end
+%      
+%     bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
+% end
 
 
 % reshows the control points so you can check them...
-[ip3,bp3]=cpselect(lm,hm,ip2,bp2,'Wait',true);
-
+% [ip3,bp3]=cpselect(lm,hm,ip2,bp2,'Wait',true);
+ip3=ip;
+bp3=bp;
 
 pickedhm=zeros(size(hm));
 bp3r=round(bp3);
