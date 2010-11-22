@@ -1,8 +1,8 @@
  function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
  
-% %version MartinSchorb 100201
+% %version MartinSchorb 101116
 % %
-% %usage is martin_ls_blind3(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,output folder);
+% %usage is martin_tfm_beads(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,acc,output folder);
 % %
 % % 
 % %
@@ -180,7 +180,7 @@ for nblind=1:ntot  % blind bead index
             end
             output.blind(nblind).sel(k-kmin+1,cnt).ip=tip;             %(*)
             output.blind(nblind).sel(k-kmin+1,cnt).bp=tbp;             %(*)
-
+            
             %analysis of the distribution
             output.blind(nblind).sel(k-kmin+1,cnt).stat_used=martin_beads_analysis2(tip,ip2,nblind);       %(*)
             

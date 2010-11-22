@@ -1,8 +1,8 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 100909
+% % version MartinSchorb 101116
 % %
-% % usage is martin_correlate('beadimage','emimage','gfpimage','rfpimage','outputfileroot');
+% % usage is john_manualregister_beads('beadimage','emimage','gfpimage','rfpimage','outputfileroot');
 % %
 % % designed for correlating light and em images using fluorescent electron
 % % dense fiducials.
@@ -28,12 +28,12 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 % % (output files easily overlayed in eg imagej)
 
 
-emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
-fmboxsize=9; % must be odd number   -  size of box for bead-image subpixel fitting
-imboxsize=9; % must be odd number   -  size of box for fluo-image subpixel fitting
+% emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
+fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
+imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
 
 
- accuracy=36; % determines the size of the circle printed as position marker (px)
+accuracy=36;
 
 % gaussfit limit
 
@@ -49,7 +49,7 @@ em=imread(emf);
 %em=em';
 fm=imread(fmf);gm=imread(gmf);rm=imread(rmf);
 fm=fm';gm=gm';rm=rm';
-% fm=fm.*(65535./(0.3*max(max(fm))));
+% fm=fm.*(65535./(0.2*max(max(fm))));
 em=imadjust(em);
 fm=imadjust(fm);
 gm=imadjust(gm);
@@ -66,62 +66,61 @@ end
 
 
 
-%check if output folder exists
-strp1=findstr(outfileroot, '/');
-folder=outfileroot(1:strp1(end));
-foldercheck=exist(folder);
-
-if foldercheck<7
-    a=msgbox('please ensure the output folder is created !','Error','modal');
-    uiwait(a);
-    
-end
+% %check if output folder exists
+% strp1=findstr(outfileroot, 'corr');
+% folder=outfileroot(1:strp1-1);
+% foldercheck=exist([folder,'corr']);
+% 
+% if foldercheck<7
+%     a=msgbox('please ensure the folder ./corr is created !','Error','modal');
+%     uiwait(a);
+%     
+% end
 
 %generate filename
 file='';
-if size(outfileroot,2)<strp1+9
-    pos=findstr(emf,'/lowmag/');
-    if pos>0
-        s=emf(1:pos-1);
-        p2=findstr(s,'/');
-        file=[file,emf(max(p2)+1:pos-1)];
-    end
-end
-
-
-% % get pixel size of em-tom
-% pos1=strfind(emf,'/stac');
-% stfile=emf(1:pos1);
-% pos2=strfind(emf,'aphy/');
-% stfile=[stfile,emf(pos2+5:pos2+10),'_',file,'lma.st'];
-% 
-% if exist(stfile)
-%     [s sz]=unix(['header ',stfile]);
-%     pos3=strfind(sz,'Cell axes');
-%     pos4=strfind(sz(pos3+42:end),'.');
-%     sz=str2num(sz(pos3+42:pos3+43+pos4(1)));
-%     psize=sz/(size(em,2));ptext='';
-% else
-%     psize=[];
-%     ptext=['NO PIXEL INFORMATION FOUND FOR TOMOGRAM '];
-%     disp(ptext);
+% if size(outfileroot,2)<strp1+9
+%     pos=findstr(emf,'/lowmag/');
+%     if pos>0
+%         s=emf(1:pos-1);
+%         p2=findstr(s,'/');
+%         file=[file,emf(max(p2)+1:pos-1)];
+%     end
 % end
 
-%check if already previously picked coordinates exist
 
-% filecheck=exist([outfileroot,file,'_pickspots1.mat']);
+% get pixel size of em-tom
+pos1=strfind(emf,'/stac');
+stfile=emf(1:pos1);
+pos2=strfind(emf,'aphy/');
+stfile=[stfile,emf(pos2+5:pos2+10),'_',file,'lma.st'];
+
+if exist(stfile)
+    [s sz]=unix(['header ',stfile]);
+    pos3=strfind(sz,'Cell axes');
+    pos4=strfind(sz(pos3+42:end),'.');
+    sz=str2num(sz(pos3+42:pos3+43+pos4(1)));
+    psize=sz/(size(em,2));ptext='';
+else
+    psize=[];
+    ptext=['NO PIXEL INFORMATION FOUND FOR TOMOGRAM '];
+    disp(ptext);
+end
+
+%check if already previously picked
+filecheck=exist([outfileroot,file,'_pickspots1.mat']);
 filecheck2=exist([outfileroot,file,'.pickspots1.mat']);
 
-if  filecheck2==0
+if filecheck==0 & filecheck2==0
   %import previously clicked positions
-        [filename, pathname] = uigetfile({'pickspots1.mat'},'select previously picked beads','/struct/briggs/wanda/DataLightMicroscopy');
+        [filename, pathname] = uigetfile({'pickspots1.mat'},'select previously picked beads','/struct/briggs/wanda/DataLightMicroscopy/100119/gridA5_DB2837/corr');
         if isequal(filename,0)
             disp('No previously picked positions selected');
             [ip,bp]=cpselect(em,fm,'Wait',true);  
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
-               [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
+                [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
 status=0;
         end
 
@@ -130,9 +129,9 @@ else
     if filecheck2==2
        load([outfileroot,file,'.pickspots1.mat']);
 %        [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
-%     else
-%         load([outfileroot,file,'_pickspots1.mat']);
-% %         [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
+    else
+        load([outfileroot,file,'_pickspots1.mat']);
+%         [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
     end
     
 end
@@ -155,7 +154,7 @@ end
 
 %export pixel values
     output=[ip,bp];
-    save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf');
+save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf');
     file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
 %     file_2 = fopen([outfileroot,'_pickspots1.txt'],'w');
 %     fprintf(file_2,'%4.0f,%4.0f,%4.0f, %4.0f \n',output);
@@ -163,55 +162,91 @@ end
     fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
     fclose(file_1);
     
-
-
+fm2=fm;
+[mlen,idx]=max(size(fm2));
+fm2(:,(end+1):mlen)=fm2(:,1:(mlen-size(fm2,2)));
+fm_filtered=tom_bandpass(double(fm2),70,1344,2);
+[fmean, fmax, fmin, fstd, fvariance] = tom_dev(fm_filtered);
+fm_filtered=double(uint16(fm_filtered));
 
 %fit beads to get subpixel centres
-ip=round(ip); bp=round(bp);
+ip=floor(ip); bp=floor(bp);
 
-emsir=(emboxsize-1)/2;
+% emsir=(emboxsize-1)/2;
 fmsir=(fmboxsize-1)/2;
-
-
+% % 
+% emF=fspecial('gaussian',emsir-3,2);
+%fmF=fspecial('gaussian',3,2);
+sss=[];
 for si=1:size(ip,1)
-%     fit em-image    
-    sixe=em(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
-    sixe=double(sixe);
-    sixe=(sixe.*-1)+max(max(sixe));
+%     sixe=em(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
+%     sixe=double(sixe);
+%     sixe1=(sixe.*-1)+max(max(sixe));
+%     sixe2=(imfilter(sixe1,emF)); 
+bp2(si,:)=bp(si,:);
+
+% % to let it converge
+for iii=1:4 
+    bp(si,:)=floor(bp2(si,:));
+    sixf=fm_filtered(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
+%     sixf1=double(ideal_high(sixf,1));
+     
+%     sixf2=double(imfilter(sixf,fmF));  
     
-    a=[0 0];
-    [a(1),a(2),sx,sy,peak0D]= Gaussian2D(sixe,gfl,.75*emboxsize);
-
-    if min(a)>0 & max(a)<emboxsize
-         ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
-    else
-         ip2(si,:)=ip(si,:);
-    end
+%     [C,rows]=max(sixf2);
+%     [maximum,colmax]=max(C);
+% 	rowmax=rows(colmax);
     
-%   fit fluosphere-image            
-    sixf=fm(round(bp(si,2))-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
-    sixf=double(sixf);
+    % last argument enables interactive mode to score sub pixel fitting...
+%       a=cntrd1(sixe2,[emsir+1 emsir+1],floor(.5*emboxsize),0);
 
-    b=[0 0];
-    [b(1),b(2),sx,sy,peak0D]= Gaussian2D(sixf,gfl,.75*fmboxsize);
+% a=[0 0];
+% [a(1),a(2),sx,sy,peak0D]= Gaussian2D_1(sixe,gfl,.75*emboxsize);
 
-    if min(b)>0 & max(b)<fmboxsize
-        bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
-    else
-        bp2(si,:)=bp(si,:);
 
-    end
- 
- 
+%     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
+% 
+% if min(a(1:2))>0 & max(a(1:2))<emboxsize
+%      ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
+% else
+%      ip2(si,:)=ip(si,:);
+% end
+%     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
+% cent1=[rowmax colmax];
+% if min(cent1)<floor(.5*fmboxsize)/2 | max(cent1)>fmboxsize-floor(.5*fmboxsize)/2
+%     b=cent1;
+% else
+    b=cntrd1(sixf,[fmsir+1 fmsir+1],floor(5),0);
+% end   
+% b=[0 0];
+% [b(1),b(2),sx,sy,peak0D]= Gaussian2D_1(sixf,gfl,.75*fmboxsize);
+
+if min(b(1:2))>0 & max(b(1:2))<fmboxsize
+    bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
+else
+    bp2(si,:)=bp(si,:);
+  
 end
+ sss(si,iii)=bp2(si,1);
+
+
+end
+
+end
+
+% sss
+
 status=0;
 while status==0
 
 %reshows the control points so you can check them...
-    [ip4,bp4]=cpselect(em,fm,ip2,bp2,'Wait',true) ;
+% ip4=ip;bp4=bp;
+    [ip4,bp4]=cpselect(em,fm,ip,bp2,'Wait',true) ;
 
+%     ip=ip4;bp=bp4;
    save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf'); 
     
+   
    
 % asks for region of interest using the control points
 
@@ -229,87 +264,112 @@ switch fluorsel
 end
 
 
-
-
-ipint=[0 0];
-bpint=[0 0];
-
-
-
-% while ~(size(ipint,1)==size(ip4,1)+1&(size(bpint,1)== size(bp4,1)+1))
-% k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
-%     uiwait(k);
-%     [ipint,bpint]=cpselect(em,im,ip4,bp4,'Wait',true) ;
-% 
-% 
-% ipint=ipint(end,:);
-% bpint=bpint(end,:);
- k=msgbox(['Click fluorescent spot to pick region of interest  - ',fluorsel,'-image shown']);
- uiwait(k);
+%  k=msgbox(['Click fluorescent spot to pick region of interest  - ',fluorsel,'-image shown']);
+%  uiwait(k);
 gm1(:,:)=gm(:,:,1);
 gm1(:,:,2)=gm(:,:,1);
 gm1(:,:,3)=gm(:,:,1);
 
-for ii=1:length(bp)
-    gm1(bp(ii,2)-1:bp(ii,2)+1,bp(ii,1)-1:bp(ii,1)+1,2:3)=65000;
-end
-imshow(gm1);
-axis([min(bp(:,1))-50 max(bp(:,1))+50 min(bp(:,2))-50 max(bp(:,2))+50]);
-[yy,xx] = ginput(1);
-close(gcf);
-ipint=[xx,yy];
+% for ii=1:length(bp)
+%     gm1(bp(ii,2)-1:bp(ii,2)+1,bp(ii,1)-1:bp(ii,1)+1,2:3)=65000;
 % end
+% imshow(gm1);
+% axis([min(bp(:,1))-50 max(bp(:,1))+50 min(bp(:,2))-50 max(bp(:,2))+50]);
+% [xx,yy] = ginput(1);
+% close(gcf);
+% bpint=floor([xx,yy]);
+% ipint=[1 1];
+
+
+ipint=[0 0];
+bpint=[0 0];
+while ~(size(ipint,1)==size(ip4,1)+1&(size(bpint,1)== size(bp4,1)+1))
+% k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
+%     uiwait(k);
+    [ipint,bpint]=cpselect(em,im,ip4,bp4,'Wait',true) ;
+end
+
+
+ipint=ipint(end,:);
+bpint=bpint(end,:);
 
 %apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
-bb=3;
-if (size(ipint,1)==size(ip4,1)+1&(size(bpint,1)== size(bp4,1)+1))
-imsir=(imboxsize+bb)/2;
-sixg=double(im(floor(bpint(2))-imsir:floor(bpint(2))+imsir,floor(bpint(1))-imsir:floor(bpint(1))+imsir));
-sixg1=ideal_high(sixg,.15);
+% bb=3;
+im2=im;
+[mlen,idx]=max(size(im2));
+im2(:,(end+1):mlen)=im2(:,1:(mlen-size(im2,2)));
+im_filtered=tom_bandpass(double(im2),70,1344,2);
+im_filtered=double(uint16(im_filtered));
+imsir=(imboxsize-1)/2;
 
-c=[0 0];
-[c(1),c(2),sx,sy,peak0D]= Gaussian2D(sixg1,gfl,.75*fmboxsize);
+for iii=1:4
+
+    sixg=double(im_filtered(floor(bpint(2))-imsir:floor(bpint(2))+imsir,floor(bpint(1))-imsir:floor(bpint(1))+imsir));
+    % sixg=ideal_high(sixg,1);
+    % sixg=imfilter(sixg,fmF);
+    % 
+    % [C,rows]=max(sixg);
+    % [maximum,colmax]=max(C);
+    % rowmax=rows(colmax);
+
+    % c=[0 0];
+    % [c(1),c(2),sx,sy,peak0D]= Gaussian2D_1(sixg,gfl,.75*fmboxsize);
 
 
-% c=cntrd1(sixg,[imsir imsir],imboxsize-6,0);
-if min(c)>0 & max(c)<imboxsize
-    bpint=floor(bpint)+c(1:2)-[1 1]-[imsir imsir];
+     c=cntrd1(sixg,[imsir imsir]+[1 1],7,0);
+
+
+    if min(c(1:2))>0 & max(c(1:2))<imboxsize
+        bpint=floor(bpint)+c(1:2)-[1 1]-[imsir imsir];
+end
+
 end
 % reshows point of interest
 
-% [ipint,bpint]=cpselect(em,im,ipint,bpint,'Wait',true) ;
+[ipint,bpint]=cpselect(em,im,ipint,bpint,'Wait',true) ;
+
 
 gm1(:,:,2)=gm(:,:,1);
 gm1(:,:,3)=gm(:,:,1);
 gm1(bpint(1)-1:bpint(1)+1,bpint(2)-1:bpint(2)+1,2:3)=65000;
 
 end
-end
-
-if exist(['medshift_',fluorsel]) == 0
+% if exist(['medshift_',fluorsel]) == 0
 
 % runs fluorescence image drift correction
 
-[bluespot,fluospot]=martin_chromaticshift_drift(fm',im',gfl,fmboxsize,imboxsize,outfileroot);
-
-% if isequal(fluospot,ones(2))
-% %     k=msgbox(['No bleed through spots found!',fluorsel,' Image shown on the right']);
-% %     uiwait(k);
-% %     [bluespot,fluospot]=martin_chromaticshift_drift(fm',gm',gfl,fmboxsize,imboxsize,outfileroot);
-% end    
+[bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,outfileroot);
+if isequal(fluospot,ones(2))
+    k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
+    uiwait(k);
+%     [bluespot,fluospot]=martin_chromaticshift_drift(fm',gm',gfl,fmboxsize,imboxsize,outfileroot);
+end    
     
-diff=fluospot-bluespot;
+sdiff=fluospot-bluespot
 
-fspot=find(abs(diff)>5);
-idspot=mod(fspot,length(diff));
-idspot=idspot+(idspot==0)*length(diff);
-diff(idspot,:)=[];
 
-n_shift=length(diff);
-medshift=median(diff);
-shifterr=std(diff)/sqrt(n_shift);
+%%%%%%%%%% reversing x and y coordinates of difference because they were
+%%%%%%%%%% calculated for transposed images JB
+sdiff=circshift(sdiff,[0 1]);
+%%%%%%%%%% ---------------------------
 
-% disp(['deviation of Shift correction [px]: ', num2str(shifterr)]);
+fspot=find(abs(sdiff)>5);
+idspot=mod(fspot,length(sdiff));
+idspot=idspot+(idspot==0)*length(sdiff);
+sdiff(idspot,:)=[];
+
+%n_shift=length(diff);
+%medshift=median(diff);
+%shifterr=std(diff)/sqrt(n_shift);
+
+%%%%%%%%% making dimension specific else fails for 1 bead JB
+
+n_shift=size(sdiff,1);
+medshift=median(sdiff,1);
+shifterr=std(sdiff)/sqrt(n_shift);
+
+
+disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
 switch fluorsel
     case 'GFP'
         medshift_GFP=medshift;
@@ -318,14 +378,14 @@ switch fluorsel
 end
 
 
-else
-
-medshift=eval(genvarname(['medshift_',fluorsel]));
-
-end
+% else
+% 
+% medshift=eval(genvarname(['medshift_',fluorsel]));
+% 
+% end
 
 disp('---  ---  ---  ---  ---  ---  ---  ---  ---');
-disp(['Shift correction in pixel: ', num2str(medshift)]);
+% disp(['Shift correction in pixel: ', num2str(medshift)]);
 
 
 
@@ -339,6 +399,14 @@ show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
 % [ipint7,bpint7]=cpselect(em,im',[ipint;ipint],show,'Wait',true) ;
 
 %runs the transformation accuracy prediction
+
+% [output,pickedem]=martin_ls_blind5(ip4,bp4,ipint,bpint,em,3,accuracy,outfileroot);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% % pasted new martin_ls_blind algorithm
+
 
 [output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,outfileroot);
 
@@ -421,7 +489,48 @@ else
     
     
 end
+%%%%%%%%%%%%%%%%%%% end of pasted ls_blind
 
+
+% clear test
+% test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
+% ip=ip4;
+% bp=bp4;
+% 
+% %     
+% %     calculates the accuracy for the predicted region:
+% for i=1:size(output.blind,2)
+%     rowmin=output.blind(i).rowmin;
+%     colmin=output.blind(i).colmin;
+%     test(i+1)=output.blind(i).minimum;
+% %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
+%     
+% end    
+% 
+% [mmum select]=min(test);
+% 
+% % the index of selected transformation
+% tfmselect=select-1;
+% 
+% 
+%  % shows the GUI to select the transformation
+% status= martin_corr_gui3(output,tfmselect,status);
+%     
+% end
+% 
+% 
+% ip=ip4;
+% bp=bp4;
+% save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf',['medshift_',fluorsel],'bpint'); 
+% 
+% 
+% % 
+% clear global status
+
+% 
+% if exist([outfileroot,file,'_transforms.mat'])==0
+%     save([outfileroot,file,'_transforms.mat'], 'output');
+% end
 
 
 
@@ -439,10 +548,7 @@ save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf',['m
 % 
 clear global status
 
-% 
-% if exist([outfileroot,file,'_transforms.mat'])==0
-%     save([outfileroot,file,'_transforms.mat'], 'output');
-% end
+file=[file,'_',fluorsel];
 
 if tfmselect==0 % transform using all beads has been selected
     appltfm=output.all.tfm;
@@ -512,7 +618,7 @@ impos1=round(impos);
 circle1=martin_circle(em,accuracy,impos1);
 impred=uint16(circle1*655535)+em;
 
-file=[file,'_',fluorsel];
+
 
 imwrite(circle1,[outfileroot,file,'_prediction.tif'],'Compression','none');
 imwrite(impred,[outfileroot,file,'_pred_overlay.tif'],'Compression','none');
