@@ -153,7 +153,7 @@ fm2=fm;
 [mlen,idx]=max(size(fm2));
 fm2(:,(end+1):mlen)=fm2(:,1:(mlen-size(fm2,2)));
 fm_filtered=tom_bandpass1(double(fm2),70,1344,2);
-[fmean, fmax, fmin, fstd, fvariance] = tom_dev(fm_filtered);
+[fmean, fmax, fmin, fstd, fvariance] = tom_dev1(fm_filtered);
 fm_filtered=double(uint16(fm_filtered));
 
 %fit beads to get subpixel centres
