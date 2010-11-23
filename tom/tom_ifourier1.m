@@ -1,4 +1,4 @@
-function c = tom_ifourier(a)
+function c = tom_ifourier1(a)
 
 %TOM_IFOURIER Calculates the inverse Fourier Transformation of Matrix A
 %   C=TOM_FOURIER(A) This function calculates the inverse Fourier Transformation of the

@@ -1,6 +1,6 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 101116
+% % version MartinSchorb 101122
 % %
 % % usage is john_manualregister_beads('beadimage','emimage','gfpimage','rfpimage','outputfileroot');
 % %
@@ -13,11 +13,11 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 % % 
 % % corrects for image shift between channels using bleed-thru beads
 % % 
-% % uses martin_ls_blind2 to suggest optimal transformation according to
+% % uses martin_tfm_beads to suggest optimal transformation according to
 % % lowest error in predictions of a single "blind" bead
 % % 
-% % calls martin_corr_gui to check and select transformation
-% % output overlayed transformations and predictinos to screen to select
+% % calls martin_corr_gui4 to check and select transformation
+% % output overlayed transformations and predictions to screen to select
 % % best transformation for the region of interest or to modify fiducials
 % % 
 % % transforms fluorescence images according to the selected transformation
@@ -28,19 +28,15 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 % % (output files easily overlayed in eg imagej)
 
 
-% emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
-fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
-imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
-
-
-accuracy=36;
-
-% gaussfit limit
-
-gfl=0.0001;
-
-
-
+% % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
+% fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
+% imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
+% 
+% 
+% accuracy=36;
+% 
+% 
+% 
 % global status 
 status=0;
 
@@ -113,7 +109,7 @@ filecheck2=exist([outfileroot,file,'.pickspots1.mat']);
 
 if filecheck==0 & filecheck2==0
   %import previously clicked positions
-        [filename, pathname] = uigetfile({'pickspots1.mat'},'select previously picked beads','/struct/briggs/wanda/DataLightMicroscopy/100119/gridA5_DB2837/corr');
+        [filename, pathname] = uigetfile({'pickspots1.mat'},'select previously picked beads',loc_pickspots);
         if isequal(filename,0)
             disp('No previously picked positions selected');
             [ip,bp]=cpselect(em,fm,'Wait',true);  
@@ -152,20 +148,11 @@ if size(ip,1) >14
     [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
 end
 
-%export pixel values
-    output=[ip,bp];
-save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf');
-    file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
-%     file_2 = fopen([outfileroot,'_pickspots1.txt'],'w');
-%     fprintf(file_2,'%4.0f,%4.0f,%4.0f, %4.0f \n',output);
-    fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
-    fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
-    fclose(file_1);
     
 fm2=fm;
 [mlen,idx]=max(size(fm2));
 fm2(:,(end+1):mlen)=fm2(:,1:(mlen-size(fm2,2)));
-fm_filtered=tom_bandpass(double(fm2),70,1344,2);
+fm_filtered=tom_bandpass1(double(fm2),70,1344,2);
 [fmean, fmax, fmin, fstd, fvariance] = tom_dev(fm_filtered);
 fm_filtered=double(uint16(fm_filtered));
 
@@ -242,8 +229,17 @@ while status==0
 %reshows the control points so you can check them...
 % ip4=ip;bp4=bp;
     [ip4,bp4]=cpselect(em,fm,ip,bp2,'Wait',true) ;
-
-%     ip=ip4;bp=bp4;
+     ip=ip4;bp=bp4;
+%export pixel values
+    output=[ip,bp];
+        file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
+%     file_2 = fopen([outfileroot,'_pickspots1.txt'],'w');
+%     fprintf(file_2,'%4.0f,%4.0f,%4.0f, %4.0f \n',output);
+    fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
+    fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
+    fclose(file_1);
+    
+    
    save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf'); 
     
    
@@ -298,7 +294,7 @@ bpint=bpint(end,:);
 im2=im;
 [mlen,idx]=max(size(im2));
 im2(:,(end+1):mlen)=im2(:,1:(mlen-size(im2,2)));
-im_filtered=tom_bandpass(double(im2),70,1344,2);
+im_filtered=tom_bandpass1(double(im2),70,1344,2);
 im_filtered=double(uint16(im_filtered));
 imsir=(imboxsize-1)/2;
 
@@ -338,7 +334,7 @@ end
 
 % runs fluorescence image drift correction
 
-[bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,fluorsel,outfileroot);
+[bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot);
 if isequal(fluospot,ones(2))
     k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
     uiwait(k);
@@ -632,7 +628,7 @@ imwrite(gm2,[outfileroot,file,'_gm.tif'],'Compression','none');
 imwrite(rm2,[outfileroot,file,'_rm.tif'],'Compression','none');
 imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
 imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');
-imwrite(rgb,[outfileroot,file,'_predictions.tif'],'Compression','none');
+% imwrite(rgb,[outfileroot,file,'_predictions.tif'],'Compression','none');
 
 save([outfileroot,file,'.appltfm.mat'],'appltfm','emf','file','circle1','fluorsel','accuracy','impos');
 

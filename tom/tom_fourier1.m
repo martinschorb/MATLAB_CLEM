@@ -1,4 +1,4 @@
-function c = tom_fourier(a)
+function c = tom_fourier1(a)
 %TOM_FOURIER Calculates the Fourier Transformation of Matrix A
 %   C=TOM_FOURIER(A) This function calculates the Fourier Transformation of the input matrix A.
 %   Matrix A can be a 1-D, 2-D or 3-D matrix. the result is stored in the matrix C.

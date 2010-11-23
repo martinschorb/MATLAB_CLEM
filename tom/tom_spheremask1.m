@@ -1,7 +1,7 @@
-function vol=tom_spheremask(vol, radius,sigma,center);
+function vol=tom_spheremask1(vol, radius,sigma,center);
 
 % TOM_SPHEREMASK masks volume with sphere of radius r around center
-%   vol=tom_spheremask(vol, radius,sigma,center)
+%   vol=tom_spheremask1(vol, radius,sigma,center)
 %
 %INPUT
 %   vol          : volume
@@ -16,7 +16,7 @@ function vol=tom_spheremask(vol, radius,sigma,center);
 %
 %EXAMPLE
 %   xxx= ones(64,64);
-%   yyy = tom_spheremask(xxx,4,10,[16 16 1]);
+%   yyy = tom_spheremask1(xxx,4,10,[16 16 1]);
 %   imagesc(yyy);
 %
 %08/14/02 FF

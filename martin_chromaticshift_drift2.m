@@ -1,6 +1,6 @@
-function [bluespot,fluospot]=martin_chromaticshift_drift2(bm,bm2,im,im2,bmboxsize,imboxsize,fluorsel,outfileroot)
+function [bluespot,fluospot]=martin_chromaticshift_drift2(bm,bm2,im,im2,bmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot)
 
-% % version MartinSchorb 100303
+% % version MartinSchorb 101122
 % %
 % % usage is martin_chromaticshift_drift2(beadimage , fluorimage ,  boxsize for beads , boxsize for fluo-image , file root);
 % %
@@ -20,7 +20,7 @@ gfl=0.1;
 % rm=imadjust(imread(rmf));gm=imadjust(imread(gmf));%bm=imadjust(imread(bmf));
 % 
 
-[filename, pathname] = uigetfile({'shiftcoos.mat'},'select previously picked fluoshift coordinates','/struct/briggs/schorb/101108');
+[filename, pathname] = uigetfile({'shiftcoos.mat'},'select previously picked fluoshift coordinates',loc_shiftcoos);
         if isequal(filename,0)
             disp('No previously picked positions selected');
             rgb=imadjust(bm);
@@ -76,10 +76,10 @@ XY(ii,:)=[];
 
 XY=round(XY);
 
-bm_filtered=tom_bandpass(double(bm2),35,1344,2);
+bm_filtered=tom_bandpass1(double(bm2),35,1344,2);
 bm_filtered=double(uint16(bm_filtered));
 
-% im_filtered=tom_bandpass(double(im2),70,1344,2);
+% im_filtered=tom_bandpass1(double(im2),70,1344,2);
 % im_filtered=double(uint16(im_filtered));
 im_filtered=im2;
 
