@@ -28,15 +28,15 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 % % (output files easily overlayed in eg imagej)
 
 
-% % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
-% fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
-% imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
-% 
-% 
-% accuracy=36;
-% 
-% 
-% 
+if exist('corr_init')==2
+    corr_init();
+elseif exist('corr_init_orig')==2
+    corr_init_orig() 
+else 
+    a=msgbox('No initialization script found!','Error','modal');uiwait(a);
+    a=msgbox('Please update algorithms!','Error','modal');uiwait(a);
+    return 
+end 
 % global status 
 status=0;
 
