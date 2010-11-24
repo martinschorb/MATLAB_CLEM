@@ -190,7 +190,6 @@ for iii=1:4
 % a=[0 0];
 % [a(1),a(2),sx,sy,peak0D]= Gaussian2D_1(sixe,gfl,.75*emboxsize);
 
-
 %     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
 % 
 % if min(a(1:2))>0 & max(a(1:2))<emboxsize
@@ -203,6 +202,7 @@ for iii=1:4
 % if min(cent1)<floor(.5*fmboxsize)/2 | max(cent1)>fmboxsize-floor(.5*fmboxsize)/2
 %     b=cent1;
 % else
+
     b=cntrd1(sixf,[fmsir+1 fmsir+1],floor(5),0);
 % end   
 % b=[0 0];
@@ -280,8 +280,8 @@ gm1(:,:,3)=gm(:,:,1);
 ipint=[0 0];
 bpint=[0 0];
 while ~(size(ipint,1)==size(ip4,1)+1&(size(bpint,1)== size(bp4,1)+1))
-% k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
-%     uiwait(k);
+k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
+    uiwait(k);
     [ipint,bpint]=cpselect(em,im,ip4,bp4,'Wait',true) ;
 end
 
