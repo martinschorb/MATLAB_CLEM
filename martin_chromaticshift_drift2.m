@@ -32,7 +32,7 @@ gfl=0.1;
             disp('Press a key to continue...')
             pause;
             XY=evalin('base', 'XY');
-            
+            evalin('base','clear XY');
         else          
             load([pathname,filename]);
             

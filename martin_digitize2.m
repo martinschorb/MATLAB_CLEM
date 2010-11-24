@@ -553,9 +553,9 @@ switch button
     case 'Export&Close'
         [XY] = getXY;
         assignin('base','XY',XY)
-        fprintf('\n\nData imported from Digitize2D:\n')
-        fprintf('   Name: ''XY''\n')
-        fprintf('   Size: [%.0f %.0f]\n\n',size(XY))
+%         fprintf('\n\nData imported from Digitize2D:\n')
+%         fprintf('   Name: ''XY''\n')
+%         fprintf('   Size: [%.0f %.0f]\n\n',size(XY))
         delete(gcf)
     case 'Close'
         delete(gcf)

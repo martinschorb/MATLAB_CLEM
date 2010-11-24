@@ -53,32 +53,32 @@
 \begin{document}
  \maketitle
 \section{Introduction}
-This document describes the usage of the algorithms designed for correlation of fluorescence microscopy images to their corresponing EM image. 
+This document describes the usage of the algorithms designed for correlation of fluorescence microscopy images to their corresponing EM image.\\
 
-The correlation procedure, as described in Kukulski et al.,... , consists of two major coordinate transformations. The first one uses fluorescent microspheres to calculate the mapping of a single point fluorescent signal onto an electron microscopy image of low resolution ($4-10 $k$\times$). The obtained coordinates can then be transformed further using a different fiducial system (in this case the gold beads used for tomogram reconstruction) to a high magnification image.
+The correlation procedure, as described in Kukulski et al.,... , consists of two major coordinate transformations. The first one uses fluorescent microspheres to calculate the mapping of a single point fluorescent signal onto an electron microscopy image of low resolution ($4-10 $k$\times$). The obtained coordinates can then be transformed further using a different fiducial system (in this case the gold beads used for tomogram reconstruction) to a high magnification image.\\
 
 This document provides a step by step manual in how to use the algorithms, their parameters and outputs and shows the corresponding code snippets to give an idea of the points at which certain things happen while running the script.
 \section{Installation and requirements}
 
 \subsection{System and software requirements}A MATLAB\textsuperscript{\textregistered} 
-installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. This should be independent on the type of operating system used. However the function was so far only successfully tested on Linux environments. 
+installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. This should be independent on the type of operating system used. However the function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
 \\
 
 In order to access the newest version of the scripts, a subversion (SVN\footnote{See \url{http://www.structures-it.embl.de/services/online/vcs},\; \url{http://en.wikipedia.org/wiki/Subversion}}) client is needed. In case you don't have access to a software capable of checking out subversion repositories, you can simply download all files individually from the webserver (\url{https://svn.structures/repo/schorb:Corr}).
 
-\subsection{Obtaining the newest version of the correlation algorithms}
 
+\subsection{Obtaining the newest version of the correlation algorithms}
 The main scripts as well as all supporting underlying algorithms and this documentation are stored in a central subversion repository which is accessible from within the EMBL network.
 \subsubsection*{First installation}
-To checkout the most recent version of algorithms and documentation files for the first time, create a directory where you want to store these files. Add this directory including all subdirectories to the MATLAB path by adding the following line to MATLAB's \texttt{startup.m} script, that is usually located in a MATLAB related folder within your home directory (\texttt{$\sim$/.matlab/startup.m} for Linux or Macintosh systems).
-\begin{verbatim}
- addpath (genpath('/path/to/your/directory'),'-begin')
-\end{verbatim}
+To checkout the most recent version of algorithms and documentation files for the first time, create a directory where you want to store these files. 
+
 Then checkout the files to this directory using your subversion client. The Unix Terminal command will be this:
 \begin{verbatim}
  svn checkout https://svn.structures/repo/schorb:Corr /your/directory/
 \end{verbatim}
-You should see a result like this:
+Accept the encryption certificate (permanently) by pressing \texttt{p}.\\
+
+You should see a result similar to this:
 \begin{verbatim}
 
 A    Corr/martin_correlate.m
@@ -89,8 +89,13 @@ Checked out revision 26.
 
 \end{verbatim}
 
-Now you have a local working copy of the most recent versions of the correlation files.
+Now you have a local working copy of the most recent versions of the correlation files.\\
 
+Add this directory including all subdirectories to the MATLAB path by adding the following line to MATLAB's \texttt{startup.m} script, that is usually located in a MATLAB related folder within your home directory (\texttt{$\sim$/.matlab/startup.m}) when working in a Linux environment. 
+\begin{verbatim}
+ addpath (genpath('/path/to/your/directory'),'-begin')
+\end{verbatim}
+On Macintosh or Windows systems you have to add the path by using MATLAB's preferences. Make sure that also the subdirectories are added.\\
 \subsubsection*{Updating your existing scripts}
 
 To have your scripts and documentation files always up to date according to the current revision, update them from the repository by simply executing
@@ -100,17 +105,17 @@ To have your scripts and documentation files always up to date according to the 
  in the directory in which you put the scripts. 
 
 \subsubsection*{Editing the scripts}
-You can manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision. 
+You can manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision.\\
 
 Also note that there will be some hidden files and directories (\texttt{.svn} etc.) written while checking out. These contain important information needed by subversion and should not be modified or deleted.
 
 \subsubsection*{Initialization}
 
-You can adjust key parameters of the correlation scrips by modifying the initialization script. When checking out the repository a file called \texttt{corr\_init\_orig.m} will appear. You can simply rename this filie to \texttt{corr\_init.m} and change the parameters and paths according to your needs. This file will then stay in your local scripts directory and will not be overritten.
+You can adjust key parameters of the correlation scrips by modifying the initialization script. When checking out the repository a file called \texttt{corr\_init\_orig.m} will appear. You can simply rename this filie to \texttt{corr\_init.m} and change the parameters and paths according to your needs. This file will then stay in your local scripts directory and will not be overritten while updating the scripts with the newest version from the repository.\\
 
  It might occur that in future revisions additional parameters will be added to this script, so in case you run into an error message stating this, just update your local \texttt{corr\_init.m} with the changes you find in the downloaded and most up-to-date \texttt{corr\_init\_orig.m}.
 
-
+\newpage
 \section{Correlation from LightMicroscopy to LowMag EM image}
 
 Correlation from the original fluorescence image to an appropriate EM image containing indentifiable fiducial markers is performed using the script \texttt{martin\_correlate}.
@@ -129,7 +134,7 @@ It requires the following input parameters:
  \item\texttt{rmf} -- path to FM image file containing point of interest in second channel -- considered to be RFP (same dimensions and format as fmf)
  \item\texttt{outfileroot} -- directory and name base for generating output files.
 \end{enumerate}
-
+\newpage
 \subsection{Output and generated files}
 The following files are generated by the correlation script during runtime. The name base is referred to as \texttt{BASE}. An appended \texttt{XFP} refers to the fluorescent channel chosen for correlation. The selected correlation that was used is denoted by either the transform number or \texttt{all} in case the transformation based on all beads was chosen (\texttt{\#}). 
 \begin{itemize}
@@ -154,9 +159,12 @@ The following files are generated by the correlation script during runtime. The 
 \item \texttt{BASE\_XFP\_\#\_transform.log} -- Plain text file containing the source files used for correlation, the transformed spot coordinates and various information about the used transformation
 \end{itemize}
 
+\newpage
 \subsection{User interaction and key procedures}
 \subsubsection{Fiducial selection}
 \label{sec:fiducials}
+A file selection dialog will ask to open already existing fiducial coordinate files. If the selected images have never been used for correlating before, just close that window.\\
+
 Fiducial pairs are selected in both LM and EM image using the \texttt{cpselect} tool. When an already existing coordinate file is opened, these are displayed. (Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
 
 \begin{figure}
@@ -185,7 +193,7 @@ A popup window will ask you to determine the fluorescence channel in which your 
 \end{figure}
 
 \subsubsection{Picking the fluorescent spot of interest}
-In the folowing \texttt{cpselect} dialog, the selected fluorescence image is shown on the right, the positions indicating the fiducial markers. Click once in the right image to determine the position of the spot of interest AND once in the left image just anywhere. This click in the left image will have no effect on the correlation. \texttt{cpselect} otherwise would just not export the clicked coordinates. In case you forget to click in the left image, a reminder will be shown and you have the chance to click again.
+In the folowing \texttt{cpselect} dialog, the selected fluorescence image is shown on the right, the positions indicating the fiducial markers. Click once in the right image to determine the position of the spot of interest AND once in the left image just anywhere. This click in the left image will have no effect on the correlation. \texttt{cpselect} otherwise would just not export the clicked coordinates. (Fig.\,\ref{fig:cpsel_fluor1}) To continue, close the window. In case you forget to click in the left image, a reminder will be shown and you have the chance to click again. 
 \begin{figure}
  \centering
  \includegraphics[width=.78\textwidth]{images/cpsel_fluor1.jpg}
@@ -195,11 +203,64 @@ In the folowing \texttt{cpselect} dialog, the selected fluorescence image is sho
 \end{figure}
 
 \subsubsection{Sub-pixel fitting of the fluorescent spot of interest}
+The coordinates of the fluorescent spot of interest are also determined by a centroid fit of the high-pass filtered image. The resulting coordinate will be presented in a new \texttt{cpselect} window. (Fig.\,\ref{fig:cpsel_fluor2})\\
+
+To continue, close the window. 
+
+\lstinputlisting[linerange={297-298,314-315}]{../martin_correlate.m}
+
 \begin{figure}
  \centering
  \includegraphics[width=.78\textwidth]{images/cpsel_fluor2.jpg}
  % cpsel_fluor2.png: 1600x1153 pixel, 72dpi, 56.44x40.68 cm, bb=0 0 1600 1153
- \caption{Positioning of the spot of interest after sub-pixel fitting}
+ \caption{Positioning of the spot of interest after sub-pixel fitting.}
  \label{fig:cpsel_fluor2}
 \end{figure}
+
+\subsubsection{Correction of stage drift in between imaging of the different fluorescence channels}
+The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels.\\
+
+A file selection window will ask for already existing files storing these coordinates.\\
+
+In case no pre-existing shift coordinates are selected a new window will open showing an RGB-overlay of the fiducial fluorescence image in red and the selected fluorescence channel containing the signal of interest in green. (Fig.\,\ref{fig:digitize}) % If a message window pops up stating that the variable called \texttt{XY} already exists, just choose overwriting it 
+Click the obvious bleeding fiducials (both channels show a spot-like signal in close proximity) and close the window, saving the positions. If you cannot find any obvious points, just continue without clicking postitions. The shift correction will then be skipped.\\
+
+To continue press any key while having the main MATLAB window active.\\
+
+\begin{figure}
+ \centering
+ \includegraphics[width=.78\textwidth]{images/digitize.jpg}
+ % digitize.jpg: 1600x1153 pixel, 762dpi, 5.33x3.84 cm, bb=0 0 151 109
+ \caption{The tool for selecting the fiducials bleeding through to the fluorescence channel of interest. Clicked positions are indicated using blue circles.}
+ \label{fig:digitize}
+\end{figure}
+
+\subsubsection{Calculation of the optimal transform and predicting fiducial and fluorescent spot EM-coordinates.}
+Based on the set of clicked fiducials, the most accurate linear transformation (consisting of scaling, a translation and a rotation) of coordinates is calculated using the script \texttt{martin\_tfm\_beads}.
+\lstinputlisting[linerange={407-408}]{../martin_correlate.m}
+
+It scores the transformation based on all beads with the optimal transformation obtained by using a subset of beads omitting each selected fiducial pair once by comparing the sum of squares of the deviation from the predicted position of all beads with the clicked position in the EM-image.
+$$
+\epsilon = \frac{1}{N}\sum_{i=1}^N (T({x_{FM_i}})-x_{EMclicked_i})^2
+$$
+\lstinputlisting[linerange={410-411}]{../martin_correlate.m}
+
+The resulting best coordinate transformation is applied to all cordinates and presented in a graphical output window. (Fig.\,\ref{fig:tfm_select}) The beads chosen for the transformation are displayed in the bottom left. Blue positions show the clicked coordinates in the EM-image, green dots represent the transformed position of corresponding fiducial signal from the fluorescence image. To have an idea where the spot of interest is predictted, it is shown by a magenta circle. By clicking the lower button, obiously mispicked beads can be corrected, jumping to the selection step of the algorithm.(\ref{sec:fiducials}) When clicking ``GO'', all output files will be created using the presented coordinate transformation.\\
+
+An overlay image showing the predicted spot within the EM image as a white circle (Fig.\,\ref{fig:tfm_appl}) indicates a successful run of the collelating sript.
+
+\begin{figure}
+ \centering
+ \includegraphics[width=.7\textwidth]{images/tfm_select.jpg}
+ % tfm_select.jpg: 1200x1153 pixel, 762dpi, 4.00x3.84 cm, bb=0 0 113 109
+ \caption{Preview of the coordinate transform. Fiducial selection can be modified by clicking the lower button.}
+ \label{fig:tfm_select}
+\vspace*{5mm}
+ \centering
+ \includegraphics[width=.7\textwidth]{images/tfm_appl.jpg}
+ % tfm_appl.jpg: 1200x1153 pixel, 762dpi, 4.00x3.84 cm, bb=0 0 113 109
+ \caption{Preview of the coordinate transform. Fiducial selection can be modified by clicking the lower button.}
+ \label{fig:tfm_appl}
+\end{figure}
+ 
 \end{document}

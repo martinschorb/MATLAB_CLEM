@@ -363,7 +363,7 @@ sdiff(idspot,:)=[];
 n_shift=size(sdiff,1);
 medshift=median(sdiff,1);
 shifterr=std(sdiff)/sqrt(n_shift);
-
+if isnan(medshift) medshift=[0 0];end
 
 disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
 switch fluorsel
@@ -407,11 +407,13 @@ show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
 [output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,outfileroot);
 
 clear test
+
 test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
+
 ip=ip4;
 bp=bp4;
 
-%     
+ 
 %     calculates the accuracy for the predicted region:
 for i=1:size(output.blind,2)
     rowmin=output.blind(i).rowmin;
