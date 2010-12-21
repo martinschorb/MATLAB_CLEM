@@ -15,7 +15,7 @@
 %outputs files in tif format representing positions of picked fiducials
 %(output files easily overlayed in eg imagej)
 
-clear all
+% clear all
 
 if exist('corr_init')==2
     corr_init();
