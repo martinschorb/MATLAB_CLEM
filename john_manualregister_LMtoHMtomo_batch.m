@@ -1,4 +1,4 @@
-function john_manualregister_LMtoHMtomo_batch()
+% function john_manualregister_LMtoHMtomo_batch()
 
 %version MartinSchorb 100222
 %
@@ -15,12 +15,28 @@ function john_manualregister_LMtoHMtomo_batch()
 %outputs files in tif format representing positions of picked fiducials
 %(output files easily overlayed in eg imagej)
 
+clear all
+
+if exist('corr_init')==2
+    corr_init();
+elseif exist('corr_init_orig')==2
+    corr_init_orig(); 
+else 
+    a=msgbox('No initialization script found!','Error','modal');uiwait(a);
+    a=msgbox('Please update algorithms!','Error','modal');uiwait(a);
+    return 
+end 
 
 
+[srt,db]=martin_dbread(2,1);
 
+[filename, pathname] = uigetfile({'appltfm.mat'},'select correlation transform','/struct/briggs2/schorb/tfm_logs/appltfms','MultiSelect', 'on');
 
-[filename, pathname] = uigetfile({'appltfm.mat'},'select correlation transform','/struct/briggs/schorb/101118/pombe');%,'/struct/briggs/wanda/DataLightMicroscopy');
-load([pathname,filename]);
+keep=[who;'keep'];  
+
+for i=1:length(filename)
+
+load([pathname,filename{i}]);
 
 % 
 % gm=imread([outfileroot,file,'_gm.tif']);
@@ -36,10 +52,27 @@ s=strfind(file,'_');
 file1=file(1:s(end)-1);
 
 
-dpod=strfind(filename,'.appl');
-namebase=filename(1:dpod-1);
+dpod=strfind(filename{i},'.appl');
+namebase=filename{i}(1:dpod-1);
 
-fluorsel='RFP';
+
+spos1=strfind(namebase,'_');
+
+if namebase(spos1(2)+1)=='i'
+    base=namebase(1:(spos1(2)+2));
+else
+    base=namebase(1:spos1(2)-1);
+end
+
+
+
+
+
+fluorsel=namebase(spos1(2)+1:spos1(2)+3);
+
+
+
+
 % switch fluorsel1
 %     case ''
 %         return
@@ -58,35 +91,63 @@ fluorsel='RFP';
 %     fluorsel1 = questdlg('confirm fluorescence signal selection','Signal Selector','GFP','RFP','Cancel');
 %     circle1=imread([outfileroot,file,'_',fluorsel,'_prediction.tif']);
 % end
+cd('/home/schorb/m/tfm_logs/LMHMcoos');
 
+   ss=dir(['*',base,'*']);
+
+   a=length(ss);
    
+   if a==0
+       ss=dir(['*',base(1:end-1),'*']);
 
-
-% if exist([outfileroot,file1,'.lmhmcoos.mat'])
-%     load([outfileroot,file1,'.lmhmcoos.mat'])
-%     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
-% else
-    [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads','/struct/briggs/wanda/DataLightMicroscopy/100119');%,'/struct/briggs/wanda/DataLightMicroscopy');
+       a=length(ss);
+   end
+   
+   if a==0
+       [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads','/struct/briggs2/schorb/tfm_logs/LMHMcoos');%,'/struct/briggs/wanda/DataLightMicroscopy');
     if ~isstr(filename1)
-%         [ip,bp]=cpselect(lm,hm,'Wait',true);
+         [ip,bp]=cpselect(lm,hm,'Wait',true);
     elseif exist([pathname1,filename1])==2    
         load([pathname1,filename1]);
 %         [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
     else
 %         [ip,bp]=cpselect(lm,hm,'Wait',true);
     end
-% end
-outfileroot=[pathname,namebase];
+   end
+if isstr(ss(a).name)
+    load(ss(a).name);
 
- lm=imread([pathname,namebase,'_em.tif']);
+%  if exist([outfileroot,file1,'.lmhmcoos.mat'])
+%     load([outfileroot,file1,'.lmhmcoos.mat'])
+%     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
+ else
+
+
+ end
+% outfileroot=[pathname,namebase];
+outfileroot=['/struct/briggs2/schorb/101216/HighMag/',base,'_',fluorsel];
+
+disp(['processing : ',filename{i}]);
+
+
+%  lm=imread([pathname,namebase,'_em.tif']);
+
+
+
+if hmf(8:9)=='./'
+    cd('/struct/briggs/wanda/DataLightMicroscopy/091216/corr');
+else
+    cd('/struct/briggs/wanda/DataLightMicroscopy/091216');
+end
 
 % read images and pick beads
-%  lm=imread(lmf);
+ lm=imread(emf);
+
 hm=imread(hmf);sm=imread(smf);
 
 
 smf1=smf;
-lm=imadjust(lm);
+% lm=imadjust(lm);
 
 
 % 
@@ -108,18 +169,20 @@ while size(ip,1) <4
     uiwait(k);
 %     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
 end
+[ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
+
 save([outfileroot,file1,'.lmhmcoos.mat'],'ip','bp', 'hmf','smf')
 %fit beads to get subpixel centres
 
-emboxsize=49; % must be odd number
-emsir=(emboxsize-1)/2;
-fmboxsize=55; % must be odd number
-fmsir=(fmboxsize-1)/2;
-
-emF=fspecial('gaussian',emsir-5,emsir/5);
-fmF=fspecial('gaussian',fmsir-5,fmsir/5);
-ip=round(ip);
-bp=round(bp);
+% emboxsize=49; % must be odd number
+% emsir=(emboxsize-1)/2;
+% fmboxsize=55; % must be odd number
+% fmsir=(fmboxsize-1)/2;
+% 
+% emF=fspecial('gaussian',emsir-5,emsir/5);
+% fmF=fspecial('gaussian',fmsir-5,fmsir/5);
+% ip=round(ip);
+% bp=round(bp);
 
 % for si=1:size(ip,1)
 %     sixe=lm(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
@@ -173,12 +236,12 @@ bp3r=round(bp3);
 for n=1:size(bp3,1)
 picked(bp3r(n,2),bp3r(n,1))=10;
 end
-pickedlm=zeros(size(lm));
-ip3r=round(ip3);
-for n=1:size(ip3,1)
-pickedlm(ip3r(n,2)-1:ip3r(n,2)+1,ip3r(n,1)-1:ip3r(n,1)+1)=10;
-pickedlm(ip3r(n,2),ip3r(n,1))=10;
-end
+% pickedlm=zeros(size(lm));
+% ip3r=round(ip3);
+% for n=1:size(ip3,1)
+% pickedlm(ip3r(n,2)-1:ip3r(n,2)+1,ip3r(n,1)-1:ip3r(n,1)+1)=10;
+% pickedlm(ip3r(n,2),ip3r(n,1))=10;
+% end
 
 thm=cp2tform(ip3,bp3,'linear conformal');
 spotpos=tformfwd(thm,impos);
@@ -189,7 +252,10 @@ hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos)
 % [gm2 xdata ydata]=imtransform(gm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
 % [rm2 xdata ydata]=imtransform(rm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
 % [picked2 xdata ydata]=imtransform(pickedlm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
-[tfmcircle xdata ydata]=imtransform(circle1,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
+% [tfmcircle xdata ydata]=imtransform(circle1,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
+
+tfmcircle=martin_circle(sm,hmaccuracy,round(spotpos));
+
 
 file=[file,'_',fluorsel];
 
@@ -226,6 +292,36 @@ imwrite(impred,[outfileroot,file,'_hm_prd_overlay.tif'],'Compression','none');
 
 
 imshow(impred);
+pause
+close(gcf);
+
+ind1=martin_dbread(base,1,db);
+    
+    if ~isempty(ind1)
+        switch fluorsel
+        case 'RFP'
+        
+                db{ind1+1,25}=spotpos(1);
+                db{ind1+1,26}=spotpos(2);
+                db{ind1+1,27}='new';
+
+        case 'GFP'
+                db{ind1+1,19}=spotpos(1);
+                db{ind1+1,20}=spotpos(2);
+                db{ind1+1,21}='new';  
+        end
+                
+    end
+
+    
+    
+a=who;
+excl=find(ismember(a,[keep;'a']));
+a(excl)=[];
+for ii=1:length(a)
+clear(a{ii});
+end
+
 
 % imwrite(picked2,[outfileroot,'_pickedhm.tif'],'Compression','none');
 % imwrite(pickedhm,[outfileroot,'_pickedlm.tif'],'Compression','none');
@@ -236,3 +332,4 @@ imshow(impred);
 % set(h, 'AlphaData', 0.5);
 %ylim = get(gca, 'YLim');
 %set(gca, 'YLim', [0.5 ylim(2)]) 
+end

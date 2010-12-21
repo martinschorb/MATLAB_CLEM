@@ -21,7 +21,10 @@ gfl=0.1;
 % 
 
 [filename, pathname] = uigetfile({'shiftcoos.mat'},'select previously picked fluoshift coordinates',loc_shiftcoos);
-        if isequal(filename,0)
+ 
+disp(['filename: ',filename]);
+
+if isequal(filename,0)
             disp('No previously picked positions selected');
             rgb=imadjust(bm);
             rgb(:,:,2)=imadjust(im);

@@ -32,5 +32,8 @@ imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitt
 
 accuracy=36;  % Size of prediction circle in pixel
 
+pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
+pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm
 
+hmaccuracy=accuracy*pixelsize_lm/pixelsize_hm;
 

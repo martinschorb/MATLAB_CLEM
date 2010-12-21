@@ -2,7 +2,7 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
 % % version MartinSchorb 101122
 % %
-% % usage is john_manualregister_beads('beadimage','emimage','gfpimage','rfpimage','outputfileroot');
+% % usage is john_manualregister_beads('beadimage','emimage','gfpimage','rfpimage','outputfileroot')
 % %
 % % designed for correlating light and em images using fluorescent electron
 % % dense fiducials.
@@ -31,7 +31,7 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 if exist('corr_init')==2
     corr_init();
 elseif exist('corr_init_orig')==2
-    corr_init_orig() 
+    corr_init_orig(); 
 else 
     a=msgbox('No initialization script found!','Error','modal');uiwait(a);
     a=msgbox('Please update algorithms!','Error','modal');uiwait(a);
@@ -157,8 +157,8 @@ fm_filtered=tom_bandpass1(double(fm2),70,1344,2);
 fm_filtered=double(uint16(fm_filtered));
 
 %fit beads to get subpixel centres
-ip=floor(ip); bp=floor(bp);
-
+% ip=floor(ip);
+bp=floor(bp);ip2=ip;bp2=bp;
 % emsir=(emboxsize-1)/2;
 fmsir=(fmboxsize-1)/2;
 % % 
@@ -170,11 +170,11 @@ for si=1:size(ip,1)
 %     sixe=double(sixe);
 %     sixe1=(sixe.*-1)+max(max(sixe));
 %     sixe2=(imfilter(sixe1,emF)); 
-bp2(si,:)=bp(si,:);
+% bp2(si,:)=bp(si,:);
 
 % % to let it converge
 for iii=1:4 
-    bp(si,:)=floor(bp2(si,:));
+%     bp(si,:)=floor(bp2(si,:));
     sixf=fm_filtered(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
 %     sixf1=double(ideal_high(sixf,1));
      
@@ -228,10 +228,10 @@ while status==0
 
 %reshows the control points so you can check them...
 % ip4=ip;bp4=bp;
-    [ip4,bp4]=cpselect(em,fm,ip,bp2,'Wait',true) ;
-     ip=ip4;bp=bp4;
+    [ip4,bp4]=cpselect(em,fm,ip2,bp2,'Wait',true) ;
+     ip2=ip4;bp2=bp4;
 %export pixel values
-    output=[ip,bp];
+    output=[ip2,bp2];
         file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
 %     file_2 = fopen([outfileroot,'_pickspots1.txt'],'w');
 %     fprintf(file_2,'%4.0f,%4.0f,%4.0f, %4.0f \n',output);
