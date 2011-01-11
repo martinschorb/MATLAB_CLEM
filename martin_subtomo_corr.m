@@ -14,6 +14,11 @@
 % st1=tom_mrcread(subtf);
 % subtomo=uint8(st1.Value+128);
 
+cc=who;
+for jj=1:length(cc)
+    clear(cc{jj});
+end
+
 [init,db]=martin_dbread(2,1);
 
 if init~=1
@@ -22,9 +27,9 @@ end
 
 
 
-[filename, pathname1] = uigetfile({'sliceinfo.mat'},'select highmag correlation','MultiSelect', 'on','/struct/briggs2/schorb/101216/HighMag');
+[filename, pathname1] = uigetfile({'sliceinfo.mat'},'select highmag correlation','MultiSelect', 'on','/struct/briggs2/schorb/tfm_logs/sliceinfos');
 
-outfileroot=['/home/schorb/m/101216/subtomocorr/'];
+outfileroot=['/home/schorb/m/110110/stc_1/'];
 
 
   keep=[who;'keep'];  
@@ -39,8 +44,9 @@ filename1=filename{fileidx};
 
 basefind=strfind(filename1,'_all_');
 namebase = filename1(1:basefind-1);
-
-load([pathname1,namebase,'.lmhmcoos.mat']);
+cd(pathname1)
+cd('../LMHMcoos')
+load([namebase,'.lmhmcoos.mat']);
 
 fluo1=strfind(filename1,'FP');
 fluotxt=['_',filename1(fluo1(1)-1:fluo1(1)+1)];
@@ -66,8 +72,8 @@ end
 
         load([pathname1,filename1]);
 
-if exist(['/home/schorb/m/101216/subtomocorr/',subtfmbase,'.subttfm.mat'])>0
-            load(['/home/schorb/m/101216/subtomocorr/',subtfmbase,'.subttfm.mat'])
+if exist(['/home/schorb/m/tfm_logs/subtomocorr/',subtfmbase,'.subttfm.mat'])>0
+            load(['/home/schorb/m/tfm_logs/subtomocorr/',subtfmbase,'.subttfm.mat'])
             disp(['existing stf loaded  - ',namebase])
 
     if slice>0
@@ -78,11 +84,13 @@ if exist(['/home/schorb/m/101216/subtomocorr/',subtfmbase,'.subttfm.mat'])>0
 
 
 else
-    cd /home/schorb/m/101216/subtomocorr/
+    cd /home/schorb/m/tfm_logs/subtomocorr/
     ss=dir(['*',namebase,'*.subttfm.mat']);
-if ~isempty(ss(1).name)
+if ~isempty(ss)
     load(ss(1).name)
     slicerange=slice;
+else
+    slicerange = floor(0.1*size(subtomo,3)):ceil(0.9*size(subtomo,3));
 end
             disp(namebase)
             disp(['slice: ',num2str(slicerange)])
@@ -109,6 +117,12 @@ end
 
 
 end
+
+
+if exist('smf_sub')
+    smf=smf_sub;
+end
+
 
 if smf(8:9)=='./'
     cd('/struct/briggs/wanda/DataLightMicroscopy/091216/corr');
@@ -151,13 +165,40 @@ sm=imread(smf);
 % spotpos=[length(sm) 0]+[-1 1].*fliplr(spotpos);
 
 disp([' processing :',namebase,' -- ',fluotxt])
-searchlim=15;
+disp([smf,'   --  ',subtf]);
 
-sub_sm=sm(floor(spotpos(2)-size(subtomo,2)/2-searchlim):floor(spotpos(2)+size(subtomo,2)/2+searchlim),floor(spotpos(1)-size(subtomo,1)/2)-searchlim:floor(spotpos(1)+size(subtomo,1)/2+searchlim));
+xsearchlim=min([300,floor(spotpos(2)-size(subtomo,2)/2),size(sm,2)-floor(spotpos(2)+size(subtomo,2)/2)])-1;
+ysearchlim=min([300,floor(spotpos(1)-size(subtomo,1)/2),size(sm,1)-floor(spotpos(1)+size(subtomo,1)/2)])-1;
+
+searchlim=50;
+if xsearchlim<0
+   xsearchlim=searchlim;
+end 
+if ysearchlim<0
+    ysearchlim=searchlim;
+end
+
+sub_sm=sm(floor(spotpos(2)-size(subtomo,2)/2-xsearchlim):floor(spotpos(2)+size(subtomo,2)/2+xsearchlim),floor(spotpos(1)-size(subtomo,1)/2)-ysearchlim:floor(spotpos(1)+size(subtomo,1)/2+ysearchlim));
 rect2_sm1=size(subtomo);
-rect_sm=[floor(spotpos(1)-size(subtomo,1)/2-searchlim) floor(spotpos(2)-size(subtomo,2)/2)-searchlim];
-rect_sm(4)=rect2_sm1(2)+2*searchlim;
-rect_sm(3)=rect2_sm1(1)+2*searchlim;
+rect_sm=[floor(spotpos(1)-size(subtomo,1)/2-ysearchlim) floor(spotpos(2)-size(subtomo,2)/2)-xsearchlim];
+rect_sm(4)=rect2_sm1(2)+xsearchlim;
+rect_sm(3)=rect2_sm1(1)+ysearchlim;
+
+disp(['xsl: ',num2str(xsearchlim),'   --   ysl: ',num2str(ysearchlim)]);
+
+
+
+% searchlim=170;
+% 
+% xsearchlim=searchlim;
+% ysearchlim=searchlim;
+% 
+% sub_sm=sm(floor(spotpos(2)-size(subtomo,2)/2-xsearchlim):floor(spotpos(2)+size(subtomo,2)/2+xsearchlim),floor(spotpos(1)-size(subtomo,1)/2)-ysearchlim:floor(spotpos(1)+size(subtomo,1)/2+ysearchlim));
+% rect2_sm1=size(subtomo);
+% rect_sm=[floor(spotpos(1)-size(subtomo,1)/2-ysearchlim) floor(spotpos(2)-size(subtomo,2)/2)-xsearchlim];
+% rect_sm(4)=rect2_sm1(2)+xsearchlim;
+% rect_sm(3)=rect2_sm1(1)+ysearchlim;
+
 
 
    
@@ -268,26 +309,26 @@ imshow(f)
 end
 
 subpos2=subpos2+[-1 1]
+close all
 
-
-
-save([outfileroot,namebase,fluotxt,'.subttfm.mat'],'subpos2','slice');
-
-
-
+smf_sub=smf;subtf;
+save([outfileroot,namebase,fluotxt,'.subttfm.mat'],'subpos2','slice','smf_sub','subtf');
 
 
 
 
-switch fluotxt
-    
-    case '_GFP'
-        db{dbindex+1,21} = subpos2(1);
-        db{dbindex+1,22} = subpos2(2);
-    case '_RFP'
-        db{dbindex+1,27} = subpos2(1);
-        db{dbindex+1,28} = subpos2(2);
-end
+
+% 
+% 
+% switch fluotxt
+%     
+%     case '_GFP'
+%         db{dbindex+1,21} = subpos2(1);
+%         db{dbindex+1,22} = subpos2(2);
+%     case '_RFP'
+%         db{dbindex+1,27} = subpos2(1);
+%         db{dbindex+1,28} = subpos2(2);
+% end
 
 
 
