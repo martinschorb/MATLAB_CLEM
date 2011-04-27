@@ -22,7 +22,7 @@ if ~isempty (nargchk(2,4,nargin))
 end
 
 if nargin < 3
-   dbname = '/struct/briggs2/schorb/_Endo-Data/Endocytosis_DATA.csv' ;
+   dbname = '/struct/briggs/schorb/_Endo-Data/Endocytosis_DATA.csv' ;
 end
 
 if nargin < 4
