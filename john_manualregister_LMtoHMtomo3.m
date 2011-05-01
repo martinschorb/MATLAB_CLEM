@@ -62,7 +62,7 @@ namebase=filename(1:dpod-1);
 %     k=msgbox('different fluorescence channel than in source transformation selected!','Error','modal');
 %     uiwait(k);
 %     fluorsel1 = questdlg('confirm fluorescence signal selection','Signal Selector','GFP','RFP','Cancel');
-    circle1=imread([outfileroot,file,'_prediction.tif']);
+%    circle1=imread([outfileroot,file,'_prediction.tif']);
 % end
 
    
