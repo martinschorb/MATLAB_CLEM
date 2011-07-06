@@ -79,7 +79,7 @@ XY(ii,:)=[];
 
 XY=round(XY);
 
-bm_filtered=tom_bandpass1(double(bm2),35,1344,2);
+bm_filtered=tom_bandpass1(double(bm2),35,max(size(bm2)),2);
 bm_filtered=double(uint16(bm_filtered));
 
 % im_filtered=tom_bandpass1(double(im2),70,1344,2);

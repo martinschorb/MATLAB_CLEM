@@ -152,7 +152,7 @@ end
 fm2=fm;
 [mlen,idx]=max(size(fm2));
 fm2(:,(end+1):mlen)=fm2(:,1:(mlen-size(fm2,2)));
-fm_filtered=tom_bandpass1(double(fm2),70,1344,2);
+fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);
 [fmean, fmax, fmin, fstd, fvariance] = tom_dev1(fm_filtered);
 fm_filtered=double(uint16(fm_filtered));
 
@@ -294,7 +294,7 @@ bpint=bpint(end,:);
 im2=im;
 [mlen,idx]=max(size(im2));
 im2(:,(end+1):mlen)=im2(:,1:(mlen-size(im2,2)));
-im_filtered=tom_bandpass1(double(im2),70,1344,2);
+im_filtered=tom_bandpass1(double(im2),70,mlen,2);
 im_filtered=double(uint16(im_filtered));
 imsir=(imboxsize-1)/2;
 
@@ -409,11 +409,11 @@ show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
 clear test
 
 test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
-
+output.emsize=size(em);
+output.fmsize=size(fm);
 ip=ip4;
 bp=bp4;
 
- 
 %     calculates the accuracy for the predicted region:
 for i=1:size(output.blind,2)
     rowmin=output.blind(i).rowmin;

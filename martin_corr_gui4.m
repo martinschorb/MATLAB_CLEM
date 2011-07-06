@@ -36,7 +36,7 @@ a=input.blind(1,tfmselect).image;
 % %     num(:,:,1)=imadjust(num(:,:,1));
 % 
 % a(1:160,1:430,:)=a(1:160,1:430,:)/2+num(1:160,1:430,:);
-k=uint8(188*ones(2048,500,3));
+% k=uint8(188*ones(2048,500,3));
 % popup=' 1';
 % for ind=2:size(input.blind,2)
 %     
