@@ -26,8 +26,7 @@ loc_hmcoos = '/struct/briggs/wanda/DataLightMicroscopy';
 
 flip = 0;
 
-% Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;
-% everything in between 0 and 1 adjusts the contrast manually - 0.2 is a good choice)
+% Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;1 - open adjustment window)
 
 contr_b = 0;
 contr_g = 0;
