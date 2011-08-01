@@ -23,10 +23,10 @@ msk=zeros([2*r,2*r]);
 msk(ind)=1.0;
 
 outcircle=zeros(size(em));
-if fluortfm(1)-error+1>0 & fluortfm(2)-error+1>0 &fluortfm(1)+error<size(em,1) &fluortfm(2)+error<size(em,2)
-    outcircle(round(fluortfm(1)-error+1):round(fluortfm(1)+error),round(fluortfm(2)-error+1):round(fluortfm(2)+error))=msk;
+if fluortfm(1)-error+1>0 & fluortfm(2)-error+1>0 &fluortfm(1)+error<size(em,2) &fluortfm(2)+error<size(em,1)
+    outcircle(round(fluortfm(2)-error+1):round(fluortfm(2)+error),round(fluortfm(1)-error+1):round(fluortfm(1)+error))=msk;
     outcircle=outcircle(1:size(em,1),1:size(em,2));
 else
     outcircle=zeros(size(em));
 end
-outcircle=outcircle(:,:,1)';
+% outcircle=outcircle(:,:,1)';

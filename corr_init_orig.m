@@ -21,8 +21,17 @@ loc_shiftcoos = '/struct/briggs/wanda/DataLightMicroscopy';
 
 loc_hmcoos = '/struct/briggs/wanda/DataLightMicroscopy';
 
+% Flip fluorescence images (different grid orientation in LM and EM)
+% flip = 1 if images should be flipped // flip = 0 if images are in same orientation
 
+flip = 0;
 
+% Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;
+% everything in between 0 and 1 adjusts the contrast manually - 0.2 is a good choice)
+
+contr_b = 0;
+contr_g = 0;
+contr_r = 0;
 
 % other parameters that can be adjusted
 
@@ -36,4 +45,6 @@ pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm
 
 hmaccuracy=accuracy*pixelsize_lm/pixelsize_hm;
+
+
 

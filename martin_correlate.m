@@ -1,8 +1,13 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 101122
+% % version MartinSchorb 110721 
+% % 
 % %
-% % usage is john_manualregister_beads('beadimage','emimage','gfpimage','rfpimage','outputfileroot')
+% =========================================================================
+%         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  
+% =========================================================================    
+% %
+% % usage is martin_correlate('beadimage','emimage','gfpimage','rfpimage','outputfileroot')
 % %
 % % designed for correlating light and em images using fluorescent electron
 % % dense fiducials.
@@ -27,7 +32,6 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 % % and predictions of the selected transform
 % % (output files easily overlayed in eg imagej)
 
-
 if exist('corr_init')==2
     corr_init();
 elseif exist('corr_init_orig')==2
@@ -40,50 +44,48 @@ end
 % global status 
 status=0;
 
+if exist('flip')~=1 
+    flip = 0; contr_b = 0; contr_g = 0; contr_r = 0; a=msgbox('Initialization script is not the newest version, please update!');uiwait(a);
+end
+
 % read images and pick beads
 em=imread(emf);
-%em=em';
 fm=imread(fmf);gm=imread(gmf);rm=imread(rmf);
-fm=fm';gm=gm';rm=rm';
-% fm=fm.*(65535./(0.2*max(max(fm))));
+
+% adjust flip/orientation of fluorescence images
+if flip==1
+    fm=fm';gm=gm';rm=rm';
+end
+
+% adjust contrast of images according to init values
 em=imadjust(em);
-fm=imadjust(fm);
-gm=imadjust(gm);
-rm=imadjust(rm);
+if contr_b==0
+    fm=imadjust(fm);
+else
+    fm=martin_contrast(fm);
+end
+if contr_g==0
+    gm=imadjust(gm);
+else
+    gm=martin_contrast(gm);
+end
 
-
+if contr_r==0
+    rm=imadjust(rm);
+else
+    rm=martin_contrast(rm);
+end
 if isa(em,'uint16')
     em2=em;
     em=uint8(em/256);
 else
     em2='';
 end
-
-
-
-
-% %check if output folder exists
-% strp1=findstr(outfileroot, 'corr');
-% folder=outfileroot(1:strp1-1);
-% foldercheck=exist([folder,'corr']);
-% 
-% if foldercheck<7
-%     a=msgbox('please ensure the folder ./corr is created !','Error','modal');
-%     uiwait(a);
-%     
-% end
+s_em=size(em);
+s_fm=size(fm);
 
 %generate filename
 file='';
-% if size(outfileroot,2)<strp1+9
-%     pos=findstr(emf,'/lowmag/');
-%     if pos>0
-%         s=emf(1:pos-1);
-%         p2=findstr(s,'/');
-%         file=[file,emf(max(p2)+1:pos-1)];
-%     end
-% end
-
 
 % get pixel size of em-tom
 pos1=strfind(emf,'/stac');
@@ -96,7 +98,7 @@ if exist(stfile)
     pos3=strfind(sz,'Cell axes');
     pos4=strfind(sz(pos3+42:end),'.');
     sz=str2num(sz(pos3+42:pos3+43+pos4(1)));
-    psize=sz/(size(em,2));ptext='';
+    psize=sz/(s_em(2));ptext='';
 else
     psize=[];
     ptext=['NO PIXEL INFORMATION FOUND FOR TOMOGRAM '];
@@ -132,8 +134,6 @@ else
     
 end
 
-
-
 while size(ip,1) <5
     k=msgbox('you need at least 5 pairs for fit','Error','modal');
     uiwait(k);
@@ -150,8 +150,8 @@ end
 
     
 fm2=fm;
-[mlen,idx]=max(size(fm2));
-fm2(:,(end+1):mlen)=fm2(:,1:(mlen-size(fm2,2)));
+[mlen,idx]=max(s_fm);
+fm2(:,(end+1):mlen)=fm2(:,1:(mlen-s_fm(2)));
 fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);
 [fmean, fmax, fmin, fstd, fvariance] = tom_dev1(fm_filtered);
 fm_filtered=double(uint16(fm_filtered));
@@ -292,8 +292,8 @@ bpint=bpint(end,:);
 %apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
 % bb=3;
 im2=im;
-[mlen,idx]=max(size(im2));
-im2(:,(end+1):mlen)=im2(:,1:(mlen-size(im2,2)));
+[mlen,idx]=max(s_fm);
+im2(:,(end+1):mlen)=im2(:,1:(mlen-s_fm(2)));
 im_filtered=tom_bandpass1(double(im2),70,mlen,2);
 im_filtered=double(uint16(im_filtered));
 imsir=(imboxsize-1)/2;
@@ -409,8 +409,8 @@ show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
 clear test
 
 test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
-output.emsize=size(em);
-output.fmsize=size(fm);
+output.emsize=s_em;
+output.fmsize=s_fm;
 ip=ip4;
 bp=bp4;
 
@@ -431,14 +431,14 @@ tfmselect=select-1;
 if tfmselect>0
     nblind=select;
     %generate images
-    tfmed=uint8(zeros(size(em)));
+    tfmed=uint8(zeros(s_em));
     bpot2=tformfwd(output.blind(nblind).optimtfm,output.blind(nblind).sel(rowmin,colmin).bp);
     bpr=round(bpot2);
     bpotfm=output.blind(nblind).bpotfm;
-    pred=uint8(zeros(size(em)));
+    pred=uint8(zeros(size_em));
     ppr=round([bpotfm;output.blind(nblind).sel(rowmin,colmin).blindtfm]);
-
-    if (max(max([bpr;ppr]))<2042) && (min(min([bpr;ppr]))>6)
+    m_bp=max(bpr);m_all=max([bpr;ppr]);
+    if (m_all(1)<s_em(1)-6) && (m_all(2)<s_em(2)) && (min(min([bpr;ppr]))>6)
 
         for n=1:size(bpr,1)
             tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=10;
@@ -465,25 +465,25 @@ if tfmselect>0
     
 else
     %      generate images
-         tfmed=uint8(zeros(size(em)));
-         newColorImage=uint8(zeros([size(em),3]));
+         tfmed=uint8(zeros(s_em));
+         newColorImage=uint8(zeros([s_em,3]));
          bptfm=output.all.bptfm;
          bpr=round(bptfm);
-    if (max(max(bpr))<size(em,1)-6) && (min(min(bpr))>6)
+         m_bp=max(bpr);
+    if (m_bp(1)<s_em(2)-6) && (m_bp(2)<s_em(1)-6) && (min(min(bpr))>6)
         for n=1:size(bpr,1)
-            tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=10;
+            tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=255;
             tfmed(bpr(n,2),bpr(n,1))=10;
         end   
-        output.all.circle=output.all.circle(1:size(em,1),1:size(em,2));
-        newColorImage(:,:,1) =uint8(output.all.circle*255)+em;
-        newColorImage(:,:,2) =tfmed/10*255+em;
-        newColorImage(:,:,3) =pickedem/10*255+uint8(output.all.circle*255)+em;
+        output.all.circle=output.all.circle(1:s_em(1),1:s_em(2));
+        newColorImage(:,:,1) =uint8(output.all.circle*255)+0.8*em;
+        newColorImage(:,:,2) =tfmed+0.8*em;
+        newColorImage(:,:,3) =pickedem/10*255+uint8(output.all.circle*255)+0.8*em;
         output.all.image=newColorImage;
     else
        output.all.image=['Bad transformation using all beads as transformation base.'];
        disp( ['Bad transformation using all beads as transformation base.']);
     end
-    
     
     
 end
@@ -595,10 +595,10 @@ end
 
 % transform the fluorescence microscopy images
 
-[fm2 xdata ydata]=imtransform(fm,appltfm,'FillValues',128,'XData', [1 size(em,2)],'YData',[1 size(em,1)],'Size',size(em));
-[gm2 xdata ydata]=imtransform(gm,appltfm,'FillValues',128,'XData', [1 size(em,2)],'YData',[1 size(em,1)],'Size',size(em));
-[rm2 xdata ydata]=imtransform(rm,appltfm,'FillValues',128,'XData', [1 size(em,2)],'YData',[1 size(em,1)],'Size',size(em));
-% [picked2 xdata ydata]=imtransform(picked,tfm,'FillValues',128,'XData', [1 size(em,2)],'YData',[1 size(em,1)],'Size',size(em));
+[fm2 xdata ydata]=imtransform(fm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+[gm2 xdata ydata]=imtransform(gm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+[rm2 xdata ydata]=imtransform(rm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+% [picked2 xdata ydata]=imtransform(picked,tfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
 
 
 %convert to 16 bit
@@ -630,7 +630,7 @@ imwrite(gm2,[outfileroot,file,'_gm.tif'],'Compression','none');
 imwrite(rm2,[outfileroot,file,'_rm.tif'],'Compression','none');
 imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
 imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');
-% imwrite(rgb,[outfileroot,file,'_predictions.tif'],'Compression','none');
+imwrite(rgb,[outfileroot,file,'_predictions.tif'],'Compression','none');
 
 save([outfileroot,file,'.appltfm.mat'],'appltfm','emf','file','circle1','fluorsel','accuracy','impos');
 
