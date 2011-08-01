@@ -45,7 +45,7 @@ end
 status=0;
 
 if exist('flip')~=1 
-    flip = 0; contr_b = 0; contr_g = 0; contr_r = 0; a=msgbox('Initialization script is not the newest version, please update!');uiwait(a);
+    flip = 0; contr_b = 0; contr_g = 0; contr_r = 0; a=msgbox('Initialization script is not the newest version, please update!','Error','modal');uiwait(a);
 end
 
 % read images and pick beads
