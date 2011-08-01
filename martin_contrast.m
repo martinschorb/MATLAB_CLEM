@@ -1,5 +1,13 @@
 function outim = martin_contrast(im)
 
+% version MartinSchorb 110731
+% 
+% usage is output_image = martin_conrast(input_image); 
+% 
+%
+% graphical interface to adjust the contrast of images
+
+
 im=uint16(im);
 im_orig = im;
 im_contr=im;

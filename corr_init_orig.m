@@ -1,7 +1,7 @@
 %% corr_init()
 %
 % 
-% Version Martin Schorb 101123
+% Version Martin Schorb 110731
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
