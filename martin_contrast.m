@@ -8,13 +8,29 @@ function outim = martin_contrast(im)
 % graphical interface to adjust the contrast of images
 
 
+% generate title
+imname = inputname(1);
+
+switch imname
+    case 'em'
+        imtitle='EM';
+    case 'fm'
+        imtitle='Fluorescent fiducial';
+    case 'gm' 
+        imtitle='GFP';
+    case 'rm'
+        imtitle='RFP';
+    otherwise
+        imtitle='Fluorescence';
+end
+
 im=uint16(im);
 im_orig = im;
 im_contr=im;
 im_offs=im;
 outim=im;
 
-hFig = figure('MenuBar','none','Name','Fluorescence image contrast adjustment');
+hFig = figure('MenuBar','none','Name',[imtitle,' image - contrast adjustment']);
 im_area=imshow(im);hold on
 h_text =  uicontrol('Parent',hFig,'Style','text','Position',[10 30 200 25],'String','Adjust Contrast:');
 h_text2 =  uicontrol('Parent',hFig,'Style','text','Position',[10 10 200 20],'String','Adjust Offset:');
