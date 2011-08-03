@@ -102,10 +102,10 @@ To have your scripts and documentation files always up to date according to the 
 \begin{verbatim}
  svn up
 \end{verbatim}
- in the directory in which you put the scripts. 
+ in the directory in which you put the scripts. If you receive an error message this most likely means that you've edited some of the scripts yourself and thus there's a conflict resulting, because the file you want to update from the server is different than what the program expects. Most of the time giving \verb|tf| as response to the conflict will solve the issue. If not, save your initialization script to another directory and delete the entire script directory (including all hidden files). Then perform a clean new installation of the scripts as described above.
 
 \subsubsection*{Editing the scripts}
-You can manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision.\\
+You are able manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision. Therefore please be really cautious while doing this! Use the initialization script instead to personalize the correlation procedure or let me know if there's substantial changes that you need.\\
 
 Also note that there will be some hidden files and directories (\texttt{.svn} etc.) written while checking out. These contain important information needed by subversion and should not be modified or deleted.
 

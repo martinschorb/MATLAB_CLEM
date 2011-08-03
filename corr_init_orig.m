@@ -28,7 +28,7 @@ flip = 0;
 
 % Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;1 - open adjustment window)
 
-contr_b = 0;
+contr_b = 1;
 contr_g = 0;
 contr_r = 0;
 
