@@ -12,6 +12,7 @@
 %\usepackage{bibgerm}
 %\usepackage{subfig}
 %\usepackage[subfigure]{tocloft}
+\usepackage{xstring}
 \usepackage[colorlinks=true]{hyperref}
 \setlength{\headheight}{15pt}
 \usepackage{fancyhdr}
@@ -23,7 +24,7 @@
 {$LastChangedRevision$}
 {$LastChangedBy$}
 \usepackage{url}
-
+\newcommand{\svnloc}{\StrBefore[5]{\svnkw{HeadURL}}{/}}
 
 
 \usepackage{multicol}
@@ -40,13 +41,15 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\lhead[\thepage]{\texttt{\svnkw{HeadURL}} -- Rev. \svnrev}
+\lhead[\thepage]{Correlation procedure for CLEM -- Rev. \svnrev}
 \rhead[\leftmark]{\thepage}
 
 \title{Correlative Microscopy - Algorithm overview}
 \author{Martin Schorb, \href{mailto:martin.schorb@embl.de}{martin.schorb@embl.de}}
-\publishers{\small{\vspace{2mm} corresponds to revision \svnrev\; commited at \svndate}\\\small{ of \texttt{martin\_correlate.m} at \url{\svnkw{HeadURL}}}
-}
+
+
+\publishers{\small{\vspace{2mm} corresponds to revision \svnrev\; commited at \svndate}\\\small{ of \texttt{martin\_correlate.m} at 
+\svnloc}}
 
 \setlength{\columnsep}{10pt}
 
@@ -64,7 +67,7 @@ This document provides a step by step manual in how to use the algorithms, their
 installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. This should be independent on the type of operating system used. However the function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
 \\
 
-In order to access the newest version of the scripts, a subversion (SVN\footnote{See \url{http://www.structures-it.embl.de/services/online/vcs},\; \url{http://en.wikipedia.org/wiki/Subversion}}) client is needed. In case you don't have access to a software capable of checking out subversion repositories, you can simply download all files individually from the webserver (\url{https://svn.structures/repo/schorb:Corr}).
+In order to access the newest version of the scripts, a subversion (SVN\footnote{See \url{http://www.structures-it.embl.de/services/online/vcs},\; \url{http://en.wikipedia.org/wiki/Subversion}}) client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download all files individually from the webserver (\url{https://svn.structures/repo/schorb:Corr}).
 
 
 \subsection{Obtaining the newest version of the correlation algorithms}
@@ -85,7 +88,7 @@ A    Corr/martin_correlate.m
 A    Corr/martin_chromaticshift_drift2.m
 ...
 A    Corr/john_manualregister_LMtoHMtomo3.m
-Checked out revision 31.
+Checked out revision 46.
 
 \end{verbatim}
 
@@ -102,21 +105,24 @@ To have your scripts and documentation files always up to date according to the 
 \begin{verbatim}
  svn up
 \end{verbatim}
- in the directory in which you put the scripts. If you receive an error message this most likely means that you've edited some of the scripts yourself and thus there's a conflict resulting, because the file you want to update from the server is different than what the program expects. Most of the time giving \verb|tf| as response to the conflict will solve the issue. If not, save your initialization script to another directory and delete the entire script directory (including all hidden files). Then perform a clean new installation of the scripts as described above.
+ in the directory in which you put the scripts.\\ 
+
+
+If you receive an error message this most likely means that you've edited some of the scripts yourself and thus there's a conflict resulting, because the file you want to update from the server is different than what the program expects. Most of the time giving \verb|tf| as response to the conflict will solve the issue. If not, save your initialization script to another directory and delete the entire script directory (including all hidden files). Then perform a clean new installation of the scripts as described above.
 
 \subsubsection*{Editing the scripts}
-You are able manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision. Therefore please be really cautious while doing this! Use the initialization script instead to personalize the correlation procedure or let me know if there's substantial changes that you need.\\
+You are able manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision. \textcolor{red}{Therefore please be really cautious while doing this! Use the initialization script instead to personalize the correlation procedure or let me know if there's substantial changes that you need.}\\
 
 Also note that there will be some hidden files and directories (\texttt{.svn} etc.) written while checking out. These contain important information needed by subversion and should not be modified or deleted.
 
 \subsubsection*{Initialization}
 
-You can adjust key parameters of the correlation scrips by modifying the initialization script. When checking out the repository a file called \texttt{corr\_init\_orig.m} will appear. You can simply rename this filie to \texttt{corr\_init.m} and change the parameters and paths according to your needs. This file will then stay in your local scripts directory and will not be overritten while updating the scripts with the newest version from the repository.\\
+You can adjust key parameters of the correlation scripts by modifying the initialization script as shown below. When checking out the repository a file called \texttt{corr\_init\_orig.m} will appear. You can simply rename this filie to \texttt{corr\_init.m} and change the parameters and paths according to your needs. This file will then stay in your local scripts directory and will not be overritten while updating the scripts with the newest version from the repository.\\
 
 \begin{quote}\textcolor{red}{
    It might occur that in future revisions additional parameters will be added to this script, so in case you run into an error message stating this, just update your local \texttt{corr\_init.m} with the changes you find in the downloaded and most up-to-date \texttt{corr\_init\_orig.m}.}
  \end{quote}
-
+ \lstinputlisting[]{../corr_init_orig.m}
 \newpage
 \section{Correlation from LightMicroscopy to LowMag EM image}
 
@@ -165,6 +171,17 @@ The following files are generated by the correlation script during runtime. The 
 
 \newpage
 \subsection{User interaction and key procedures}
+\subsubsection{Contrast adjustment - optional}
+If selected in the initialization script, the contrast of each fluorescent image can be adjusted. This is done using the script \verb|martin_contrast(image)| . The contrast can be adjusted either manually or automatically.
+\begin{figure}
+ \centering
+ \includegraphics[width=0.2\textwidth]{images/contr_overview.jpg}\includegraphics[width=0.65\textwidth]{images/contr.jpg}
+ % contr.jpg: 1085x942 pixel, 762dpi, 3.62x3.14 cm, bb=0 0 103 89
+ \caption{Contrast adjustment tool}
+ \label{fig:contrast}
+\end{figure}
+
+
 \subsubsection{Fiducial selection}
 \label{sec:fiducials}
 A file selection dialog will ask to open already existing fiducial coordinate files. If the selected images have never been used for correlating before, just close that window.\\

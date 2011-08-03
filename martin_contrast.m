@@ -30,17 +30,31 @@ im_contr=im;
 im_offs=im;
 outim=im;
 
-hFig = figure('MenuBar','none','Name',[imtitle,' image - contrast adjustment']);
-im_area=imshow(im);hold on
-h_text =  uicontrol('Parent',hFig,'Style','text','Position',[10 30 200 25],'String','Adjust Contrast:');
-h_text2 =  uicontrol('Parent',hFig,'Style','text','Position',[10 10 200 20],'String','Adjust Offset:');
+hFig = figure('MenuBar','none','Toolbar','none','NumberTitle','off','Name',[imtitle,' image - contrast adjustment']);
+im_area=imshow(imadjust(im));hold on
 
-h_slider = uicontrol('Parent',hFig,'Style','slider','Position',[350 35 350 20],'Callback',@contrast_slider,'Value', 0.5);
-h_slider2 = uicontrol('Parent',hFig,'Style','slider','Position',[350 10 350 20],'Callback',@offset_slider,'Value', 0.5);
+hSp = imscrollpanel(hFig,im_area);
+api = iptgetapi(hSp);
+api.setMagnification(2);
 
-h_autobutton = uicontrol('Parent',hFig,'Style','PushButton','Position',[750 15 150 35],'Callback',@autobutton,'String','Auto Contrast/Reset');
+hMagBox = immagbox(hFig,im_area);
+set(hMagBox,'Position',[10 10 50 25]);
+% hover = imoverview(im_area);
+% set(hover,'MenuBar','none')
 
-h_closebutton = uicontrol('Parent',hFig,'Style','PushButton','Position',[950 15 120 35],'Callback',@closebutton,'String','Done');
+set(hSp,'Units','normalized','Position',[0 .1 1 0.9])
+hOvPanel = imoverview(im_area);
+% set(hOvPanel,'Units','Normalized','Position',[0 0.1 1 .3])
+
+h_text =  uicontrol('Parent',hFig,'Style','text','Units','Normalized','Position',[0.05 0.03 0.1 .02],'String','Adjust Contrast:');
+h_text2 =  uicontrol('Parent',hFig,'Style','text','Units','Normalized','Position',[0.05 0.01 0.1 .02],'String','Adjust Offset:');
+
+h_slider = uicontrol('Parent',hFig,'Style','slider','Units','Normalized','Position',[0.2 0.03 0.2 0.015],'Callback',@contrast_slider,'Value', 0.5);
+h_slider2 = uicontrol('Parent',hFig,'Style','slider','Units','Normalized','Position',[0.2 0.01 0.2 0.015],'Callback',@offset_slider,'Value', 0.5);
+
+h_autobutton = uicontrol('Parent',hFig,'Style','PushButton','Units','Normalized','Position',[0.5 0.02 0.2 0.03],'Callback',@autobutton,'String','Auto Contrast/Reset');
+
+h_closebutton = uicontrol('Parent',hFig,'Style','PushButton','Units','Normalized','Position',[0.72 0.02 .1 0.03],'Callback',@closebutton,'String','Done');
 
 uiwait(hFig)
 % -----------------------------------
