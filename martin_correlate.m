@@ -111,7 +111,8 @@ filecheck2=exist([outfileroot,file,'.pickspots1.mat']);
 
 if filecheck==0 & filecheck2==0
   %import previously clicked positions
-        [filename, pathname] = uigetfile({'pickspots1.mat'},'select previously picked beads',loc_pickspots);
+
+  [filename, pathname] = uigetfile('*.pickspots1.mat','select previously picked beads',loc_pickspots,'Wait',true);
         if isequal(filename,0)
             disp('No previously picked positions selected');
             [ip,bp]=cpselect(em,fm,'Wait',true);  
@@ -121,7 +122,6 @@ if filecheck==0 & filecheck2==0
                 [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
 status=0;
         end
-
 else
     %import previously clicked positions
     if filecheck2==2
@@ -149,7 +149,7 @@ if size(ip,1) >14
 end
 
     
-fm2=fm;
+fm2=fm;coo
 [mlen,idx]=max(s_fm);
 fm2(:,(end+1):mlen)=fm2(:,1:(mlen-s_fm(2)));
 fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);

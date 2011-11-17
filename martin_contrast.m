@@ -56,7 +56,12 @@ h_autobutton = uicontrol('Parent',hFig,'Style','PushButton','Units','Normalized'
 
 h_closebutton = uicontrol('Parent',hFig,'Style','PushButton','Units','Normalized','Position',[0.72 0.02 .1 0.03],'Callback',@closebutton,'String','Done');
 
-uiwait(hFig)
+uiwait
+uiresume
+close gcf
+
+
+% uiwait(hFig)
 % -----------------------------------
 
 function contrast_slider(h_slider,event)

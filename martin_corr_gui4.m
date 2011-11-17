@@ -119,7 +119,7 @@ else
 end
 
 
-f = figure('Visible','off','Position','NumberTitle','off',[0,120,900,900]);
+f = figure('Visible','off','Position',[0,120,900,900],'NumberTitle','off');
 s=imshow(a);
 hSP = imscrollpanel(f,s);
 api = iptgetapi(hSP);
