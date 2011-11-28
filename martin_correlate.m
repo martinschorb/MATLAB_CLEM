@@ -149,7 +149,7 @@ if size(ip,1) >14
 end
 
     
-fm2=fm;coo
+fm2=fm;
 [mlen,idx]=max(s_fm);
 fm2(:,(end+1):mlen)=fm2(:,1:(mlen-s_fm(2)));
 fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);

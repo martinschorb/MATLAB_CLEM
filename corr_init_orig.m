@@ -17,7 +17,7 @@ loc_pickspots = '/struct/briggs/wanda/DataLightMicroscopy';
 loc_shiftcoos = '/struct/briggs/wanda/DataLightMicroscopy';
 
 
-% Location to search for Highmag Fiducial coordinate file - *.shiftcoos.mat
+% Location to search for Highmag Fiducial coordinate file - *.lmhmcoos.mat
 
 loc_hmcoos = '/struct/briggs/wanda/DataLightMicroscopy';
 
