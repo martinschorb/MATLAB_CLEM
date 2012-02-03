@@ -52,11 +52,11 @@ bp2=bp;
 ntot=size(ip2,1);
 
 %generate picked image
-
-pickedem=uint8(zeros(size(em)));
+sz_em=size(em);
+pickedem=uint8(zeros(sz_em));
 ip2r=round(ip2);
 for n=1:size(ip2,1)
-pickedem(ip2r(n,2)-5:ip2r(n,2)+5,ip2r(n,1)-5:ip2r(n,1)+5)=10;
+pickedem(max(ip2r(n,2)-5,1):min(ip2r(n,2)+5,sz_em(1)),max(ip2r(n,1)-5,1):min(ip2r(n,1)+5,sz_em(2)))=10;
 pickedem(ip2r(n,2),ip2r(n,1))=10;
 end
 

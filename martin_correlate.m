@@ -56,7 +56,6 @@ fm=imread(fmf);gm=imread(gmf);rm=imread(rmf);
 if flip==1
     fm=fm';gm=gm';rm=rm';
 end
-
 % adjust contrast of images according to init values
 em=imadjust(em);
 if contr_b==0
@@ -69,7 +68,6 @@ if contr_g==0
 else
     gm=martin_contrast(gm);
 end
-
 if contr_r==0
     rm=imadjust(rm);
 else
@@ -114,8 +112,10 @@ if filecheck==0 & filecheck2==0
 
   [filename, pathname] = uigetfile('*.pickspots1.mat','select previously picked beads',loc_pickspots);
         if isequal(filename,0)
-            disp('No previously picked positions selected');
-            [ip,bp]=cpselect(em,fm,'Wait',true);  
+            disp('No previously picked positions selected');            
+            [fm1,rotid] = martin_rotateimage(em,fm);
+            [ip,bp]=cpselect(em,fm1,'Wait',true); 
+            bp=martin_coordinate_sort(bp,rotid,s_fm);
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
@@ -151,7 +151,12 @@ end
     
 fm2=fm;
 [mlen,idx]=max(s_fm);
-fm2(:,(end+1):mlen)=fm2(:,1:(mlen-s_fm(2)));
+if idx==1
+    fm2=padarray(fm2,[0 mlen-s_fm(2)],'symmetric','post');
+else
+    fm2=padarray(fm2,[mlen-s_fm(1) 0],'symmetric','post');
+end
+
 fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);
 [fmean, fmax, fmin, fstd, fvariance] = tom_dev1(fm_filtered);
 fm_filtered=double(uint16(fm_filtered));
@@ -177,13 +182,10 @@ for iii=1:4
 %     bp(si,:)=floor(bp2(si,:));
     sixf=fm_filtered(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
 %     sixf1=double(ideal_high(sixf,1));
-     
 %     sixf2=double(imfilter(sixf,fmF));  
-    
 %     [C,rows]=max(sixf2);
 %     [maximum,colmax]=max(C);
 % 	rowmax=rows(colmax);
-    
     % last argument enables interactive mode to score sub pixel fitting...
 %       a=cntrd1(sixe2,[emsir+1 emsir+1],floor(.5*emboxsize),0);
 
@@ -202,7 +204,6 @@ for iii=1:4
 % if min(cent1)<floor(.5*fmboxsize)/2 | max(cent1)>fmboxsize-floor(.5*fmboxsize)/2
 %     b=cent1;
 % else
-
     b=cntrd1(sixf,[fmsir+1 fmsir+1],floor(5),0);
 % end   
 % b=[0 0];
@@ -293,13 +294,15 @@ bpint=bpint(end,:);
 % bb=3;
 im2=im;
 [mlen,idx]=max(s_fm);
-im2(:,(end+1):mlen)=im2(:,1:(mlen-s_fm(2)));
+if idx==1
+    im2=padarray(im2,[0 mlen-s_fm(2)],'symmetric','post');
+else
+    im2=padarray(im2,[mlen-s_fm(1) 0],'symmetric','post');
+end
 im_filtered=tom_bandpass1(double(im2),70,mlen,2);
 im_filtered=double(uint16(im_filtered));
 imsir=(imboxsize-1)/2;
-
 for iii=1:4
-
     sixg=double(im_filtered(floor(bpint(2))-imsir:floor(bpint(2))+imsir,floor(bpint(1))-imsir:floor(bpint(1))+imsir));
     % sixg=ideal_high(sixg,1);
     % sixg=imfilter(sixg,fmF);
@@ -307,10 +310,8 @@ for iii=1:4
     % [C,rows]=max(sixg);
     % [maximum,colmax]=max(C);
     % rowmax=rows(colmax);
-
     % c=[0 0];
     % [c(1),c(2),sx,sy,peak0D]= Gaussian2D_1(sixg,gfl,.75*fmboxsize);
-
 
      c=cntrd1(sixg,[imsir imsir]+[1 1],7,0);
 

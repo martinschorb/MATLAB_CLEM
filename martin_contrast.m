@@ -1,6 +1,6 @@
 function outim = martin_contrast(im)
 
-% version MartinSchorb 110731
+% version MartinSchorb 120201
 % 
 % usage is output_image = martin_conrast(input_image); 
 % 
@@ -29,6 +29,7 @@ im_orig = im;
 im_contr=im;
 im_offs=im;
 outim=im;
+ev=0;
 
 hFig = figure('MenuBar','none','Toolbar','none','NumberTitle','off','Name',[imtitle,' image - contrast adjustment']);
 im_area=imshow(imadjust(im));hold on
@@ -70,6 +71,7 @@ function contrast_slider(h_slider,event)
      im_contr=im;
      im_area=imshow(im);drawnow;
      outim=im;
+     ev=1;
 end
 
 % -----------------------------------
@@ -79,6 +81,7 @@ function offset_slider(h_slider2,event)
      im=uint16(im_contr+(offset-0.5)*(65535));
      im_offs=im;
      im_area=imshow(im);drawnow;
+     ev=1;
      
 end
 
@@ -92,12 +95,17 @@ function autobutton(h_autobutton,event)
      set(h_slider,'Value',0.5);
      set(h_slider2,'Value',0.5);
      outim=im;
+     ev=1;
 end
 
 % -----------------------------------
 
 function closebutton(h_closebutton,event)
      outim=im;close gcf;
+     if ~ev
+      outim=imadjust(outim);
+     end
+     
 end
 
 
