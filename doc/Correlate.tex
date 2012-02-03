@@ -181,12 +181,28 @@ If selected in the initialization script, the contrast of each fluorescent image
  \label{fig:contrast}
 \end{figure}
 
+A file selection dialog will ask to open already existing fiducial coordinate files. If the selected images have never been used for correlating before, just close that window.\\
+
+\subsubsection{Rotation of the fluorescence fiducial image}
+\label{sec:rotation}
+
+If no previous fiducial coordinates could be found you can rotate the fluorecence fiducial image in 90 degree steps to simplify the initital detection of fiducial pairs.\,(Fig.\,\ref{fig:rotate}) Just rotate the image that its orientation best fits the EM-image presented in the small window.
+
+\begin{figure}
+ \centering
+ \includegraphics[width=0.65\textwidth]{images/rotate.jpg}
+ % rotate.jpg: 713x686 pixel, 762dpi, 2.38x2.29 cm, bb=0 0 67 65
+ \caption{Image rotation window for initial correlation}
+ \label{fig:rotate}
+\end{figure}
+
+If the proper orientation is selected, click ``Done''. The initial manual assignment of fiducial pairs now is done with the selected orientation. For the further processing and coordinate checks the original orientation will be used.
+
 
 \subsubsection{Fiducial selection}
 \label{sec:fiducials}
-A file selection dialog will ask to open already existing fiducial coordinate files. If the selected images have never been used for correlating before, just close that window.\\
 
-Fiducial pairs are selected in both LM and EM image using the \texttt{cpselect} tool. When an already existing coordinate file is opened, these are displayed. (Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
+Fiducial pairs are selected in both LM and EM image using the \texttt{cpselect} tool. When an already existing coordinate file is opened, these are displayed.\, (Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
 
 \begin{figure}
  \centering
@@ -198,7 +214,7 @@ Fiducial pairs are selected in both LM and EM image using the \texttt{cpselect} 
 
 \subsubsection{Fiducial sub-pixel fitting and display}
 Fiducial positions in the light microscopy image are fitted with sub-pixel accuracy using a center of mass detection after high-pass filtering.
-The fitted positions are presented again using a \texttt{cpselect} dialog. (Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
+The fitted positions are presented again using a \texttt{cpselect} dialog.\,(Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
 
  \lstinputlisting[linerange={157-157,205-206}]{../martin_correlate.m}
 
@@ -214,7 +230,7 @@ A popup window will ask you to determine the fluorescence channel in which your 
 \end{figure}
 
 \subsubsection{Picking the fluorescent spot of interest}
-In the folowing \texttt{cpselect} dialog, the selected fluorescence image is shown on the right, the positions indicating the fiducial markers. Click once in the right image to determine the position of the spot of interest AND once in the left image just anywhere. This click in the left image will have no effect on the correlation. \texttt{cpselect} otherwise would just not export the clicked coordinates. (Fig.\,\ref{fig:cpsel_fluor1}) To continue, close the window. In case you forget to click in the left image, a reminder will be shown and you have the chance to click again. 
+In the folowing \texttt{cpselect} dialog, the selected fluorescence image is shown on the right, the positions indicating the fiducial markers. Click once in the right image to determine the position of the spot of interest AND once in the left image just anywhere. This click in the left image will have no effect on the correlation. \texttt{cpselect} otherwise would just not export the clicked coordinates.\,(Fig.\,\ref{fig:cpsel_fluor1}) To continue, close the window. In case you forget to click in the left image, a reminder will be shown and you have the chance to click again. 
 \begin{figure}
  \centering
  \includegraphics[width=.78\textwidth]{images/cpsel_fluor1.jpg}
@@ -239,7 +255,7 @@ To continue, close the window.
 \end{figure}
 
 \subsubsection{Correction of stage drift in between imaging of the different fluorescence channels}
-The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels.\\
+The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels. This step can be skipped if not needed. Just close the selection window and select ``Export and Close''. To continue then press any key while having the main MATLAB window active. If you constantly want to skip this correction you can modify your configuration script accordingly.\\
 
 A file selection window will ask for already existing files storing these coordinates.\\
 

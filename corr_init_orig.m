@@ -1,7 +1,7 @@
 %% corr_init()
 %
 % 
-% Version Martin Schorb 110731
+% Version Martin Schorb 120202
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
@@ -32,13 +32,23 @@ contr_b = 1;
 contr_g = 0;
 contr_r = 0;
 
-% other parameters that can be adjusted
+% Skip the shift adjustment between channels (active if 1)
+
+shift_skip = 0;
+
+% Size of prediction circle in pixel
+
+accuracy=36;  
+
+%  ------------------------------------------------------------------------
+%  
+
+% other parameters that can be adjusted, if unsure leave them as they are
 
 % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
 fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
 imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
 
-accuracy=36;  % Size of prediction circle in pixel
 
 pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm

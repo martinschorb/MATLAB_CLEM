@@ -1,6 +1,6 @@
  function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
  
-% %version MartinSchorb 101116
+% %version MartinSchorb 120203
 % %
 % %usage is martin_tfm_beads(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,acc,output folder);
 % %

@@ -1,6 +1,6 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 110731 
+% % version MartinSchorb 120203
 % % 
 % %
 % =========================================================================
@@ -44,8 +44,8 @@ end
 % global status 
 status=0;
 
-if exist('flip')~=1 
-    flip = 0; contr_b = 0; contr_g = 0; contr_r = 0; a=msgbox('Initialization script is not the newest version, please update!');uiwait(a);
+if exist('shift_skip')~=1 
+    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); shift_skip = 0; %flip = 0; contr_b = 0; contr_g = 0; contr_r = 0;
 end
 
 % read images and pick beads
@@ -334,64 +334,64 @@ end
 % if exist(['medshift_',fluorsel]) == 0
 
 % runs fluorescence image drift correction
+if ~shift_skip
+    [bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot);
+    if isequal(fluospot,ones(2))
+        k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
+        uiwait(k);
+    %     [bluespot,fluospot]=martin_chromaticshift_drift(fm',gm',gfl,fmboxsize,imboxsize,outfileroot);
+    end    
 
-[bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot);
-if isequal(fluospot,ones(2))
-    k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
-    uiwait(k);
-%     [bluespot,fluospot]=martin_chromaticshift_drift(fm',gm',gfl,fmboxsize,imboxsize,outfileroot);
-end    
-    
-sdiff=fluospot-bluespot
+    sdiff=fluospot-bluespot
 
 
-%%%%%%%%%% reversing x and y coordinates of difference because they were
-%%%%%%%%%% calculated for transposed images JB
-sdiff=circshift(sdiff,[0 1]);
-%%%%%%%%%% ---------------------------
+    %%%%%%%%%% reversing x and y coordinates of difference because they were
+    %%%%%%%%%% calculated for transposed images JB
+    sdiff=circshift(sdiff,[0 1]);
+    %%%%%%%%%% ---------------------------
 
-fspot=find(abs(sdiff)>5);
-idspot=mod(fspot,length(sdiff));
-idspot=idspot+(idspot==0)*length(sdiff);
-sdiff(idspot,:)=[];
+    fspot=find(abs(sdiff)>5);
+    idspot=mod(fspot,length(sdiff));
+    idspot=idspot+(idspot==0)*length(sdiff);
+    sdiff(idspot,:)=[];
 
-%n_shift=length(diff);
-%medshift=median(diff);
-%shifterr=std(diff)/sqrt(n_shift);
+    %n_shift=length(diff);
+    %medshift=median(diff);
+    %shifterr=std(diff)/sqrt(n_shift);
 
-%%%%%%%%% making dimension specific else fails for 1 bead JB
+    %%%%%%%%% making dimension specific else fails for 1 bead JB
 
-n_shift=size(sdiff,1);
-medshift=median(sdiff,1);
-shifterr=std(sdiff)/sqrt(n_shift);
-if isnan(medshift) medshift=[0 0];end
+    n_shift=size(sdiff,1);
+    medshift=median(sdiff,1);
+    shifterr=std(sdiff)/sqrt(n_shift);
+    if isnan(medshift) medshift=[0 0];end
 
-disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
-switch fluorsel
-    case 'GFP'
-        medshift_GFP=medshift;
-    case 'RFP'
-        medshift_RFP=medshift;
+    disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
+    switch fluorsel
+        case 'GFP'
+            medshift_GFP=medshift;
+        case 'RFP'
+            medshift_RFP=medshift;
+    end
+
+
+    % else
+    % 
+    % medshift=eval(genvarname(['medshift_',fluorsel]));
+    % 
+    % end
+
+    disp('---  ---  ---  ---  ---  ---  ---  ---  ---');
+    % disp(['Shift correction in pixel: ', num2str(medshift)]);
+
+
+
+    %corrects for median shift of bleed-thru beads
+    bpint2=bpint;
+    bpint=bpint-medshift;
 end
 
-
-% else
-% 
-% medshift=eval(genvarname(['medshift_',fluorsel]));
-% 
-% end
-
-disp('---  ---  ---  ---  ---  ---  ---  ---  ---');
-% disp(['Shift correction in pixel: ', num2str(medshift)]);
-
-
-
-%corrects for median shift of bleed-thru beads
-bpint2=bpint;
-bpint=bpint-medshift;
-
 show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
-
 
 % [ipint7,bpint7]=cpselect(em,im',[ipint;ipint],show,'Wait',true) ;
 
