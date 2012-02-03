@@ -40,6 +40,12 @@ shift_skip = 0;
 
 accuracy=36;  
 
+% write overlay images for high-mag correlation (files will be written if 1)
+
+hm_overlays = 0;
+
+
+
 %  ------------------------------------------------------------------------
 %  
 

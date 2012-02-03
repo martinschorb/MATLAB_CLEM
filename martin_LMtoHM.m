@@ -1,8 +1,8 @@
-function john_manualregister_LMtoHMtomo3(hmf,smf,outfileroot)
+function martin_LMtoHM(hmf,smf,outfileroot)
 
-%version MartinSchorb 1011XY=23
+%version MartinSchorb 120203
 %
-%usage is john_manualregister_LMtoHMtomo3('highmaggold_image','any highmag slice', 'outputfileroot')
+%usage is martin_LMtoHM('highmaggold_image','highmag slice of interest', 'outputfileroot')
 %
 %designed for correlating em images using electron
 %dense fiducials such as the gold beads used for tomogram reconstruction.
@@ -25,6 +25,10 @@ else
     return 
 end 
 
+if exist('hm_overlays')~=1 
+    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); hm_overlays = 0; 
+end
+
 [filename, pathname] = uigetfile({'appltfm.mat'},'select correlation transform',loc_hmcoos);%,'/struct/briggs/wanda/DataLightMicroscopy');
 load([pathname,filename]);
 
@@ -44,30 +48,8 @@ file1=file(1:s(end)-1);
 
 dpod=strfind(filename,'.appl');
 namebase=filename(1:dpod-1);
-% 
-% 
-% switch fluorsel1
-%     case ''
-%         return
-%     case 'GFP'
-% %         im=gm;
-%         imtxt='gm';
-%     case 'RFP'
-% %         im=rm;
-%         imtxt='rm';
-% end
-% 
-% 
-% if ~isequal(fluorsel1,fluorsel)
-%     k=msgbox('different fluorescence channel than in source transformation selected!','Error','modal');
-%     uiwait(k);
-%     fluorsel1 = questdlg('confirm fluorescence signal selection','Signal Selector','GFP','RFP','Cancel');
-%    circle1=imread([outfileroot,file,'_prediction.tif']);
-% end
 
-   
-
- lm=imread([pathname,namebase,'_em.tif']);
+lm=imread([pathname,namebase,'_em.tif']);
 
 % read images and pick beads
 %  lm=imread(lmf);
@@ -76,7 +58,6 @@ hm=imread(hmf);sm=imread(smf);
 
 smf1=smf;
 lm=imadjust(lm);
-
 
 % 
 % gm=conv8to16bit(gm);
@@ -87,7 +68,6 @@ sm=conv8to16bit(sm);
 
 hm=imadjust(hm);
 sm=imadjust(sm);
-
 
 % fm=im;
 
@@ -178,12 +158,6 @@ thm=cp2tform(ip3,bp3,'linear conformal');
 spotpos=tformfwd(thm,impos);
 hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos),norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,-accuracy])-spotpos)]);
 
-
-% [lm2 xdata ydata]=imtransform(lm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
-% [gm2 xdata ydata]=imtransform(gm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
-% [rm2 xdata ydata]=imtransform(rm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
-% [picked2 xdata ydata]=imtransform(pickedlm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
-% [tfmcircle xdata ydata]=imtransform(circle1,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
 tfmcircle=martin_circle(sm,hmaccuracy,round(spotpos));
 file=[file,'_',fluorsel];
 
@@ -212,21 +186,18 @@ imwrite(hm,[outfileroot,file,'_hm.tif'],'Compression','none');
 % imwrite(lm2,[outfileroot,file,'_lm2hm.tif'],'Compression','none');
 imwrite(sm,[outfileroot,file,'_sm.tif'],'Compression','none');
 imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
-% imwrite(gm2,[outfileroot,file,'_hm_gm.tif'],'Compression','none');
-% imwrite(rm2,[outfileroot,file,'_hm_rm.tif'],'Compression','none');
-% 
+
+if hm_overlays
+ [lm2 xdata ydata]=imtransform(lm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
+ [gm2 xdata ydata]=imtransform(gm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
+ imwrite(gm2,[outfileroot,file,'_hm_gm.tif'],'Compression','none');
+ imwrite(rm2,[outfileroot,file,'_hm_rm.tif'],'Compression','none');
+end
+
 impred=tfmcircle+sm;
 imwrite(impred,[outfileroot,file,'_hm_prd_overlay.tif'],'Compression','none');
 
 
 imshow(impred);
 
-% imwrite(picked2,[outfileroot,'_pickedhm.tif'],'Compression','none');
-% imwrite(pickedhm,[outfileroot,'_pickedlm.tif'],'Compression','none');
-% hmc = ind2rgb(hm2,jet(55525));
-% figure; imshow(hmc,'XData', xdata, 'YData', ydata);
-% hold on
-% h = imshow(lm, gray(45536));
-% set(h, 'AlphaData', 0.5);
-%ylim = get(gca, 'YLim');
-%set(gca, 'YLim', [0.5 ylim(2)]) 
+
