@@ -1,7 +1,7 @@
  function [stats] = martin_beads_analysis2(pos,allpos,index)
 
 %version MartinSchorb 091229
-
+%
 %usage is martin_beads_analysis(bead coordinates used for tfm, all bead coord, blind bead index);
 %
 %designed for calculating statistics on fiducial distribution.

@@ -138,52 +138,22 @@ for nblind=1:ntot  % blind bead index
     
     for k=kmin:(n-1)  % # of trafo base index
         
-        %generate binary selector(permutation) for beads
-
-        a=[2^k-1:2^(n)-1];
-        bm=dec2bin(a);  %binary matrix
-        sel=zeros(size(bm)); %selection matrix
-        lim=size(bm,1);
-
-        for i=1:lim
-            for j=1:size(bm,2)
-                sel(i,j)=str2num(bm(i,j));
-            end
-        end
-
-        %remove all combinations involving less than k beads
-        bselect=zeros(n,n);
-        m=1;
-        for l=1:lim
-            if sum(sel(l,:))==k
-            bselect(m,:)=sel(l,:);  %final selection matrix
-            m=m+1;
-            end
-            l=l+1;
-        end
-
-        %calculate transforms and predicted positions
-        tbp=zeros(k,2);
-        tip=zeros(k,2);
-
-        for cnt=1:size(bselect,1) %index to go through the possible transformations
-            output.blind(nblind).sel(k-kmin+1,cnt).beads='';
-            p=1;
-            for o=1:n
-                if bselect(cnt,o)~=0
-                    tip(p,:)=ip(o,:);
-                    tbp(p,:)=bp(o,:);
-                    output.blind(nblind).sel(k-kmin+1,cnt).beads=[output.blind(nblind).sel(k-kmin+1,cnt).beads,' ',int2str(o)]; %(*)
-                    output.blind(nblind).sel(k-kmin+1,cnt).point(p)=o;             %(*)
-                    p=p+1;
-                end
-            end
+        tsize=nchoosek(n,k);
+        permidx=combnk(1:n,k);
+        
+        for cnt=1:tsize %index to go through the possible transformations
+            output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
+            
+            tip=ip(permidx(cnt,:),:);
+            tbp=bp(permidx(cnt,:),:);
+            output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
+           
             output.blind(nblind).sel(k-kmin+1,cnt).ip=tip;             %(*)
             output.blind(nblind).sel(k-kmin+1,cnt).bp=tbp;             %(*)
             
             %analysis of the distribution
             output.blind(nblind).sel(k-kmin+1,cnt).stat_used=martin_beads_analysis2(tip,ip2,nblind);       %(*)
-            
+            output.blind(nblind).sel(k-kmin+1,cnt).point=permidx(cnt,:);
 
 
              %calculate current transformation
@@ -203,18 +173,15 @@ for nblind=1:ntot  % blind bead index
             
             %calculate internal property
             ls=0;
-%                 for r=1:n
-%                    ls=ls+((bptfm(r,1)-ip(r,1))^2+(bptfm(r,2)-ip(r,2))^2)/sqrt(norm(ip(r,:)-ip2(nblind)));
-%                 end
+
                 
-                ls=sum(sum((bptfm(:,1:2)-ip2).^2));
+            ls=sum(sum((bptfm(:,1:2)-ip2).^2));
                 
                 
-                m4(k-kmin+1,cnt)=ls/n;
+            m4(k-kmin+1,cnt)=ls/n;
             
-            
-            
-            %calculate accuracy of prediction
+                      
+%             calculate accuracy of prediction
             output.blind(nblind).sel(k-kmin+1,cnt).blindtfm=tformfwd(tfm,bp2(nblind,:));
             output.blind(nblind).sel(k-kmin+1,cnt).blinddev=(output.blind(nblind).sel(k-kmin+1,cnt).blindtfm(1)-ip2(nblind,1))^2+(output.blind(nblind).sel(k-kmin+1,cnt).blindtfm(2)-ip2(nblind,2))^2;
 

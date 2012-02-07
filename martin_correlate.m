@@ -389,9 +389,9 @@ if ~shift_skip
     %corrects for median shift of bleed-thru beads
     bpint2=bpint;
     bpint=bpint-medshift;
-end
+    show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
 
-show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
+end
 
 % [ipint7,bpint7]=cpselect(em,im',[ipint;ipint],show,'Wait',true) ;
 
