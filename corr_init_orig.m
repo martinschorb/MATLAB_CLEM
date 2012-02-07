@@ -6,16 +6,13 @@
 % martin_correlate.m
 
 
-
 % Location to search for fiducial coordinate file - *.pickspots.mat
 
 loc_pickspots = '/struct/briggs/wanda/DataLightMicroscopy';
 
-
 % Location to search for shift correction coordinate file - *.shiftcoos.mat
 
 loc_shiftcoos = '/struct/briggs/wanda/DataLightMicroscopy';
-
 
 % Location to search for Highmag Fiducial coordinate file - *.lmhmcoos.mat
 
@@ -44,8 +41,6 @@ accuracy=36;
 
 hm_overlays = 0;
 
-
-
 %  ------------------------------------------------------------------------
 %  
 
@@ -54,7 +49,6 @@ hm_overlays = 0;
 % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
 fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
 imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
-
 
 pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm

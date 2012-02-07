@@ -130,8 +130,7 @@ else
     else
         load([outfileroot,file,'_pickspots1.mat']);
 %         [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
-    end
-    
+    end    
 end
 
 while size(ip,1) <5
@@ -141,13 +140,11 @@ while size(ip,1) <5
 end
 
 % computation warning
-
 if size(ip,1) >14
     k=msgbox('Accuracy estimation might take a while when choosing too many fiducials.');
     uiwait(k);
     [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
 end
-
     
 fm2=fm;
 [mlen,idx]=max(s_fm);
@@ -277,7 +274,6 @@ gm1(:,:,3)=gm(:,:,1);
 % bpint=floor([xx,yy]);
 % ipint=[1 1];
 
-
 ipint=[0 0];
 bpint=[0 0];
 while ~(size(ipint,1)==size(ip4,1)+1&(size(bpint,1)== size(bp4,1)+1))
@@ -285,13 +281,12 @@ k=msgbox(['Click one spot in both images to pick region of interest     --    ',
     uiwait(k);
     [ipint,bpint]=cpselect(em,im,ip4,bp4,'Wait',true) ;
 end
-
-
 ipint=ipint(end,:);
 bpint=bpint(end,:);
 
 %apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
 % bb=3;
+
 im2=im;
 [mlen,idx]=max(s_fm);
 if idx==1
@@ -301,9 +296,13 @@ else
 end
 im_filtered=tom_bandpass1(double(im2),70,mlen,2);
 im_filtered=double(uint16(im_filtered));
+
 imsir=(imboxsize-1)/2;
+
 for iii=1:4
+   
     sixg=double(im_filtered(floor(bpint(2))-imsir:floor(bpint(2))+imsir,floor(bpint(1))-imsir:floor(bpint(1))+imsir));
+    
     % sixg=ideal_high(sixg,1);
     % sixg=imfilter(sixg,fmF);
     % 
