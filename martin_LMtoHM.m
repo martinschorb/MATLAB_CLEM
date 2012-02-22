@@ -1,6 +1,6 @@
 function martin_LMtoHM(hmf,smf,outfileroot)
 
-%version MartinSchorb 120203
+%version MartinSchorb 120222
 %
 %usage is martin_LMtoHM('highmaggold_image','highmag slice of interest', 'outputfileroot')
 %
@@ -156,8 +156,8 @@ ip3=ip;bp3=bp;
 
 thm=cp2tform(ip3,bp3,'linear conformal');
 spotpos=tformfwd(thm,impos);
-hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos),norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,-accuracy])-spotpos)]);
-
+% hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos),norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,-accuracy])-spotpos)]);
+hm_accuracy=hmaccuracy;
 tfmcircle=martin_circle(sm,hmaccuracy,round(spotpos));
 file=[file,'_',fluorsel];
 
@@ -175,7 +175,7 @@ fprintf(file_2,[outfileroot,file,'_hm_transform.log      ---   Logfile of LowMag
 fprintf(file_2,['lowmag file: ',outfileroot,file,'_em.tif  --  highmag file: ',hmf,'  --  slice of interest: ',smf1,'\n\n']);
 fprintf(file_2,'coordinates of transformed fluorescence spot:');
 fprintf(file_2,'%2.3f %2.3f',spotpos);
-fprintf(file_2,['\n prediction circle radius (px): ',int2str(hm_accuracy)]);
+fprintf(file_2,['\n prediction circle radius (px): ',int2str(hmaccuracy)]);
 fclose(file_2);
 
 save([outfileroot,file,'.sliceinfo.mat'],'slice','hm_accuracy','spotpos');
