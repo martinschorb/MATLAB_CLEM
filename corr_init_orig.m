@@ -1,7 +1,7 @@
 %% corr_init()
 %
 % 
-% Version Martin Schorb 120202
+% Version Martin Schorb 120222
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
@@ -40,6 +40,10 @@ accuracy=36;
 % write overlay images for high-mag correlation (files will be written if 1)
 
 hm_overlays = 0;
+
+% multiple spots of interest?
+
+multispot=0;
 
 %  ------------------------------------------------------------------------
 %  

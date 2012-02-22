@@ -105,7 +105,7 @@ end
 % -----------------------------------
 
 function closebutton(h_closebutton,event)
-     outim=im;close gcf;
+     close gcf;
      if ~ev
       outim=imadjust(outim);
      end

@@ -1,6 +1,6 @@
  function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
  
-% %version MartinSchorb 120203
+% %version MartinSchorb 120222
 % %
 % %usage is martin_tfm_beads(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,acc,output folder);
 % %
@@ -50,7 +50,7 @@ stamp=d1(3:12);
 ip2=ip;
 bp2=bp;
 ntot=size(ip2,1);
-
+pos=mean(pos,1);
 %generate picked image
 sz_em=size(em);
 pickedem=uint8(zeros(sz_em));

@@ -1,6 +1,6 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 120203
+% % version MartinSchorb 120222
 % % 
 % %
 % =========================================================================
@@ -44,8 +44,8 @@ end
 % global status 
 status=0;
 
-if exist('shift_skip')~=1 
-    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); shift_skip = 0; %flip = 0; contr_b = 0; contr_g = 0; contr_r = 0;
+if exist('multispot')~=1 
+    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); multispot = 0; %flip = 0; contr_b = 0; contr_g = 0; contr_r = 0;
 end
 
 % read images and pick beads
@@ -59,19 +59,19 @@ end
 % adjust contrast of images according to init values
 em=imadjust(em);
 if contr_b==0
-    fm=imadjust(fm);
+    fm_view=imadjust(fm);
 else
-    fm=martin_contrast(fm);
+    fm_view=martin_contrast(fm);
 end
 if contr_g==0
-    gm=imadjust(gm);
+    gm_view=imadjust(gm);
 else
-    gm=martin_contrast(gm);
+    gm_view=martin_contrast(gm);
 end
 if contr_r==0
-    rm=imadjust(rm);
+    rm_view=imadjust(rm);
 else
-    rm=martin_contrast(rm);
+    rm_view=martin_contrast(rm);
 end
 if isa(em,'uint16')
     em2=em;
@@ -113,13 +113,13 @@ if filecheck==0 & filecheck2==0
   [filename, pathname] = uigetfile('*.pickspots1.mat','select previously picked beads',loc_pickspots);
         if isequal(filename,0)
             disp('No previously picked positions selected');            
-            [fm1,rotid] = martin_rotateimage(em,fm);
-            [ip,bp]=cpselect(em,fm1,'Wait',true); 
+            [fm_view1,rotid] = martin_rotateimage(em,fm_view);
+            [ip,bp]=cpselect(em,fm_view1,'Wait',true); 
             bp=martin_coordinate_sort(bp,rotid,s_fm);
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
-                [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
+                [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
 status=0;
         end
 else
@@ -136,14 +136,14 @@ end
 while size(ip,1) <5
     k=msgbox('you need at least 5 pairs for fit','Error','modal');
     uiwait(k);
-    [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
+    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
 end
 
 % computation warning
 if size(ip,1) >14
     k=msgbox('Accuracy estimation might take a while when choosing too many fiducials.');
     uiwait(k);
-    [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
+    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
 end
     
 fm2=fm;
@@ -157,7 +157,7 @@ end
 fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);
 [fmean, fmax, fmin, fstd, fvariance] = tom_dev1(fm_filtered);
 fm_filtered=double(uint16(fm_filtered));
-
+numfids=size(ip,1);
 %fit beads to get subpixel centres
 % ip=floor(ip);
 bp=floor(bp);ip2=ip;bp2=bp;
@@ -167,7 +167,7 @@ fmsir=(fmboxsize-1)/2;
 % emF=fspecial('gaussian',emsir-3,2);
 %fmF=fspecial('gaussian',3,2);
 sss=[];
-for si=1:size(ip,1)
+for si=1:numfids
 %     sixe=em(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
 %     sixe=double(sixe);
 %     sixe1=(sixe.*-1)+max(max(sixe));
@@ -226,7 +226,7 @@ while status==0
 
 %reshows the control points so you can check them...
 % ip4=ip;bp4=bp;
-    [ip4,bp4]=cpselect(em,fm,ip2,bp2,'Wait',true) ;
+    [ip4,bp4]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
      ip2=ip4;bp2=bp4;
 %export pixel values
     output=[ip2,bp2];
@@ -252,38 +252,39 @@ switch fluorsel
     case ''
         return
     case 'GFP'
-        im=gm;imtxt='gm';
+        im=gm;im_view=gm_view;imtxt='gm';
     case 'RFP'
-        im=rm;imtxt='rm';
+        im=rm;im_view=rm_view;imtxt='rm';
 end
+numspots=1;
+if multispot==1;
+    numq='s';
+    ipint=[0 0];
+    bpint=[0 0];    
+    while ~strcmp(numq,'Correct')
+        [ipint,bpint]=cpselect(em,im_view,ip4,bp4,'Wait',true);
+        ipint=ipint(numfids+1:end,:);
+        bpint=bpint(numfids+1:end,:);
+        numspots=size(bpint,1);
+        numq = questdlg(['You have selected ' num2str(numspots) ' fluorescent spots of interest'],'Check number of spots','Correct','No select again','Cancel');
+    end
+
+    
 
 
-%  k=msgbox(['Click fluorescent spot to pick region of interest  - ',fluorsel,'-image shown']);
-%  uiwait(k);
-gm1(:,:)=gm(:,:,1);
-gm1(:,:,2)=gm(:,:,1);
-gm1(:,:,3)=gm(:,:,1);
 
-% for ii=1:length(bp)
-%     gm1(bp(ii,2)-1:bp(ii,2)+1,bp(ii,1)-1:bp(ii,1)+1,2:3)=65000;
-% end
-% imshow(gm1);
-% axis([min(bp(:,1))-50 max(bp(:,1))+50 min(bp(:,2))-50 max(bp(:,2))+50]);
-% [xx,yy] = ginput(1);
-% close(gcf);
-% bpint=floor([xx,yy]);
-% ipint=[1 1];
 
-ipint=[0 0];
-bpint=[0 0];
-while ~(size(ipint,1)==size(ip4,1)+1&(size(bpint,1)== size(bp4,1)+1))
-k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
-    uiwait(k);
-    [ipint,bpint]=cpselect(em,im,ip4,bp4,'Wait',true) ;
+else
+    ipint=[0 0];
+    bpint=[0 0];
+    while ~(size(ipint,1)==numfids+1&(size(bpint,1)== numfids+1))
+        k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
+        uiwait(k);
+        [ipint,bpint]=cpselect(em,im_view,ip4,bp4,'Wait',true) ;
+    end
+    ipint=ipint(end,:);
+    bpint=bpint(end,:);
 end
-ipint=ipint(end,:);
-bpint=bpint(end,:);
-
 %apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
 % bb=3;
 
@@ -298,37 +299,37 @@ im_filtered=tom_bandpass1(double(im2),70,mlen,2);
 im_filtered=double(uint16(im_filtered));
 
 imsir=(imboxsize-1)/2;
+for ispot=1:numspots
+    for iii=1:4
 
-for iii=1:4
-   
-    sixg=double(im_filtered(floor(bpint(2))-imsir:floor(bpint(2))+imsir,floor(bpint(1))-imsir:floor(bpint(1))+imsir));
-    
-    % sixg=ideal_high(sixg,1);
-    % sixg=imfilter(sixg,fmF);
-    % 
-    % [C,rows]=max(sixg);
-    % [maximum,colmax]=max(C);
-    % rowmax=rows(colmax);
-    % c=[0 0];
-    % [c(1),c(2),sx,sy,peak0D]= Gaussian2D_1(sixg,gfl,.75*fmboxsize);
+        sixg=double(im_filtered(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir,floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
 
-     c=cntrd1(sixg,[imsir imsir]+[1 1],7,0);
+        % sixg=ideal_high(sixg,1);
+        % sixg=imfilter(sixg,fmF);
+        % 
+        % [C,rows]=max(sixg);
+        % [maximum,colmax]=max(C);
+        % rowmax=rows(colmax);
+        % c=[0 0];
+        % [c(1),c(2),sx,sy,peak0D]= Gaussian2D_1(sixg,gfl,.75*fmboxsize);
+
+         c=cntrd1(sixg,[imsir imsir]+[1 1],7,0);
 
 
-    if min(c(1:2))>0 & max(c(1:2))<imboxsize
-        bpint=floor(bpint)+c(1:2)-[1 1]-[imsir imsir];
-end
-
+        if min(c(1:2))>0 & max(c(1:2))<imboxsize
+            bpint(ispot,:)=floor(bpint(ispot,:))+c(1:2)-[1 1]-[imsir imsir];
+        end
+    end
 end
 % reshows point of interest
 
 [ipint,bpint]=cpselect(em,im,ipint,bpint,'Wait',true) ;
 
-
 gm1(:,:,2)=gm(:,:,1);
 gm1(:,:,3)=gm(:,:,1);
-gm1(bpint(1)-1:bpint(1)+1,bpint(2)-1:bpint(2)+1,2:3)=65000;
-
+    for ispot=1:numspots
+        gm1(bpint(ispot,1)-1:bpint(ispot,1)+1,bpint(ispot,2)-1:bpint(ispot,2)+1,2:3)=65000;
+    end
 end
 % if exist(['medshift_',fluorsel]) == 0
 
@@ -384,8 +385,8 @@ if ~shift_skip
     % disp(['Shift correction in pixel: ', num2str(medshift)]);
     %corrects for median shift of bleed-thru beads
     bpint2=bpint;
-    bpint=bpint-medshift;
-    show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
+    bpint=bpint-repmat(medshift,[numspots,1]);
+    show=[bpint(:,2) bpint(:,1);bpint2(:,2) bpint2(:,1)];
     
 else
     medshift_GFP=[];
