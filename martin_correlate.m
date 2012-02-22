@@ -382,14 +382,14 @@ if ~shift_skip
 
     disp('---  ---  ---  ---  ---  ---  ---  ---  ---');
     % disp(['Shift correction in pixel: ', num2str(medshift)]);
-
-
-
     %corrects for median shift of bleed-thru beads
     bpint2=bpint;
     bpint=bpint-medshift;
     show=[bpint(2) bpint(1);bpint2(2) bpint2(1)];
-
+    
+else
+    medshift_GFP=[];
+    medshift_RFP=[];
 end
 
 % [ipint7,bpint7]=cpselect(em,im',[ipint;ipint],show,'Wait',true) ;

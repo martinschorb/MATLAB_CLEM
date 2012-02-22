@@ -24,15 +24,16 @@ switch imname
         imtitle='Fluorescence';
 end
 
-im=uint16(im);
-im_orig = im;
-im_contr=im;
-im_offs=im;
 outim=im;
+im=double(im);
+im_orig = im;
+outim=uint16(imadjust(outim));
+
+
 ev=0;
 
 hFig = figure('MenuBar','none','Toolbar','none','NumberTitle','off','Name',[imtitle,' image - contrast adjustment']);
-im_area=imshow(imadjust(im));hold on
+im_area=imshow(outim);hold on
 
 hSp = imscrollpanel(hFig,im_area);
 api = iptgetapi(hSp);
@@ -57,6 +58,10 @@ h_autobutton = uicontrol('Parent',hFig,'Style','PushButton','Units','Normalized'
 
 h_closebutton = uicontrol('Parent',hFig,'Style','PushButton','Units','Normalized','Position',[0.72 0.02 .1 0.03],'Callback',@closebutton,'String','Done');
 
+or_max=max(max(im_orig));
+contr = 1-get(h_slider,'Value');
+offset = get(h_slider2,'Value');
+
 uiwait
 uiresume
 close gcf
@@ -67,10 +72,10 @@ close gcf
 
 function contrast_slider(h_slider,event)
      contr = 1-get(h_slider,'Value');
-     im=im_offs.*(65535./(min([contr,1])*max(max(im_offs))));
-     im_contr=im;
-     im_area=imshow(im);drawnow;
-     outim=im;
+     im=im_orig.*(65535./(min([contr,1])*or_max))+(offset-0.5)*(65535);
+%      im_contr=im;
+     outim=uint16(im);
+     im_area=imshow(outim);drawnow;
      ev=1;
 end
 
@@ -78,9 +83,10 @@ end
 
 function offset_slider(h_slider2,event)
      offset = get(h_slider2,'Value');
-     im=uint16(im_contr+(offset-0.5)*(65535));
-     im_offs=im;
-     im_area=imshow(im);drawnow;
+     im=im_orig.*(65535./(min([contr,1])*or_max))+(offset-0.5)*(65535);
+%      im_offs=im;
+     outim=uint16(im);
+     im_area=imshow(outim);drawnow;
      ev=1;
      
 end
@@ -89,13 +95,11 @@ end
 % -----------------------------------
 
 function autobutton(h_autobutton,event)
-     contr = get(h_slider,'Value');
-     im=imadjust(im_orig);
-     im_area=imshow(im);drawnow
+     outim=imadjust(uint16(im_orig));
+     im_area=imshow(outim);drawnow
      set(h_slider,'Value',0.5);
      set(h_slider2,'Value',0.5);
-     outim=im;
-     ev=1;
+     ev=0;
 end
 
 % -----------------------------------
