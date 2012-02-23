@@ -20,30 +20,40 @@ end
 
 ind=find(dst < r & dst > r-7);
 
-msk=zeros([2*r,2*r]);
-msk(ind)=1.0;
-
-outcircle=zeros(size(em));
+msk=logical(zeros([2*r,2*r]));
+msk(ind)=1;
+s_o=size(em);
+outcircle=logical(zeros(s_o));
 numspots=size(fluortfm,1);
 ping=0;
 for jj=1:numspots
 
-if fluortfm(jj,1)-error+1>0 & fluortfm(jj,2)-error+1>0 &fluortfm(jj,1)+error<size(em,2) &fluortfm(jj,2)+error<size(em,1)
-    outcircle(round(fluortfm(jj,2)-error+1):round(fluortfm(jj,2)+error),round(fluortfm(jj,1)-error+1):round(fluortfm(jj,1)+error))=msk;
+if fluortfm(jj,1)-error+1>0 & fluortfm(jj,2)-error+1>0 &fluortfm(jj,1)+error<s_o(2) &fluortfm(jj,2)+error<s_o(1)
+    ar1=outcircle(round(fluortfm(jj,2)-error+1):round(fluortfm(jj,2)+error),round(fluortfm(jj,1)-error+1):round(fluortfm(jj,1)+error));
+    outcircle(round(fluortfm(jj,2)-error+1):round(fluortfm(jj,2)+error),round(fluortfm(jj,1)-error+1):round(fluortfm(jj,1)+error))=bitor(ar1,msk);
 %     outcircle=outcircle(1:size(em,1),1:size(em,2));
     ping=1;
 end
 
 if numspots>1
     hf = figure('color','white','units','pixel','Visible', 'off');
-    text('units','pixels','position',[100 100],'fontsize',30,'string',num2str(jj));
+    text('units','pixels','position',[100 100],'HorizontalAlignment','center','fontsize',30,'string',num2str(jj));
     set(gca,'units','pixels','position',[1 1 200 200],'visible','off');
-    tim = getframe(gca);
+    orig_mode = get(hf, 'PaperPositionMode');
+    set(hf, 'PaperPositionMode', 'auto');
+    cdata = hardcopy(hf, '-Dzbuffer', '-r0');
+    
+    
+%     tim = getframe(gca,[80 85 57 41]);
     close all;
-    tim2 = tim.cdata;
-    tim3 = imcrop(tim2,[90 80 56 32]);
-    tim4 = ~tim3(:,:,1);
-    outcircle(round(fluortfm(jj,2)+error+12-16):round(fluortfm(jj,2)+error+12+16),round(fluortfm(jj,1))-28:round(fluortfm(jj,1))+28)=tim4;
+%     tim2 = tim.cdata;
+    tim3=~cdata(:,:,1);
+    tim4 = imcrop(tim3,[79 310 42 30]);
+
+ 
+if fluortfm(jj,1)>21 & fluortfm(jj,2)+error+13-15>0 &fluortfm(jj,1)+21<size(em,2) & fluortfm(jj,2)+error+13+15<size(em,1)
+    area=outcircle(round(fluortfm(jj,2)+error+13-15):round(fluortfm(jj,2)+error+13+15),round(fluortfm(jj,1))-21:round(fluortfm(jj,1))+21);
+    outcircle(round(fluortfm(jj,2)+error+13-15):round(fluortfm(jj,2)+error+13+15),round(fluortfm(jj,1))-21:round(fluortfm(jj,1))+21)=bitor(area,tim4);
 end
 
 end
