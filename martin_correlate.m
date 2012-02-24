@@ -201,6 +201,8 @@ for iii=1:4
 % if min(cent1)<floor(.5*fmboxsize)/2 | max(cent1)>fmboxsize-floor(.5*fmboxsize)/2
 %     b=cent1;
 % else
+
+
     b=cntrd1(sixf,[fmsir+1 fmsir+1],floor(5),0);
 % end   
 % b=[0 0];
@@ -214,9 +216,7 @@ else
 end
  sss(si,iii)=bp2(si,1);
 
-
 end
-
 end
 
 % sss
@@ -287,7 +287,6 @@ else
 end
 %apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
 % bb=3;
-
 im2=im;
 [mlen,idx]=max(s_fm);
 if idx==1
@@ -298,12 +297,12 @@ end
 im_filtered=tom_bandpass1(double(im2),70,mlen,2);
 im_filtered=double(uint16(im_filtered));
 
+
 imsir=(imboxsize-1)/2;
 for ispot=1:numspots
     for iii=1:4
 
         sixg=double(im_filtered(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir,floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
-
         % sixg=ideal_high(sixg,1);
         % sixg=imfilter(sixg,fmF);
         % 
@@ -316,6 +315,7 @@ for ispot=1:numspots
          c=cntrd1(sixg,[imsir imsir]+[1 1],7,0);
 
 
+         
         if min(c(1:2))>0 & max(c(1:2))<imboxsize
             bpint(ispot,:)=floor(bpint(ispot,:))+c(1:2)-[1 1]-[imsir imsir];
         end
@@ -406,7 +406,6 @@ end
 
 
 [output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,outfileroot);
-
 clear test
 
 test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
