@@ -323,7 +323,7 @@ for ispot=1:numspots
 end
 % reshows point of interest
 
-[ipint,bpint]=cpselect(em,im,ipint,bpint,'Wait',true) ;
+[ipint,bpint]=cpselect(em,im_view,ipint,bpint,'Wait',true) ;
 
 gm1(:,:,2)=gm(:,:,1);
 gm1(:,:,3)=gm(:,:,1);
