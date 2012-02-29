@@ -310,7 +310,7 @@ An overlay image showing the predicted spot(s) within the EM image as a white ci
  \newpage
 \section{Correlation form low magnification tomogram to high magnification EM image}
 
-Correlation from a low resolution EM tomogram slice to a high magnification image of the same sample containing indentifiable fiducial markers such as the gold beads used for tomogram reconstruction is performed using the script \texttt{john\_manualregister\_LMtoHMtomo3.m}.
+Correlation from a low resolution EM tomogram slice to a high magnification image of the same sample containing indentifiable fiducial markers such as the gold beads used for tomogram reconstruction is performed using the script \texttt{martin\_LMtoHM.m}.
 \subsection{Executing the script}
 To execute the script and start the correlation simply run \begin{verbatim}
  martin_LMtoHM(hmf,smf,outfileroot)
@@ -367,7 +367,7 @@ Coordinates are transformed using all marked fiducials and the output files are 
 \end{figure}
 \newpage
 \section{Useful hints and tricks}
-\subsection*{Overlay of correlated images}
+\subsection{Overlay of correlated images}
 The correlation procedure writes a variety of images in tiff format that have all be aligned to each other according to the transformation used for correlation. (see\,\ref{sec:lm_output}) These include transformed fluorescence images as well as prediction circles or fiducial positions.
 You can easily superimpose these images to the EM image or even the tomogram.
 
