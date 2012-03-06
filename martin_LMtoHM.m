@@ -180,7 +180,7 @@ fclose(file_2);
 
 save([outfileroot,file,'.sliceinfo.mat'],'slice','hm_accuracy','spotpos');
 
-tfmcircle=uint16(tfmcircle/max(max(tfmcircle))*65535);
+tfmcircle=uint16(tfmcircle*65535);
 %writes output files
 imwrite(hm,[outfileroot,file,'_hm.tif'],'Compression','none');
 % imwrite(lm2,[outfileroot,file,'_lm2hm.tif'],'Compression','none');
