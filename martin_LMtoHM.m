@@ -54,12 +54,13 @@ lm=imread([pathname,namebase,'_em.tif']);
 % read images and pick beads
 %  lm=imread(lmf);
 hm=imread(hmf);sm=imread(smf);
-
-
+if hm_overlays
+    gm=imread([pathname,namebase,'_gm.tif']);
+    rm=imread([pathname,namebase,'_rm.tif']);
+end
 smf1=smf;
 lm=imadjust(lm);
-
-% 
+ 
 % gm=conv8to16bit(gm);
 % rm=conv8to16bit(rm);
 hm=conv8to16bit(hm);
@@ -69,7 +70,6 @@ sm=conv8to16bit(sm);
 hm=imadjust(hm);
 sm=imadjust(sm);
 
-% fm=im;
 
 if exist([outfileroot,file1,'.lmhmcoos.mat'])
     load([outfileroot,file1,'.lmhmcoos.mat'])
@@ -188,8 +188,8 @@ imwrite(sm,[outfileroot,file,'_sm.tif'],'Compression','none');
 imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
 
 if hm_overlays
- [lm2 xdata ydata]=imtransform(lm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
  [gm2 xdata ydata]=imtransform(gm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
+ [rm2 xdata ydata]=imtransform(rm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));  
  imwrite(gm2,[outfileroot,file,'_hm_gm.tif'],'Compression','none');
  imwrite(rm2,[outfileroot,file,'_hm_rm.tif'],'Compression','none');
 end
