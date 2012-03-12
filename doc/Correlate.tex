@@ -18,14 +18,7 @@
 \usepackage{fancyhdr}
 \usepackage{listings}
 \usepackage{svn-multi}
-\svnidlong
-{$HeadURL: https://svn.structures/repo/schorb:Corr/doc/Correlate.tex $}
-{$LastChangedDate: 2012-02-29 13:37:34 +0100 (Wed, 29 Feb 2012) $}
-{$LastChangedRevision: 72 $}
-{$LastChangedBy: schorb $}
-\usepackage{url}
-\newcommand{\svnloc}{\StrBefore[5]{\svnkw{HeadURL}}{/}}
-
+\usepackage{gitinfo}
 
 \usepackage{multicol}
 \lstset{language=Matlab
@@ -41,15 +34,15 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\lhead[\thepage]{Correlation procedure for CLEM -- Rev. \svnrev}
+\lhead[\thepage]{Correlation procedure for CLEM -- commit \gitAbbrevHash , \gitCommitterDate}
 \rhead[\leftmark]{\thepage}
 
 \title{Correlative Microscopy - Algorithm overview}
 \author{Martin Schorb, \href{mailto:martin.schorb@embl.de}{martin.schorb@embl.de}}
 
 
-\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{/doc}}\\ \vspace{2mm} \small{corresponds to revision \svnrev\; commited at \svndate}\\\small{ of \texttt{martin\_correlate.m} at 
-\svnloc}}
+\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{/doc}}\\ \vspace{2mm} \small{corresponds to commit \gitAbbrevHash\;commited at \gitCommitterIsoDate}\\\small{ of \texttt{martin\_correlate.m} at \url{http://git.embl.de/cgit/schorb/corr/}
+}}
 
 \setlength{\columnsep}{10pt}
 
