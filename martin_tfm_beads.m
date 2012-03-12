@@ -1,4 +1,8 @@
- function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
+ testchange testchange
+
+
+
+function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
  
 % %version MartinSchorb 120222
 % %
