@@ -1,6 +1,6 @@
 function outim = martin_contrast(im)
 
-% version MartinSchorb 120201
+% version MartinSchorb 120312
 % 
 % usage is output_image = martin_conrast(input_image); 
 % 
