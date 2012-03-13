@@ -41,7 +41,7 @@
 \author{Martin Schorb, \href{mailto:martin.schorb@embl.de}{martin.schorb@embl.de}}
 
 
-\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{/doc}}\\ \vspace{2mm} \small{corresponds to commit \gitAbbrevHash\;commited at \gitCommitterIsoDate}\\\small{ of \texttt{martin\_correlate.m} at \url{http://git.embl.de/cgit/schorb/corr/}
+\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit \gitAbbrevHash\;commited at \gitCommitterIsoDate}\\\small{ of \texttt{martin\_correlate.m} at \url{http://git.embl.de/cgit/schorb/corr/}
 }}
 
 \setlength{\columnsep}{10pt}
@@ -57,39 +57,40 @@ The correlation procedure, as described in Kukulski et al.,2011 JCB, consists of
 
 This document provides a step by step manual in how to use the algorithms, their parameters and outputs and shows the corresponding code snippets to give an idea of the points at which certain things happen while running the script.\\
 
-\textcolor{blue}{The pdf-file of this documentation corresponding to the version of the scripts you are using can be found in your scripts directory, subfolder \texttt{/doc}.}
+\textcolor{blue}{The pdf-file of this documentation corresponding to the version of the scripts you are using can be found in your scripts directory, subfolder \texttt{doc/}.}
 \section{Installation and requirements}
 
 \subsection{System and software requirements}A MATLAB\textsuperscript{\textregistered} 
 installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. This should be independent on the type of operating system used. However the function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
 \\
 
-In order to access the newest version of the scripts, a subversion (SVN\footnote{See \url{http://www.structures-it.embl.de/services/online/vcs},\; \url{http://en.wikipedia.org/wiki/Subversion}}) client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download all files individually from the webserver (\url{https://svn.structures/repo/schorb:Corr}).
+In order to access the newest version of the scripts, a Git\footnote{See \url{http://git.embl.de/},\; \url{http://en.wikipedia.org/wiki/Git_(software)}} client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download all files individually from the webserver (\url{http://git.embl.de/cgit/schorb/corr/tree/}).
 
 
 \subsection{Obtaining the newest version of the correlation algorithms}
-The main scripts as well as all supporting underlying algorithms and this documentation are stored in a central subversion repository which is accessible from within the EMBL network.
+The main scripts as well as all supporting underlying algorithms and this documentation are stored in a central Git repository which is accessible from within the EMBL network.
 \subsubsection*{First installation}
-To checkout the most recent version of algorithms and documentation files for the first time, create a directory where you want to store these files. 
-
-Then checkout the files to this directory using your subversion client. The Unix Terminal command will be this:
+To get the most recent version of algorithms and documentation files for the first time, you need to copy the code from the server into the directory where you want to store these files. 
+Open a Unix Terminal shell and change to the directory in which you want the scripts to end up.
+To get the scripts type:
 \begin{verbatim}
- svn checkout https://svn.structures/repo/schorb:Corr /your/directory/
+ git clone git@git.embl.de:schorb/corr XXX
 \end{verbatim}
-Accept the encryption certificate (permanently) by pressing \texttt{p}.\\
+Where \texttt{XXX} is an optional directory name where the scripts will be copied into. If no directory name is specified a folder \texttt{corr/} containing all files will be generated. Accept the encryption certificate.\\
 
 You should see a result similar to this:
 \begin{verbatim}
-
-A    Corr/martin_contrast.m 
-A    Corr/martin_correlate.m
-...
-A    Corr/martin_tfm_beads.m
-Checked out revision 71.
-
+% git clone git@git.embl.de:schorb/corr XXX
+Cloning into 'XXX'...
+remote: Counting objects: 61, done.
+remote: Compressing objects: 100% (60/60), done.
+remote: Total 61 (delta 7), reused 0 (delta 0)
+Receiving objects: 100% (61/61), 4.79 MiB | 9.05 MiB/s, done.
+Resolving deltas: 100% (7/7), done.
 \end{verbatim}
 
 Now you have a local working copy of the most recent versions of the correlation files.\\
+\textcolor{blue}{You can also now find the most up-to-date copy of this manual in the \texttt{doc/} subfolder.}\\
 
 Add this directory including all subdirectories to the MATLAB path by adding the following line to MATLAB's \texttt{startup.m} script, that is usually located in a MATLAB related folder within your home directory (\texttt{$\sim$/.matlab/startup.m}) when working in a Linux environment. 
 \begin{verbatim}
@@ -100,7 +101,7 @@ On Macintosh or Windows systems you have to add the path by using MATLAB's prefe
 
 To have your scripts and documentation files always up to date according to the current revision, update them from the repository by simply executing
 \begin{verbatim}
- svn up
+ git pull
 \end{verbatim}
  in the directory in which you put the scripts.\\ 
 
