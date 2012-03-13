@@ -1,6 +1,6 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 120222
+% % version MartinSchorb 120312
 % % 
 % %
 % =========================================================================
