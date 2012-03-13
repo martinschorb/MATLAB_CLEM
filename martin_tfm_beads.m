@@ -1,8 +1,4 @@
- testchange testchange
-
-
-
-function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
+ function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
  
 % %version MartinSchorb 120222
 % %
@@ -143,7 +139,7 @@ for nblind=1:ntot  % blind bead index
     for k=kmin:(n-1)  % # of trafo base index
         
         tsize=nchoosek(n,k);
-        permidx=combnk(1:n,k);
+        permidx=martin_combin(n,k);
         
         for cnt=1:tsize %index to go through the possible transformations
             output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
