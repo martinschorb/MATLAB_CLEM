@@ -103,7 +103,13 @@ To have your scripts and documentation files always up to date according to the 
 \begin{verbatim}
  git pull
 \end{verbatim}
- in the directory in which you put the scripts.\\ 
+ in the directory in which you put the scripts.
+ 
+If you get an error:
+\begin{verbatim}
+ fatal: Not a git repository ...
+\end{verbatim}
+Make sure your console is in the correct directory.
 
 
 If you receive an error message this most likely means that you've edited some of the scripts yourself and thus there's a conflict resulting, because the file you want to update from the server is different than what the program expects. Most of the time giving \verb|tf| as response to the conflict will solve the issue. If not, save your initialization script to another directory and delete the entire script directory (including all hidden files). Then perform a clean new installation of the scripts as described above.
