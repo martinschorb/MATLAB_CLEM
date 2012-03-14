@@ -98,7 +98,7 @@ for nblind=1:ntot  % blind bead index
     data.allprederr(y)=norm(allbptfm(dix)-ip2(dix));
     allprederr(nblind)=data.allprederr(y);
     
-    data.optstat(y,:)=martin_beads_analysis2(ip,ip2,nblind);
+%      data.optstat(y,:)=martin_beads_analysis2(ip,ip2,nblind);
     
         n=size(ip,1); %total number of picked beads
         m1=150000000*ones(n-kmin+1,max(nchoosek(n+1,kmin+2),nchoosek(n,kmin)));
@@ -111,27 +111,10 @@ for nblind=1:ntot  % blind bead index
 
             %generate binary selector(permutation) for beads
 
-            a=[2^k-1:2^(n)-1];
-            bm=dec2bin(a);  %binary matrix
-            sel=zeros(size(bm)); %selection matrix
-            lim=size(bm,1);
+	tsize=nchoosek(n,k);
+        bselect=martin_combin(n,k);
 
-            for i=1:lim
-                for j=1:size(bm,2)
-                    sel(i,j)=str2num(bm(i,j));
-                end
-            end
-
-            %remove all combinations involving less than k beads
-            bselect=zeros(n,n);
-            m=1;
-            for l=1:lim
-                if sum(sel(l,:))==k
-                bselect(m,:)=sel(l,:);  %final selection matrix
-                m=m+1;
-                end
-                l=l+1;
-            end
+           
 
             %calculate transforms and predicted positions
             tbp=zeros(k,2);
