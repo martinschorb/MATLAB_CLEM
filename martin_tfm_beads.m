@@ -95,7 +95,7 @@ output.blind.sel=struct;
 %          lsall=lsall+(bptfm(r,1)-ip(r,1))^2+(bptfm(r,2)-ip(r,2))^2;
 %      end
 %      output.blind(nblind).all.ls=lsall;
-     output.all.stat_used=martin_beads_analysis(ip2);
+%     output.all.stat_used=martin_beads_analysis(ip2);
      
 %      generate images
 %      tfmed=uint8(zeros(size(em)));
@@ -152,7 +152,7 @@ for nblind=1:ntot  % blind bead index
             output.blind(nblind).sel(k-kmin+1,cnt).bp=tbp;             %(*)
             
             %analysis of the distribution
-            output.blind(nblind).sel(k-kmin+1,cnt).stat_used=martin_beads_analysis2(tip,ip2,nblind);       %(*)
+%            output.blind(nblind).sel(k-kmin+1,cnt).stat_used=martin_beads_analysis2(tip,ip2,nblind);       %(*)
             output.blind(nblind).sel(k-kmin+1,cnt).point=permidx(cnt,:);
 
 
