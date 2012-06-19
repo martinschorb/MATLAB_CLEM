@@ -228,11 +228,11 @@ while status==0
 % ip4=ip;bp4=bp;
     [ip4,bp4]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
      ip2=ip4;bp2=bp4;
+     numfids=size(ip2,1);
 %export pixel values
     output=[ip2,bp2];
         file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
 %     file_2 = fopen([outfileroot,'_pickspots1.txt'],'w');
-%     fprintf(file_2,'%4.0f,%4.0f,%4.0f, %4.0f \n',output);
     fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
     fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
     fclose(file_1);

@@ -127,7 +127,7 @@ for nblind=1:ntot  % blind bead index
                 
                 output.blind(nblind).sel(k-kmin+1,cnt).beads='';
                 p=1;
-                for o=1:n
+                for o=1:k
                     if bselect(cnt,o)~=0
                         tip(p,:)=ip(o,:);
                         tbp(p,:)=bp(o,:);
