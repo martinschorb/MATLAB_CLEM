@@ -92,7 +92,7 @@ for nblind=1:ntot  % blind bead index
 
     data.file(y)=filename(fileidx);
     
-    alltfm=cp2tform(bp,ip,'projective');%'linear conformal');
+    alltfm=cp2tform(bp,ip,'linear conformal');
     allbptfm=(tformfwd(alltfm,bp2));
     
     data.allprederr(y)=norm(allbptfm(dix)-ip2(dix));
@@ -177,7 +177,7 @@ permidx=combnk(1:n,k);
 
 
                  %calculate current transformation
-                  tfm=cp2tform(tbp,tip,'projective');%,'linear conformal');
+                  tfm=cp2tform(tbp,tip,'linear conformal');
                  output.blind(nblind).sel(k-kmin+1,cnt).tfm=tfm;           %(*)
                   %transform coordinates and estimate
                  bptfm2=tformfwd(tfm,bp2);
@@ -245,7 +245,7 @@ expo=1;
         sbp=[output.blind(nblind).sel(rowmin,colmin).bp;bp2(dix,:)];
         sip=[output.blind(nblind).sel(rowmin,colmin).ip;ip2(dix,:)];
         
-        tfm=cp2tform(sbp,sip,'projective');%'linear conformal');
+        tfm=cp2tform(sbp,sip,'linear conformal');
         bptfm2=tformfwd(tfm,bp2);
         
         

@@ -1,7 +1,7 @@
 %% corr_init()
 %
 % 
-% Version Martin Schorb 120222
+% Version Martin Schorb 120725
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
@@ -49,6 +49,9 @@ multispot=0;
 %  
 
 % other parameters that can be adjusted, if unsure leave them as they are
+
+trafo = 'linear conformal';
+
 
 % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
 fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting

@@ -1,8 +1,8 @@
- function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,outfileroot)
+ function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,trafo,outfileroot)
  
-% %version MartinSchorb 120222
+% %version MartinSchorb 120725
 % %
-% %usage is martin_tfm_beads(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,acc,output folder);
+% %usage is martin_tfm_beads(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,acc,transformation type, output folder);
 % %
 % % 
 % %
@@ -82,7 +82,7 @@ output.blind.sel=struct;
 %     % include transformation using all beads
 % 
      %calculate current transformation
-     tfm=cp2tform(bp2,ip2,'linear conformal');
+     tfm=cp2tform(bp2,ip2,trafo);
      output.all.tfm=tfm;           %(*)martin_ls_blind3.m
      output.all.circle=martin_circle(em,accuracy,tformfwd(tfm,round(bpint)));
      %transform coordinates 
@@ -157,7 +157,7 @@ for nblind=1:ntot  % blind bead index
 
 
              %calculate current transformation
-              tfm=cp2tform(tbp,tip,'linear conformal');
+              tfm=cp2tform(tbp,tip,trafo);
              output.blind(nblind).sel(k-kmin+1,cnt).tfm=tfm;           %(*)
               %transform coordinates and estimate
              bptfm=tformfwd(tfm,bp2);

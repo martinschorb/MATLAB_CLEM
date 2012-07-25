@@ -1,6 +1,6 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 120312
+% % version MartinSchorb 120725
 % % 
 % %
 % =========================================================================
@@ -44,8 +44,8 @@ end
 % global status 
 status=0;
 
-if exist('multispot')~=1 
-    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); multispot = 0; %flip = 0; contr_b = 0; contr_g = 0; contr_r = 0;
+if exist('trafo')~=1 
+    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); trafo = 'linear conformal';
 end
 
 % read images and pick beads
@@ -405,7 +405,7 @@ end
 % % pasted new martin_ls_blind algorithm
 
 
-[output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,outfileroot);
+[output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,trafo,outfileroot);
 clear test
 
 test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
