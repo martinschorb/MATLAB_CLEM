@@ -269,8 +269,6 @@ if multispot==1;
         numq = questdlg(['You have selected ' num2str(numspots) ' fluorescent spots of interest'],'Check number of spots','Correct','No select again','Cancel');
     end
 
-    
-
 
 
 
@@ -285,6 +283,8 @@ else
     ipint=ipint(end,:);
     bpint=bpint(end,:);
 end
+numspots=size(bpint,1);
+
 %apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
 % bb=3;
 im2=im;
