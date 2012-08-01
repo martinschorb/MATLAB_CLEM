@@ -1,10 +1,8 @@
 %% corr_init()
 %
-% 
 % Version Martin Schorb 120725
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
-
 
 % Location to search for fiducial coordinate file - *.pickspots.mat
 
@@ -46,12 +44,12 @@ hm_overlays = 0;
 multispot=0;
 
 %  ------------------------------------------------------------------------
-%  
 
 % other parameters that can be adjusted, if unsure leave them as they are
 
 trafo = 'linear conformal';
-
+% trafo = 'affine';
+% trafo = 'projective';
 
 % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
 fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
@@ -59,7 +57,6 @@ imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitt
 
 pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm
-
 hmaccuracy=accuracy*pixelsize_lm/pixelsize_hm;
 
 
