@@ -31,7 +31,7 @@ c_outfile = uicontrol('Parent',t_outfile,'Style','edit','BackgroundColor',[0.95 
 %    ---
 
 t_dir = uipanel('Title','starting input directory','FontSize',12,'BackgroundColor',[0.85 0.85 0.85],...
-          'Position',[0.05,0.7,0.4,0.08]);
+           'Position',[0.05,0.7,0.4,0.08]);
 ct_dir = uicontrol('Parent',t_dir,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
            'Position',[10,10,300,40],'String',in_dir);       
 but_dir = uicontrol('Parent',t_dir,'Style','pushbutton','BackgroundColor',[0.95 0.95 0.95],...
@@ -41,7 +41,7 @@ but_dir = uicontrol('Parent',t_dir,'Style','pushbutton','BackgroundColor',[0.95 
 t_px = uipanel('Title','EM pixel size [nm]','FontSize',12,'BackgroundColor',[0.85 0.85 0.85],...
           'Position',[0.05,0.6,0.4,0.08]);
 ct_px = uicontrol('Parent',t_px,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
-           'Position',[10,10,300,40],'String',pxs); 
+          'Position',[10,10,300,40],'String',pxs); 
 
 %   ---
     
@@ -50,12 +50,23 @@ g_trafo = uibuttongroup('Title','Transformation type to use','FontSize',12,'Back
 u0 = uicontrol('Style','Radio','String','linear conformal (default)','BackgroundColor',[0.85 0.85 0.85],...
     'pos',[10 70 300 30],'parent',g_trafo,'HandleVisibility','off');
 u1 = uicontrol('Style','Radio','String','affine','BackgroundColor',[0.85 0.85 0.85],...
-    'pos',[10 40 300 30],'parent',g_trafo,'Callback',{@aff_Callback});
+    'pos',[10 40 300 30],'parent',g_trafo);
 u2 = uicontrol('Style','Radio','String','projective','BackgroundColor',[0.85 0.85 0.85],...
-    'pos',[10 10 300 30],'parent',g_trafo,'Callback',{@proj_Callback});
+    'pos',[10 10 300 30],'parent',g_trafo);
 % Initialize button group properties. 
 set(g_trafo,'SelectionChangeFcn',@selcbk);      
-      
+switch trafo
+        case 'linear conformal'
+            set(g_trafo,'SelectedObject',u0);
+        case 'affine'
+            set(g_trafo,'SelectedObject',u1);
+        case 'projective'
+            set(g_trafo,'SelectedObject',u2);
+    end
+
+
+
+
 %   ---
 t_bds = uipanel('Title','Minimum number of beads','FontSize',12,'BackgroundColor',[0.85 0.85 0.85],...
           'Position',[0.05,0.35,0.4,0.08]);
@@ -99,16 +110,6 @@ function  selcbk(source,eventdata)
     end
 end
 
-function  aff_Callback(source,eventdata)
-    minbeads = 3;
-    set(ct_bds,'String','3')
-end
-
-
-function  proj_Callback(source,eventdata)
-    minbeads = 4;
-    set(ct_bds,'String','4')
-end
 
 function go_Callback(source,eventdata)
     outfile = get(c_outfile,'String');

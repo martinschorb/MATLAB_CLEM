@@ -1,43 +1,22 @@
 function [data,output]=martin_corr_accuracy(kmin)
 
-% %version MartinSchorb 120207
+% %version MartinSchorb 120903
 % %
-% %usage is martin_blindstat('outputfileroot');
-% %
-% %
-% % uses martin_ls_blind.m for calculating estimations and ratings of
-% %     transformations
-% % designed for estimating the accuracy of correlating light and em images using fluorescent electron
-% % dense fiducials.
-% % 
-% % 
-% % 
-% % output is a struct including:
-% % 
-% % xx - filename pickspots
-% % 1 - index of blind bead
-% % 2 - index of optimal transformation 
-% % 3 - error of blind prediction
-% % 4 - error of closest bead
-% % 5 - relative error for prediction
+
+if exist('corr_init')==2
+    corr_init();
+elseif exist('corr_init_orig')==2
+    corr_init_orig(); 
+else 
+    a=msgbox('No initialization script found!','Error','modal');uiwait(a);
+    a=msgbox('Please update algorithms!','Error','modal');uiwait(a);
+    return 
+end 
 
 
-%create timestamp
-d=clock;
-d1='';
-for i=1:size(d,2)
-    if d(i)<10
-        d1=[d1,'0',int2str(d(i))];
-    else
-        d1=[d1,int2str(d(i))];
-    end
-end
-stamp=d1(3:12);
+%  initialization
 
-%save data file output
-% 
-% file_1 = fopen([outfileroot,'blind_errorpred_',stamp,'.txt'],'w');
-% fprintf(file_1,'Statistics for blind bead prediction errors \n\n');   
+[outfile,in_dir,pxs,trafo,minbeads]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo);
 
 
 
@@ -47,32 +26,33 @@ y=1;
 data=struct;
 data.file=cell(2);
 data.optimum=cell(2);
-
+kmin=minbeads;
 
 while x>0
 %import previously clicked positions
-[filename, pathname] = uigetfile({'*.mat'},'select previously picked beads','MultiSelect', 'on','/struct/briggs/schorb/beadcoord');
+[filename, pathname] = uigetfile({'*.mat'},'select previously picked beads','MultiSelect', 'on',in_dir);
 if isequal(filename,0)
-    disp('thanks...');
+    disp('Correlation accuracy estimation finished');
     x=0;    
 else
-%     fprintf(file_1,['Filenames: \n', pathname,'\n-------\n']);
-    for fileidx=1:size(filename,2) %file list index
-%         fprintf(file_1,[cell2mat(filename(fileidx)),'\n']);
+    
+    
+   for fileidx=1:size(filename,2) %file list index
+
         a=open([pathname,cell2mat(filename(fileidx))]);
         n=size(a.ip,1);         % # of beads
 
-    %          %  analyse blind bead accuracy for the current file (image&bead coordinates)
+ %  analyse blind bead accuracy for the current file (image&bead coordinates)
         ip=a.ip;
         bp=a.bp;
 
         ip2=ip;
         bp2=bp;
         ntot=size(ip,1);
-if ntot>4 & ntot<12
+        
+if ntot>minbeads & ntot<12
         output=struct;
         nblind=1;
-    
         alli=y;
         
 for nblind=1:ntot  % blind bead index
@@ -92,13 +72,12 @@ for nblind=1:ntot  % blind bead index
 
     data.file(y)=filename(fileidx);
     
-    alltfm=cp2tform(bp,ip,'linear conformal');
+    alltfm=cp2tform(bp,ip,trafo);
     allbptfm=(tformfwd(alltfm,bp2));
     
     data.allprederr(y)=norm(allbptfm(dix)-ip2(dix));
     allprederr(nblind)=data.allprederr(y);
     
-    data.optstat(y,:)=martin_beads_analysis2(ip,ip2,nblind);
     
         n=size(ip,1); %total number of picked beads
         if n>kmin
@@ -177,7 +156,7 @@ permidx=combnk(1:n,k);
 
 
                  %calculate current transformation
-                  tfm=cp2tform(tbp,tip,'linear conformal');
+                  tfm=cp2tform(tbp,tip,trafo);
                  output.blind(nblind).sel(k-kmin+1,cnt).tfm=tfm;           %(*)
                   %transform coordinates and estimate
                  bptfm2=tformfwd(tfm,bp2);
@@ -245,7 +224,7 @@ expo=1;
         sbp=[output.blind(nblind).sel(rowmin,colmin).bp;bp2(dix,:)];
         sip=[output.blind(nblind).sel(rowmin,colmin).ip;ip2(dix,:)];
         
-        tfm=cp2tform(sbp,sip,'linear conformal');
+        tfm=cp2tform(sbp,sip,trafo);
         bptfm2=tformfwd(tfm,bp2);
         
         
@@ -285,4 +264,4 @@ expo=1;
     end
 end
 
-%  fclose(file_1);
+
