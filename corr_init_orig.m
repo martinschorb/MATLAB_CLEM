@@ -6,15 +6,15 @@
 
 % Location to search for fiducial coordinate file - *.pickspots.mat
 
-loc_pickspots = '/struct/briggs/wanda/DataLightMicroscopy';
+loc_pickspots = '/struct/briggs/wanda/DataLightMicroscopy/';
 
 % Location to search for shift correction coordinate file - *.shiftcoos.mat
 
-loc_shiftcoos = '/struct/briggs/wanda/DataLightMicroscopy';
+loc_shiftcoos = '/struct/briggs/wanda/DataLightMicroscopy/';
 
 % Location to search for Highmag Fiducial coordinate file - *.lmhmcoos.mat
 
-loc_hmcoos = '/struct/briggs/wanda/DataLightMicroscopy';
+loc_hmcoos = '/struct/briggs/wanda/DataLightMicroscopy/';
 
 % Flip fluorescence images (different grid orientation in LM and EM)
 % flip = 1 if images should be flipped // flip = 0 if images are in same orientation

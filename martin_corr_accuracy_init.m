@@ -77,7 +77,7 @@ ct_bds = uicontrol('Parent',t_bds,'Style','edit','BackgroundColor',[0.95 0.95 0.
 
 %   ---
 go = uicontrol('Style','pushbutton','BackgroundColor',[0.95 0.95 0.95],...
-           'Position',[50 50 30 50],'String','Go','Callback',{@go_Callback}); 
+           'Position',[50 50 300 50],'String','Go','Callback',{@go_Callback}); 
 
 
 % movegui(f,'center')      
@@ -87,8 +87,9 @@ uiwait(f);
 
 % -------------------------- Callback functions  ----------------------
 
-function but_dir_Callback(source,eventdata)   
-    in_dir = uigetdir('select previously picked beads',in_dir);
+function but_dir_Callback(source,eventdata)
+    in_dir = get(ct_dir,'String');
+    in_dir = uigetdir(in_dir,'select previously picked beads');
     set(ct_dir,'String',in_dir)
 end
 
@@ -116,7 +117,7 @@ function go_Callback(source,eventdata)
     in_dir = get(ct_dir,'String');
     pxs = str2num(get(ct_px,'String'));
     minbeads = str2num(get(ct_bds,'String'));
-    close(f)
+    close(f);
 end
 
 end
