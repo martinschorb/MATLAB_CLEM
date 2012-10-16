@@ -373,6 +373,16 @@ Coordinates are transformed using all marked fiducials and the output files are 
  \label{fig:tfm_HM}
 \end{figure}
 \newpage
+\section{Accuracy determination}
+The accuracy of a set of correlations performed on a certain kind of sample can be estimated by calculating the deviation of a transformed fluorescence signal of a fiducial with its true position in the EM image. The transformation is therefore generated using the remaining beads out of the set of fiducials.
+
+Once you have run a reasonable number of correlations you can use the following procedure to determine the accuracy. It is crucial that all the EM images you used for the correlations are of the same pixel size in order to compare the deviations.
+
+
+
+
+
+\newpage
 \section{Useful hints and tricks}
 \subsection{Overlay of correlated images}
 The correlation procedure writes a variety of images in tiff format that have all be aligned to each other according to the transformation used for correlation. (see\,\ref{sec:lm_output}) These include transformed fluorescence images as well as prediction circles or fiducial positions.

@@ -470,20 +470,21 @@ else
          bptfm=output.all.bptfm;
          bpr=round(bptfm);
          m_bp=max(bpr);
-    if (m_bp(1)<s_em(2)-6) && (m_bp(2)<s_em(1)-6) && (min(min(bpr))>6)
-        for n=1:size(bpr,1)
+        sr=size(bpr,1);
+        for n=1:sr
+            if min(bpr(n,:))>6 & max(bpr(n,:))<(s_em-6)
             tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=255;
-            tfmed(bpr(n,2),bpr(n,1))=10;
+            tfmed(bpr(n,2),bpr(n,1))=10;end
         end   
         output.all.circle=output.all.circle(1:s_em(1),1:s_em(2));
         newColorImage(:,:,1) =uint8(output.all.circle*255)+0.8*em;
         newColorImage(:,:,2) =tfmed+0.8*em;
         newColorImage(:,:,3) =pickedem/10*255+uint8(output.all.circle*255)+0.8*em;
         output.all.image=newColorImage;
-    else
-       output.all.image=['Bad transformation using all beads as transformation base.'];
-       disp( ['Bad transformation using all beads as transformation base.']);
-    end
+%     else
+%        output.all.image=['Bad transformation using all beads as transformation base.'];
+%        disp( ['Bad transformation using all beads as transformation base.']);
+%     end
     
     
 end
