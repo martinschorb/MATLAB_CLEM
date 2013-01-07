@@ -43,7 +43,7 @@ else
 end 
 % global status 
 status=0;
-fiti=1;
+
 if exist('gaussloc')~=1 
     a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); gaussloc = 0;
 end
