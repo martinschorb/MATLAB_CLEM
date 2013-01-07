@@ -1,4 +1,4 @@
-function [outfile,in_dir,pxs,trafo,minbeads]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo)
+function [outfile,in_dir,pxs,trafo,minbeads]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo,minbeads)
 
 close all
 % need to run this outside because of nested functions
@@ -18,7 +18,7 @@ close all
 in_dir = loc_pickspots;
 pxs = pixelsize_lm;
 outfile = 'corr_accuracy';
-minbeads = 3;
+% minbeads = 3;
 
 
 f = figure('Visible','off','Position',[0,120,1000,1000],'NumberTitle','off','Menubar','none','Name','Correlation Accuracy Determination - Initial Configuration');

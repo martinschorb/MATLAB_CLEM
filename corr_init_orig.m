@@ -1,6 +1,6 @@
 %% corr_init()
 %
-% Version Martin Schorb 120725
+% Version Martin Schorb 130107
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
@@ -41,7 +41,20 @@ hm_overlays = 0;
 
 % multiple spots of interest?
 
-multispot=0;
+multispot = 0;
+
+% subpixel localization of fluorophores enable/disable (Optimization Toolbox required!!)
+% options:
+% 0 - no fitting
+% 1 - fit signal of interest only
+% 2 - fit fiducials only
+% 3 - fit both fiducials and signal of interest
+
+gaussloc = 3;
+
+% interactive mode for fitting (0 - inactive, 1 - active, 2 - always active)
+
+fit_interactive = 0;
 
 %  ------------------------------------------------------------------------
 
@@ -52,12 +65,19 @@ trafo = 'linear conformal';
 % trafo = 'projective';
 
 % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
-fmboxsize=19; % must be odd number   -  size of box for bead-image subpixel fitting
-imboxsize=19; % must be odd number   -  size of box for fluo-image subpixel fitting
+fmboxsize=7; % must be odd number   -  size of box for bead-image subpixel fitting
+imboxsize=7; % must be odd number   -  size of box for fluo-image subpixel fitting
+
+fmfilter = 45;
 
 pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm
 hmaccuracy=accuracy*pixelsize_lm/pixelsize_hm;
 
+% check Toolbox
 
-
+a=ver('optim');
+if isempty(a)
+    warning('Optimization Toolbox not found! Not using subpixel localization.');
+    gaussloc = 0;
+end

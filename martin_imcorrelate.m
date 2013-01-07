@@ -1,4 +1,4 @@
-function martin_imcorrelate(lmf,hmf,imf,outfileroot)
+function martin_imcorrelate(lmf,hmf,imf,outfileroot,fmindex)
 
 %version MartinSchorb 100222
 %
@@ -15,6 +15,9 @@ function martin_imcorrelate(lmf,hmf,imf,outfileroot)
 %outputs files in tif format representing positions of picked fiducials
 %(output files easily overlayed in eg imagej)
 
+if nargin<5
+    fmindex = 1;
+end
 
 file=[];
 
@@ -90,9 +93,8 @@ else
     
 end
 
-% % read images and pick beads
-
-sm=imread(imf);
+% % read images and pick
+sm=imread(imf,fmindex);
 % 
 % 
 % 
@@ -102,7 +104,7 @@ sm=imread(imf);
 % % 
 % % gm=conv8to16bit(gm);
 % % rm=conv8to16bit(rm);
-hm=conv8to16bit(hm);
+% hm=conv8to16bit(hm);
 % sm=conv8to16bit(sm);
 % % lm=conv8to16bit(lm);
 % 

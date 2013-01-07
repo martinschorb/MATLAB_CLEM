@@ -1,6 +1,6 @@
 function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 
-% % version MartinSchorb 120725
+% % version MartinSchorb 130107
 % % 
 % %
 % =========================================================================
@@ -43,9 +43,9 @@ else
 end 
 % global status 
 status=0;
-
-if exist('trafo')~=1 
-    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); trafo = 'linear conformal';
+fiti=1;
+if exist('gaussloc')~=1 
+    a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); gaussloc = 0;
 end
 
 % read images and pick beads
@@ -77,7 +77,7 @@ if isa(em,'uint16')
     em2=em;
     em=uint8(em/256);
 else
-    em2='';
+    em2=em;
 end
 s_em=size(em);
 s_fm=size(fm);
@@ -148,79 +148,79 @@ end
     
 fm2=fm;
 [mlen,idx]=max(s_fm);
-if idx==1
-    fm2=padarray(fm2,[0 mlen-s_fm(2)],'symmetric','post');
-else
-    fm2=padarray(fm2,[mlen-s_fm(1) 0],'symmetric','post');
-end
 
-fm_filtered=tom_bandpass1(double(fm2),70,mlen,2);
-[fmean, fmax, fmin, fstd, fvariance] = tom_dev1(fm_filtered);
-fm_filtered=double(uint16(fm_filtered));
 numfids=size(ip,1);
-%fit beads to get subpixel centres
-% ip=floor(ip);
 bp=floor(bp);ip2=ip;bp2=bp;
-% emsir=(emboxsize-1)/2;
-fmsir=(fmboxsize-1)/2;
-% % 
-% emF=fspecial('gaussian',emsir-3,2);
-%fmF=fspecial('gaussian',3,2);
-sss=[];
-for si=1:numfids
-%     sixe=em(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
-%     sixe=double(sixe);
-%     sixe1=(sixe.*-1)+max(max(sixe));
-%     sixe2=(imfilter(sixe1,emF)); 
-% bp2(si,:)=bp(si,:);
 
-% % to let it converge
-for iii=1:4 
-%     bp(si,:)=floor(bp2(si,:));
-    sixf=fm_filtered(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
-%     sixf1=double(ideal_high(sixf,1));
-%     sixf2=double(imfilter(sixf,fmF));  
-%     [C,rows]=max(sixf2);
-%     [maximum,colmax]=max(C);
-% 	rowmax=rows(colmax);
-    % last argument enables interactive mode to score sub pixel fitting...
-%       a=cntrd1(sixe2,[emsir+1 emsir+1],floor(.5*emboxsize),0);
+if gaussloc > 1
+    imsir=floor(imboxsize/2);
+for ispot=1:numfids
+    sixf=double(fm(floor(bp(ispot,2))-imsir:floor(bp(ispot,2))+imsir , floor(bp(ispot,1))-imsir:floor(bp(ispot,1))+imsir));
+    [mu,sig,Amp,check] = martin_2dgaussfit(sixf,1,fit_interactive);
+    if isnan(mu)
+        bp1(ispot,:)=[NaN,NaN];
+    else
+    if check
+        bp1(ispot,:)=bp(ispot,:);
+        
+            
+        
+   % 168     
+    else
+        
+        bp1(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+    end
+    end
 
-% a=[0 0];
-% [a(1),a(2),sx,sy,peak0D]= Gaussian2D_1(sixe,gfl,.75*emboxsize);
-
-%     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
-% 
-% if min(a(1:2))>0 & max(a(1:2))<emboxsize
-%      ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
-% else
-%      ip2(si,:)=ip(si,:);
-% end
-%     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
-% cent1=[rowmax colmax];
-% if min(cent1)<floor(.5*fmboxsize)/2 | max(cent1)>fmboxsize-floor(.5*fmboxsize)/2
-%     b=cent1;
-% else
-
-
-    b=cntrd1(sixf,[fmsir+1 fmsir+1],floor(5),0);
-% end   
-% b=[0 0];
-% [b(1),b(2),sx,sy,peak0D]= Gaussian2D_1(sixf,gfl,.75*fmboxsize);
-
-if min(b(1:2))>0 & max(b(1:2))<fmboxsize
-    bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
-else
-    bp2(si,:)=bp(si,:);
-  
-end
- sss(si,iii)=bp2(si,1);
-
-end
+    
 end
 
-% sss
+    bp1(find(isnan(bp1(:,1))),:)=[];
 
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% 223
 status=0;
 while status==0
 
@@ -231,8 +231,8 @@ while status==0
      numfids=size(ip2,1);
 %export pixel values
     output=[ip2,bp2];
-        file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
-%     file_2 = fopen([outfileroot,'_pickspots1.txt'],'w');
+% 234
+    file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
     fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
     fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
     fclose(file_1);
@@ -283,47 +283,47 @@ else
     ipint=ipint(end,:);
     bpint=bpint(end,:);
 end
+
 numspots=size(bpint,1);
 
-%apply highpass-filter to eliminate cellular autofluorescence and fit intensity peak to get subpixel centre
-% bb=3;
-im2=im;
-[mlen,idx]=max(s_fm);
-if idx==1
-    im2=padarray(im2,[0 mlen-s_fm(2)],'symmetric','post');
-else
-    im2=padarray(im2,[mlen-s_fm(1) 0],'symmetric','post');
-end
-im_filtered=tom_bandpass1(double(im2),70,mlen,2);
-im_filtered=double(uint16(im_filtered));
-
-
-imsir=(imboxsize-1)/2;
+if mod(gaussloc,2) == 1
+    imsir=floor(imboxsize/2);
 for ispot=1:numspots
-    for iii=1:4
-
-        sixg=double(im_filtered(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir,floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
-        % sixg=ideal_high(sixg,1);
-        % sixg=imfilter(sixg,fmF);
-        % 
-        % [C,rows]=max(sixg);
-        % [maximum,colmax]=max(C);
-        % rowmax=rows(colmax);
-        % c=[0 0];
-        % [c(1),c(2),sx,sy,peak0D]= Gaussian2D_1(sixg,gfl,.75*fmboxsize);
-
-         c=cntrd1(sixg,[imsir imsir]+[1 1],7,0);
-
-
-         
-        if min(c(1:2))>0 & max(c(1:2))<imboxsize
-            bpint(ispot,:)=floor(bpint(ispot,:))+c(1:2)-[1 1]-[imsir imsir];
-        end
+    sixg=double(im(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir , floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
+    [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
+    if check
+        bpint1(ispot,:)=bpint(ispot,:);
+    else
+        
+        bpint1(ispot,:)=floor(bpint(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
 end
-% reshows point of interest
+end
 
-[ipint,bpint]=cpselect(em,im_view,ipint,bpint,'Wait',true) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% 324 reshows point of interest
+
+[ipint,bpint]=cpselect(em,im_view,ipint,bpint1,'Wait',true) ;
 
 gm1(:,:,2)=gm(:,:,1);
 gm1(:,:,3)=gm(:,:,1);
@@ -406,9 +406,9 @@ end
 
 
 [output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,trafo,outfileroot);
-clear test
+% clear test
 
-test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
+% test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
 output.emsize=s_em;
 output.fmsize=s_fm;
 ip=ip4;
@@ -423,45 +423,45 @@ for i=1:size(output.blind,2)
     
 end    
 
-[mmum select]=min(test);
+% [mmum select]=min(test);
 
 % the index of selected transformation
-tfmselect=select-1;
-
+% tfmselect=select-1;
+tfmselect = 0; % temporarily always use tfm using all beads until accuracy issue is solved!
 if tfmselect>0
-    nblind=select;
-    %generate images
-    tfmed=uint8(zeros(s_em));
-    bpot2=tformfwd(output.blind(nblind).optimtfm,output.blind(nblind).sel(rowmin,colmin).bp);
-    bpr=round(bpot2);
-    bpotfm=output.blind(nblind).bpotfm;
-    pred=uint8(zeros(size_em));
-    ppr=round([bpotfm;output.blind(nblind).sel(rowmin,colmin).blindtfm]);
-    m_bp=max(bpr);m_all=max([bpr;ppr]);
-    if (m_all(1)<s_em(1)-6) && (m_all(2)<s_em(2)) && (min(min([bpr;ppr]))>6)
-
-        for n=1:size(bpr,1)
-            tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=10;
-            tfmed(bpr(n,2),bpr(n,1))=10;
-        end
-
-
-
-        for n=1:size(ppr,1)
-            pred(ppr(n,2)-5:ppr(n,2)+5,ppr(n,1)-5:ppr(n,1)+5)=10;
-            pred(ppr(n,2),ppr(n,1))=10;
-        end
-
-
-        newColorImage(:,:,1) =pred/10*255+uint8(output.blind(nblind).circle*255)+em;
-        newColorImage(:,:,2) =tfmed/10*255+em;
-        newColorImage(:,:,3) =pickedem/10*255+uint8(output.blind(nblind).circle*255)+em;
-        output.blind(nblind).image=newColorImage;
-    else
-        output.blind(nblind).image=['blind: ',int2str(nblind),' -- ',output.blind(nblind).sel(rowmin,colmin).beads];
-        disp( ['Bad transformation using bead ',int2str(nblind),' as blind bead']);disp(['and beads ',output.blind(nblind).sel(rowmin,colmin).beads,' as transformation base.']);
-    end
-    
+%     nblind=select;
+%     %generate images
+%     tfmed=uint8(zeros(s_em));
+%     bpot2=tformfwd(output.blind(nblind).optimtfm,output.blind(nblind).sel(rowmin,colmin).bp);
+%     bpr=round(bpot2);
+%     bpotfm=output.blind(nblind).bpotfm;
+%     pred=uint8(zeros(size_em));
+%     ppr=round([bpotfm;output.blind(nblind).sel(rowmin,colmin).blindtfm]);
+%     m_bp=max(bpr);m_all=max([bpr;ppr]);
+%     if (m_all(1)<s_em(1)-6) && (m_all(2)<s_em(2)) && (min(min([bpr;ppr]))>6)
+% 
+%         for n=1:size(bpr,1)
+%             tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=10;
+%             tfmed(bpr(n,2),bpr(n,1))=10;
+%         end
+% 
+% 
+% 
+%         for n=1:size(ppr,1)
+%             pred(ppr(n,2)-5:ppr(n,2)+5,ppr(n,1)-5:ppr(n,1)+5)=10;
+%             pred(ppr(n,2),ppr(n,1))=10;
+%         end
+% 
+% 
+%         newColorImage(:,:,1) =pred/10*255+uint8(output.blind(nblind).circle*255)+em;
+%         newColorImage(:,:,2) =tfmed/10*255+em;
+%         newColorImage(:,:,3) =pickedem/10*255+uint8(output.blind(nblind).circle*255)+em;
+%         output.blind(nblind).image=newColorImage;
+%     else
+%         output.blind(nblind).image=['blind: ',int2str(nblind),' -- ',output.blind(nblind).sel(rowmin,colmin).beads];
+%         disp( ['Bad transformation using bead ',int2str(nblind),' as blind bead']);disp(['and beads ',output.blind(nblind).sel(rowmin,colmin).beads,' as transformation base.']);
+%     end
+%     
     
 else
     %      generate images
@@ -602,11 +602,11 @@ end
 % [picked2 xdata ydata]=imtransform(picked,tfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
 
 
-%convert to 16 bit
-if isa(em2,'uint16')
-    em=em2;
+%convert to 8 bit
+if isa(em,'uint8')
+    
 else
-    em=256*uint16(em);
+    em=uint8(em2/256);
 end
 
 
@@ -615,7 +615,7 @@ end
 impos=tformfwd(appltfm,bpint);
 impos1=round(impos);
 circle1=martin_circle(em,accuracy,impos1);
-impred=uint16(circle1*655535)+em;
+impred=uint8(circle1*255)+em;
 
 
 
@@ -643,9 +643,9 @@ fprintf(file_2,['Selected transformation used: ', beads,'\n\n EM Stack: ',emf,'\
 % fprintf(file_2,['Shift error (pixel):  ',int2str(shifterr),'   #of spots used for shift: ',int2str(n_shift),'\n\n-----\n']);
 fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
 fprintf(file_2,'%2.3g',psize);
-fprintf(file_2,'\n coordinates of transformed fluorescence spot:');
-fprintf(file_2,'%2.3f %2.3f',impos);
-fprintf(file_2,['\n prediction circle radius (px): ',int2str(accuracy),'\n\n-----------------\n']);
+fprintf(file_2,'\n coordinates of transformed fluorescence spot:\n');
+fprintf(file_2,'%2.2f %2.2f\n',impos);
+fprintf(file_2,['\n\n prediction circle radius (px): ',int2str(accuracy),'\n\n-----------------\n']);
 % fprintf(file_2,[ptext,t]);
 % if isequal(psize,[])
 %     fprintf(file_2,'%3.3f ,  %2.3f\n',prederrlist);
