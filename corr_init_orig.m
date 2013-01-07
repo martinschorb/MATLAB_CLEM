@@ -65,8 +65,8 @@ trafo = 'linear conformal';
 % trafo = 'projective';
 
 % emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
-fmboxsize=7; % must be odd number   -  size of box for bead-image subpixel fitting
-imboxsize=7; % must be odd number   -  size of box for fluo-image subpixel fitting
+fmboxsize=11; % must be odd number   -  size of box for bead-image subpixel fitting
+imboxsize=11; % must be odd number   -  size of box for fluo-image subpixel fitting
 
 fmfilter = 45;
 
