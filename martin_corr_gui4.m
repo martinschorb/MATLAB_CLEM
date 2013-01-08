@@ -13,7 +13,7 @@ if tfmselect>0
 
 
 %generate image list
-a=input.blind(1,tfmselect).image;
+% a=input.blind(1,tfmselect).image;
 % % num=double(imread('/struct/briggs/schorb/code/1.tif'));
 % num=double(imread(['/struct/briggs/schorb/code/',int2str(tfmselect),'.tif']));
 % num=uint8(num);
@@ -81,7 +81,7 @@ a=input.blind(1,tfmselect).image;
 %    
 % end
 
-seltext=int2str(tfmselect);
+% seltext=int2str(tfmselect);
 
 else
 % num=double(imread(['/struct/briggs/schorb/code/all.tif']));

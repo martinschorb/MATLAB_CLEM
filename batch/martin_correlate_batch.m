@@ -42,6 +42,10 @@ end
 
 
 
+
+
+
+
 [filename, pathname] = uigetfile({'*.pickspots1.mat'},'select Fiducial coordinate files','MultiSelect', 'on','/struct/briggs/schorb/beadcoord/');
 
   if iscell(filename)
@@ -62,9 +66,15 @@ for i=1:indend
 % 
 %       dirfind = strfind(file,'/');
 %       file = file(dirfind(end)+1:end);
-      
+ disp(['processing:  ',file]);     
     file1 = file;
     
+   outfileroot=['/struct/briggs/schorb/batchcorr/',file,'_bcorr1_linconf']; 
+    
+   if ~strcmp(gmf(1),'/')
+       
+       
+       
     lmdate = martin_dbread(file,8,'/struct/briggs/schorb/_Endo-Data/outliers.csv');
     
     if isempty(lmdate)
@@ -89,8 +99,8 @@ for i=1:indend
     end
     
     
-    
-    
+%     file1=filebase;
+    outfileroot=['/struct/briggs/schorb/batchcorr/',file,'_bcorr1_orig'];
   
 
 
@@ -178,6 +188,7 @@ if fmf(1:2)=='..'
     cd('corr')
 end
 
+
 if exist(gmf)==0
     
 [gmf, pathname2] = uigetfile({'*.tif'},['select GFP image (',gmf,')']);
@@ -186,13 +197,12 @@ cd(pathname2);
 
 end
 
-outfileroot=['/struct/briggs/schorb/batchcorr/',file1,'_bcorr1'];
+fmdir = [pwd,'/'];
 
 % read images and pick beads
 % em=imread(emf);
 %em=em';
-fm=imread(fmf);gm=imread(gmf);rm=imread(rmf);
-fm=fm';gm=gm';rm=rm';
+
 % fm=fm.*(65535./(0.2*max(max(fm))));
     
     cd corr;
@@ -209,14 +219,17 @@ fm=fm';gm=gm';rm=rm';
         pause
     end
     
-    
+    emdir=[pwd,'/'];
     
 %     
 %     
     emf = (emd(1).name);
-    
+end   
+
     em=imread(emf);
-    
+    cd ..
+    fm=imread(fmf);gm=imread(gmf);rm=imread(rmf);
+    fm=fm';gm=gm';rm=rm';    
 % adjust contrast of images according to init values
 em=imadjust(em);
 if contr_b==0
@@ -338,10 +351,11 @@ fm2=fm;
 [mlen,idx]=max(s_fm);
 
 numfids=size(ip,1);
-bp=floor(bp);ip2=ip;bp2=bp;
+bp=floor(bp);ip2=ip;bp2=bp;bp1=bp;
 
-
-[ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
+status=0;
+while status==0
+% [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
 
 
 
@@ -363,17 +377,16 @@ for ispot=1:numfids
    % 168     
     else
         
-        bp1(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+        bp2(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
     end
 
     
 end
-
-    bp1(find(isnan(bp1(:,1))),:)=[];
-
+    nanidx=find(isnan(bp1(:,1)));
+    bp2(nanidx,:)=[];
+    ip2(nanidx,:)=[];
 end
-
 
 
 
@@ -416,8 +429,7 @@ end
 
 
 % 223
-status=0;
-while status==0
+
 
 %reshows the control points so you can check them...
 % ip4=ip;bp4=bp;
@@ -429,7 +441,7 @@ while status==0
 % 234
     file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
     fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
-    fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
+    fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',output'); 
     fclose(file_1);
     
     
@@ -518,8 +530,8 @@ end
 
 % 324 reshows point of interest
 
-[ipint,bpint]=cpselect(em,im_view,ipint,bpint1,'Wait',true) ;
-
+% [ipint,bpint]=cpselect(em,im_view,ipint,bpint1,'Wait',true) ;
+% 
 gm1(:,:,2)=gm(:,:,1);
 gm1(:,:,3)=gm(:,:,1);
     for ispot=1:numspots
@@ -603,8 +615,10 @@ end
 % [output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,trafo,outfileroot);
 % clear test
 
-alltfm = cp2tfm(bp4,ip4,trafo);
+alltfm = cp2tform(bp4,ip4,trafo);
 bptfm = tformfwd(alltfm,bp4);
+
+appltfm = alltfm;
 
 % test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
 output.emsize=s_em;
@@ -635,7 +649,14 @@ impos=tformfwd(appltfm,bpint);
 impos1=round(impos);
 circle1=martin_circle(em,accuracy,impos1);
 impred=uint8(circle1*255)+em;
-        
+
+sz_em=size(em);
+pickedem=uint8(zeros(sz_em));
+ip2r=round(ip4);
+for n=1:size(ip4,1)
+pickedem(max(ip2r(n,2)-5,1):min(ip2r(n,2)+5,sz_em(1)),max(ip2r(n,1)-5,1):min(ip2r(n,1)+5,sz_em(2)))=10;
+pickedem(ip2r(n,2),ip2r(n,1))=10;
+end
         
         
         for n=1:sr
@@ -664,6 +685,12 @@ end
 
 ip=ip4;
 bp=bp4;
+
+fmf=[fmdir,fmf];
+gmf=[fmdir,gmf];
+rmf=[fmdir,rmf];
+emf=[emdir,emf];
+
 save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf',['medshift_',fluorsel],'bpint'); 
 
 
@@ -717,21 +744,19 @@ end
 
 
 
-
-
-imwrite(circle1,[outfileroot,file,'_prediction.tif'],'Compression','none');
-imwrite(impred,[outfileroot,file,'_pred_overlay.tif'],'Compression','none');
+imwrite(circle1,[outfileroot,file,'_prediction.jpg']);
+imwrite(impred,[outfileroot,file,'_pred_overlay.jpg']);
 
 
 
 % write output files
-imwrite(fm2,[outfileroot,file,'_fm.tif'],'Compression','none');
-imwrite(em,[outfileroot,file,'_em.tif'],'Compression','none');
-imwrite(gm2,[outfileroot,file,'_gm.tif'],'Compression','none');
-imwrite(rm2,[outfileroot,file,'_rm.tif'],'Compression','none');
-imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
-imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');
-imwrite(rgb,[outfileroot,file,'_predictions.tif'],'Compression','none');
+imwrite(fm2,[outfileroot,file,'_fm.jpg']);
+imwrite(em,[outfileroot,file,'_em.jpg']);
+imwrite(gm2,[outfileroot,file,'_gm.jpg']);
+imwrite(rm2,[outfileroot,file,'_rm.jpg']);
+imwrite(tfmed,[outfileroot,file,'_tfmed.jpg']);
+imwrite(pickedem,[outfileroot,file,'_pickedem.jpg']);
+imwrite(rgb,[outfileroot,file,'_predictions.jpg']);
 
 save([outfileroot,file,'.appltfm.mat'],'appltfm','emf','file','circle1','fluorsel','accuracy','impos');
 
@@ -741,8 +766,8 @@ file_2 = fopen([outfileroot,file,'_transform.log'],'w');
 fprintf(file_2,[outfileroot,file,'_transform.log      ---   Logfile of transformation\n\n']);
 fprintf(file_2,['Selected transformation used: ', beads,'\n\n EM Stack: ',emf,'\n Fluorospheres: ',fmf,'\n GFP Image: ',gmf, '\n RFP Image: ',rmf,'\n\n-----\n']);
 % fprintf(file_2,['Shift error (pixel):  ',int2str(shifterr),'   #of spots used for shift: ',int2str(n_shift),'\n\n-----\n']);
-fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
-fprintf(file_2,'%2.3g',psize);
+% fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
+% fprintf(file_2,'%2.3g',psize);
 fprintf(file_2,'\n coordinates of transformed fluorescence spot:\n');
 fprintf(file_2,'%2.2f %2.2f\n',impos);
 fprintf(file_2,['\n\n prediction circle radius (px): ',int2str(accuracy),'\n\n-----------------\n']);

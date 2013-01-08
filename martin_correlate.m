@@ -123,16 +123,16 @@ pause(0.001)
 status=0;
         end
 else
-    %import previously clicked positions
-    if filecheck2==2
-       load([outfileroot,file,'.pickspots1.mat']);
-%        [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
-    else
-        load([outfileroot,file,'_pickspots1.mat']);
-%         [ip,bp]=cpselect(em,fm,ip,bp,'Wait',true);
-    end    
+    load([outfileroot,file,'.pickspots1.mat']);
 end
 
+status=0;
+while status==0
+    if exist(ip2)>0
+        [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
+    end
+
+% 135
 while size(ip,1) <5
     k=msgbox('you need at least 5 pairs for fit','Error','modal');
     uiwait(k);
@@ -150,7 +150,7 @@ fm2=fm;
 [mlen,idx]=max(s_fm);
 
 numfids=size(ip,1);
-bp=floor(bp);ip2=ip;bp2=bp;
+bp=floor(bp);ip2=ip;bp2=bp;bp1=bp;
 
 if gaussloc > 1
     imsir=floor(imboxsize/2);
@@ -168,15 +168,15 @@ for ispot=1:numfids
    % 168     
     else
         
-        bp1(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+        bp2(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
     end
 
     
 end
-
-    bp1(find(isnan(bp1(:,1))),:)=[];
-
+    nanidx=find(isnan(bp1(:,1)));
+    bp2(nanidx,:)=[];
+    ip2(nanidx,:)=[];    
 end
 
 
@@ -220,10 +220,10 @@ end
 
 
 
-% 223
-status=0;
-while status==0
 
+
+
+% 226
 %reshows the control points so you can check them...
 % ip4=ip;bp4=bp;
     [ip4,bp4]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
@@ -234,7 +234,7 @@ while status==0
 % 234
     file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
     fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
-    fprintf(file_1,'%4.0f,%4.0f -  %4.0f, %4.0f \n',output'); 
+    fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',output'); 
     fclose(file_1);
     
     
@@ -415,13 +415,13 @@ ip=ip4;
 bp=bp4;
 
 %     calculates the accuracy for the predicted region:
-for i=1:size(output.blind,2)
-    rowmin=output.blind(i).rowmin;
-    colmin=output.blind(i).colmin;
-    test(i+1)=output.blind(i).minimum;
-%     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
-    
-end    
+% for i=1:size(output.blind,2)
+%     rowmin=output.blind(i).rowmin;
+%     colmin=output.blind(i).colmin;
+%     test(i+1)=output.blind(i).minimum;
+% %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
+%     
+% end    
 
 % [mmum select]=min(test);
 

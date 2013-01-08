@@ -1,11 +1,14 @@
-function data=martin_corr_accuracy(kmin,files)
+function data = martin_corr_accuracy(kmin,files)
 
 % %version MartinSchorb 120912
 % %
 
 
-accthr = 50/(5.068/2);
+% accthr = 50/(5.068/2);
 
+if nargin==0
+    kmin=3;
+end
 
 if exist('corr_init')==2
     corr_init();
@@ -18,11 +21,10 @@ else
 end 
 
 
-file_1 = fopen('/struct/briggs/schorb/accuracy/outliers/images_good.csv','w');
-fprintf(file_1,['Correlation accuracy for certain images.\n\n threshold is set to ',num2str(accthr*5.068),' nm\n\n File    ;   number of total beads    ;  outimage numbers  ;  number of instances above threshold  \n------------------------\n']);
+% file_1 = fopen('/struct/briggs/schorb/batchcorr/images_good.csv','w');
+% fprintf(file_1,['Correlation accuracy for certain images.\n\n threshold is set to ',num2str(accthr*5.068),' nm\n\n File    ;   number of total beads    ;  outimage numbers  ;  number of instances above threshold  \n------------------------\n']);
     
-
-   
+  
 
 %  initialization and GUI
 
@@ -63,7 +65,8 @@ else
     
 for fileidx=1:size(filename,2) %file list index
         disp(['processing ',filename{fileidx},' ... ',num2str(fileidx),' of ',num2str(size(filename,2))]);
-                data.files{fileidx} = [pathname,cell2mat(filename(fileidx))];
+                data.files{fileidx} = cell2mat(filename(fileidx));
+                
         a=open([pathname,cell2mat(filename(fileidx))]);
 % 
 % %%  analyse blind bead accuracy for the current file (image&bead coordinates)
@@ -165,7 +168,7 @@ pt1 = ip2(nblind,:);
 %                  ls = sum(sum(((bptfm(:,1:2)-tip).^2).^expo,2)); % least squares deviation for all beads
 %                  lsr = sum((1./dist_em1).^expo_r.*sum(((bptfm(:,1:2)-tip).^2).^expo,2));
 
-                usedbeads = st;
+                usedbeads(corrindex) = st;
 %                 m4(k-kmin+1,cnt)=ls/usedbeads;
                 
                 prederr = norm(ip2(nblind,:)-bptfm2(nblind,:));
@@ -180,8 +183,9 @@ pt1 = ip2(nblind,:);
                x=x+1;
                corrindex = corrindex+1;
             end
-            
-
+            if cnt==1
+                data.allbeads_err(y) = prederr;
+            end
 
         end
 
@@ -189,7 +193,7 @@ pt1 = ip2(nblind,:);
        
 [testdist,tix] = min(prdr);
 
-
+data.n_used(y) = usedbeads(tix);
 
 
 data.minprederr(y)=testdist;
@@ -202,6 +206,7 @@ clear prdr
 % 
 % if testdist < accthr
       file = filename{fileidx}(1:end-15);
+      
 %       disp(num2str(testdist));
 %       dirfind = strfind(file,'/');
 %       file = file(dirfind(end)+1:end);
@@ -374,6 +379,6 @@ data.besterrors = sortrows(data.minprederr'*pxs);
  lpb = 1/length(data.besterrors);
  data.bestpercentage = lpb:lpb:1;
 
-    fclose(file_1);
+%     fclose(file_1);
 
 

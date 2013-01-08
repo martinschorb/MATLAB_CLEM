@@ -75,9 +75,9 @@ output.blind.sel=struct;
     for cl=1:ntot
         dist1(cl)=norm(pos-ip2(cl,:));
     end
-    [mincl dix]=min(dist1);
-    output.closdist=mincl;
-    output.dix=dix;
+%     [mincl dix]=min(dist1);
+%     output.closdist=mincl;
+%     output.dix=dix;
 % 
 %     % include transformation using all beads
 % 
@@ -115,81 +115,81 @@ output.blind.sel=struct;
 %    output.all.image=['Bad transformation using all beads as transformation base.'];
 %    disp( ['Bad transformation using all beads as transformation base.']);
 % end
-output.all.closerr=norm(ip2(dix)-output.all.bptfm(dix));
+% output.all.closerr=norm(ip2(dix)-output.all.bptfm(dix));
 % output.all.tfmed=tfmed;
 
 
 % prediction loops -------------------------------------------------
-
-for nblind=1:ntot  % blind bead index
-
-    %ip3=[ip2(1:-1,:);999999 9999999;ip2(nblind+1:end,:)];
-    ip=ip2;
-    bp=bp2;
-    
- 
-   
-    ip(nblind,:)=[];
-    bp(nblind,:)=[];
-    n=size(ip,1); %total number of picked beads
-    output.blind(nblind).ip=ip;
-    output.blind(nblind).bp=bp;
-    m4=150000000*ones(n-kmin+1,max(nchoosek(n+1,kmin+2),nchoosek(n,kmin)));
-    
-    for k=kmin:(n-1)  % # of trafo base index
-        
-        tsize=nchoosek(n,k);
-        permidx=martin_combin(n,k);
-        
-        for cnt=1:tsize %index to go through the possible transformations
-            output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
-            
-            tip=ip(permidx(cnt,:),:);
-            tbp=bp(permidx(cnt,:),:);
-            output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
-           
-            output.blind(nblind).sel(k-kmin+1,cnt).ip=tip;             %(*)
-            output.blind(nblind).sel(k-kmin+1,cnt).bp=tbp;             %(*)
-            
-            %analysis of the distribution
-%            output.blind(nblind).sel(k-kmin+1,cnt).stat_used=martin_beads_analysis2(tip,ip2,nblind);       %(*)
-            output.blind(nblind).sel(k-kmin+1,cnt).point=permidx(cnt,:);
-
-
-             %calculate current transformation
-              tfm=cp2tform(tbp,tip,trafo);
-             output.blind(nblind).sel(k-kmin+1,cnt).tfm=tfm;           %(*)
-              %transform coordinates and estimate
-             bptfm=tformfwd(tfm,bp2);
-
-            %mark whether predicted position used to generate transform
-            for q=1:k
-                bptfm(output.blind(nblind).sel(k-kmin+1,cnt).point(q),3)=1;
-            end
-              output.blind(nblind).sel(k-kmin+1,cnt).bptfm=bptfm;
-%               output.blind(nblind).sel(k-kmin+1).bselect=bselect;
-
-            
-            
-            %calculate internal property
-            ls=0;
-
-                
-            ls=sum(sum((bptfm(:,1:2)-ip2).^2));
-                
-                
-            m4(k-kmin+1,cnt)=ls/n;
-            
-                      
-%             calculate accuracy of prediction
-            output.blind(nblind).sel(k-kmin+1,cnt).blindtfm=tformfwd(tfm,bp2(nblind,:));
-            output.blind(nblind).sel(k-kmin+1,cnt).blinddev=(output.blind(nblind).sel(k-kmin+1,cnt).blindtfm(1)-ip2(nblind,1))^2+(output.blind(nblind).sel(k-kmin+1,cnt).blindtfm(2)-ip2(nblind,2))^2;
-
-   
-
-    end
-    
-    end  
+% 
+% for nblind=1:ntot  % blind bead index
+% 
+%     %ip3=[ip2(1:-1,:);999999 9999999;ip2(nblind+1:end,:)];
+%     ip=ip2;
+%     bp=bp2;
+%     
+%  
+%    
+%     ip(nblind,:)=[];
+%     bp(nblind,:)=[];
+%     n=size(ip,1); %total number of picked beads
+%     output.blind(nblind).ip=ip;
+%     output.blind(nblind).bp=bp;
+%     m4=150000000*ones(n-kmin+1,max(nchoosek(n+1,kmin+2),nchoosek(n,kmin)));
+%     
+%     for k=kmin:(n-1)  % # of trafo base index
+%         
+%         tsize=nchoosek(n,k);
+%         permidx=martin_combin(n,k);
+%         
+%         for cnt=1:tsize %index to go through the possible transformations
+%             output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
+%             
+%             tip=ip(permidx(cnt,:),:);
+%             tbp=bp(permidx(cnt,:),:);
+%             output.blind(nblind).sel(k-kmin+1,cnt).beads=permidx(cnt,:);
+%            
+%             output.blind(nblind).sel(k-kmin+1,cnt).ip=tip;             %(*)
+%             output.blind(nblind).sel(k-kmin+1,cnt).bp=tbp;             %(*)
+%             
+%             %analysis of the distribution
+% %            output.blind(nblind).sel(k-kmin+1,cnt).stat_used=martin_beads_analysis2(tip,ip2,nblind);       %(*)
+%             output.blind(nblind).sel(k-kmin+1,cnt).point=permidx(cnt,:);
+% 
+% 
+%              %calculate current transformation
+%               tfm=cp2tform(tbp,tip,trafo);
+%              output.blind(nblind).sel(k-kmin+1,cnt).tfm=tfm;           %(*)
+%               %transform coordinates and estimate
+%              bptfm=tformfwd(tfm,bp2);
+% 
+%             %mark whether predicted position used to generate transform
+%             for q=1:k
+%                 bptfm(output.blind(nblind).sel(k-kmin+1,cnt).point(q),3)=1;
+%             end
+%               output.blind(nblind).sel(k-kmin+1,cnt).bptfm=bptfm;
+% %               output.blind(nblind).sel(k-kmin+1).bselect=bselect;
+% 
+%             
+%             
+%             %calculate internal property
+%             ls=0;
+% 
+%                 
+%             ls=sum(sum((bptfm(:,1:2)-ip2).^2));
+%                 
+%                 
+%             m4(k-kmin+1,cnt)=ls/n;
+%             
+%                       
+% %             calculate accuracy of prediction
+%             output.blind(nblind).sel(k-kmin+1,cnt).blindtfm=tformfwd(tfm,bp2(nblind,:));
+%             output.blind(nblind).sel(k-kmin+1,cnt).blinddev=(output.blind(nblind).sel(k-kmin+1,cnt).blindtfm(1)-ip2(nblind,1))^2+(output.blind(nblind).sel(k-kmin+1,cnt).blindtfm(2)-ip2(nblind,2))^2;
+% 
+%    
+% 
+%     end
+%     
+%     end  
     
 
     
@@ -198,43 +198,43 @@ for nblind=1:ntot  % blind bead index
 
 % find minimum of squared residues and the corresponding transformation
 
-[C,rows]=min(m4);
-if size(rows,2)>1
-    [minimum,colmin]=min(C);
-    rowmin=rows(colmin);
-else
-    minimum=C;
-    rowmin=1;
-    colmin=rows;
-end
-output.blind(nblind).optimum=[rowmin,colmin];
-output.blind(nblind).minimum=minimum;
-output.blind(nblind).rowmin=rowmin;
-output.blind(nblind).colmin=colmin;
-output.blind(nblind).closerr=norm(ip2(dix)-output.blind(nblind).sel(rowmin,colmin).bptfm(dix));
-output.blind(nblind).optimtfm=output.blind(nblind).sel(rowmin,colmin).tfm;
+% [C,rows]=min(m4);
+% if size(rows,2)>1
+%     [minimum,colmin]=min(C);
+%     rowmin=rows(colmin);
+% else
+%     minimum=C;
+%     rowmin=1;
+%     colmin=rows;
+% end
+% output.blind(nblind).optimum=[rowmin,colmin];
+% output.blind(nblind).minimum=minimum;
+% output.blind(nblind).rowmin=rowmin;
+% output.blind(nblind).colmin=colmin;
+% output.blind(nblind).closerr=norm(ip2(dix)-output.blind(nblind).sel(rowmin,colmin).bptfm(dix));
+% output.blind(nblind).optimtfm=output.blind(nblind).sel(rowmin,colmin).tfm;
 
 % % apply optimal transform to predict all other beads.
 
 % select beads
-for ind=1:size(output.blind(nblind).sel(rowmin,colmin).point,2)
-    bp(output.blind(nblind).sel(rowmin,colmin).point(end-ind+1),:)=[];
-    ip(output.blind(nblind).sel(rowmin,colmin).point(end-ind+1),:)=[];
-end
-
-    bpotfm=tformfwd(output.blind(nblind).optimtfm,bp);
-    output.blind(nblind).circle=martin_circle(em,accuracy,round(tformfwd(output.blind(nblind).optimtfm,bpint)));
+% for ind=1:size(output.blind(nblind).sel(rowmin,colmin).point,2)
+%     bp(output.blind(nblind).sel(rowmin,colmin).point(end-ind+1),:)=[];
+%     ip(output.blind(nblind).sel(rowmin,colmin).point(end-ind+1),:)=[];
+% end
+% 
+%     bpotfm=tformfwd(output.blind(nblind).optimtfm,bp);
+%     output.blind(nblind).circle=martin_circle(em,accuracy,round(tformfwd(output.blind(nblind).optimtfm,bpint)));
+% %     
+% %     error estimation
+%     output.blind(nblind).devall=minimum;
+%     output.blind(nblind).preddev=minimum;
+%     output.blind(nblind).bpotfm=bpotfm;
 %     
-%     error estimation
-    output.blind(nblind).devall=minimum;
-    output.blind(nblind).preddev=minimum;
-    output.blind(nblind).bpotfm=bpotfm;
-    
-        for eix=1:size(bpotfm,1)
-            output.blind(nblind).devall=output.blind(nblind).devall+(norm(bpotfm(eix,:)-ip(eix,:)))^2;
-            output.blind(nblind).preddev(eix+1)=(norm(bpotfm(eix,:)-ip(eix,:)))^2;
-        end
-
+%         for eix=1:size(bpotfm,1)
+%             output.blind(nblind).devall=output.blind(nblind).devall+(norm(bpotfm(eix,:)-ip(eix,:)))^2;
+%             output.blind(nblind).preddev(eix+1)=(norm(bpotfm(eix,:)-ip(eix,:)))^2;
+%         end
+% 
 
 % devall(nblind)= output.blind(nblind).devall;
 
