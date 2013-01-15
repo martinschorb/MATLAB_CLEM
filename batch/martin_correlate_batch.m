@@ -28,9 +28,9 @@
 % % (output files easily overlayed in eg imagej)
  clear all
 
-if exist('corr_init')==2
+if exist('corr_init','file')==2
     corr_init();
-elseif exist('corr_init_orig')==2
+elseif exist('corr_init_orig','file')==2
     corr_init_orig(); 
 else 
     a=msgbox('No initialization script found!','Error','modal');uiwait(a);
@@ -71,6 +71,11 @@ for i=1:indend
     
    outfileroot=['/struct/briggs/schorb/batchcorr/',file,'_bcorr1_linconf']; 
     
+   
+   if exist([outfileroot,'_picked1.txt'])==0
+   
+   
+   
    if ~strcmp(gmf(1),'/')
        
        
@@ -92,6 +97,7 @@ for i=1:indend
     end
     
     
+    
     if ~isempty(str2num(file(end))) 
         filebase = file;
     else
@@ -102,7 +108,9 @@ for i=1:indend
 %     file1=filebase;
     outfileroot=['/struct/briggs/schorb/batchcorr/',file,'_bcorr1_orig'];
   
-
+    if exist([outfileroot,'_picked1.txt'])==2
+        continue
+    end
 
     if isempty(lmdate)
         
@@ -182,14 +190,13 @@ for i=1:indend
 % end
 
 
+dirpos1 = strfind(fmf,'/');
+fmf = fmf(dirpos1(end)+1:end);
+gmf = gmf(dirpos1(end)+1:end);
+rmf = rmf(dirpos1(end)+1:end);
 
 
-if fmf(1:2)=='..'
-    cd('corr')
-end
-
-
-if exist(gmf)==0
+if exist(gmf,'file')==0
     
 [gmf, pathname2] = uigetfile({'*.tif'},['select GFP image (',gmf,')']);
 
@@ -362,6 +369,9 @@ while status==0
 
 
 if gaussloc > 1
+    ip4=[];
+ while length(ip4)~=length(ip2)   
+    
     imsir=floor(imboxsize/2);
 for ispot=1:numfids
     sixf=double(fm(floor(bp(ispot,2))-imsir:floor(bp(ispot,2))+imsir , floor(bp(ispot,1))-imsir:floor(bp(ispot,1))+imsir));
@@ -372,9 +382,7 @@ for ispot=1:numfids
     if check
         bp1(ispot,:)=bp(ispot,:);
         
-            
-        
-   % 168     
+
     else
         
         bp2(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
@@ -386,54 +394,15 @@ end
     nanidx=find(isnan(bp1(:,1)));
     bp2(nanidx,:)=[];
     ip2(nanidx,:)=[];
-end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% 223
 
 
 %reshows the control points so you can check them...
 % ip4=ip;bp4=bp;
     [ip4,bp4]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
+    ip=ip4;bp=bp4;
+ end
+end
      ip2=ip4;bp2=bp4;
      numfids=size(ip2,1);
 %export pixel values
@@ -790,7 +759,7 @@ fclose(file_2);
 % imshow(rgb)
 imshow(impred)
 
-
+   end
 
 a=who;
 excl=find(ismember(a,[keep;'a']));

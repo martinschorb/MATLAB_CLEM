@@ -1,13 +1,14 @@
-function [mu,sig,A,check] = martin_2dgaussfit(im,linear,interactive)
+function [mu,sig,A,check] = martin_2dgaussfit(im,linear,interactive,c0)
 
 % 2D-Gauss Fit (i.e. of one peak to a PSF-convolved image)
 % 
-% usage is [mu,sig,check] = martin_2dgaussfit(image,linear_background_enable,interactive_mode_enable)
+% usage is [mu,sig,check] = martin_2dgaussfit(image,linear_background_enable,interactive_mode_enable,initial_guess_of_center)
 % 
 % version MartinSchorb 130107
 % 
-% with the inputs: image (has to be square) , and indicators whether linear
-% background subtraction and interactive mode should be enabled.
+% with the inputs: image (has to be square) , indicators whether linear
+% background subtraction and interactive mode should be enabled, and
+% optional initial coordinates of the center.
 %
 % returns: mu - the fitted centre of the gaussian, sig - its standard dev.,
 %   A - its Amplitude, check - an indicator whether the outputs are
@@ -87,11 +88,23 @@ for i=1:length(row)
     end
 end
 
+%  initial parameters
+
+
     
-% prepare fit function to minimize and start parameters
-centerim = im1(2:end-1,2:end-1);
-maxpeak = max(centerim(:));
-middle=ceil(sz(1:2)/2);
+    centerim = im1(2:end-1,2:end-1);
+    maxpeak = max(centerim(:));
+    
+if nargin<4
+    
+    middle=ceil(sz(1:2)/2);
+
+else
+
+    middle = c0;
+end
+
+
 
 %Define a function which returns the residual between image and your fitted gaussian
 gauss2D = @(params) params(1)/params(4)*exp(-(1/(2*params(4))*((X(:)-params(2)).^2+(Y(:)-params(3)).^2))) - im1(:);
@@ -169,7 +182,7 @@ if (interactive + check) > 1
     set(aa,'LineWidth',2)
     set(aa,'EdgeColor','k');
     set(aa,'FaceAlpha',0);
-    bb = plot3(repmat((sz(1)+1)/2,[2 1]),repmat((sz(1)+1)/2,[2 1]),[0 max([im1(:);Z(:)])]);
+    bb = plot3(repmat(middle(1),[2 1]),repmat(middle(2),[2 1]),[0 max([im1(:);Z(:)])]);
     set(bb,'LineWidth',3);
     set(bb,'Color','m');
     
@@ -206,10 +219,20 @@ end
 function manualbutton(h_manualbutton,event)
     close all
     [xxx,mu] = cpselect(uint16(im1),imadjust(uint16(im1)),mu,mu,'Wait',true);
-    A=NaN; sig=NaN;
-    check = 0;
     
-    
+%     reduce box size
+    cs = round(log2(sz));
+    newsize = max(sz - 2*cs,[3 3]);
+    dis1 = ceil(newsize/2)-1;
+    corner = min(max(round(mu)-dis1,1),sz-newsize+1);
+    im1 = imcrop(im,[corner,newsize-1]);
+    c1 = max(mu-corner+dis1-1,[1 1]);
+    [mu1,sig,A,check] = martin_2dgaussfit(im1,linear,2,c1);
+    if c1 == [1 1]
+        mu = mu1;
+    else
+        mu = mu1-dis1+corner;
+    end
 end
 
 

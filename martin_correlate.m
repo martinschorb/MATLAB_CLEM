@@ -32,9 +32,9 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 % % and predictions of the selected transform
 % % (output files easily overlayed in eg imagej)
 
-if exist('corr_init')==2
+if exist('corr_init','file')==2
     corr_init();
-elseif exist('corr_init_orig')==2
+elseif exist('corr_init_orig','file')==2
     corr_init_orig(); 
 else 
     a=msgbox('No initialization script found!','Error','modal');uiwait(a);
@@ -44,7 +44,7 @@ end
 % global status 
 status=0;
 
-if exist('gaussloc')~=1 
+if exist('gaussloc','var')~=1 
     a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); gaussloc = 0;
 end
 
@@ -86,26 +86,26 @@ s_fm=size(fm);
 file='';
 
 % get pixel size of em-tom
-pos1=strfind(emf,'/stac');
-stfile=emf(1:pos1);
-pos2=strfind(emf,'aphy/');
-stfile=[stfile,emf(pos2+5:pos2+10),'_',file,'lma.st'];
-
-if exist(stfile)
-    [s sz]=unix(['header ',stfile]);
-    pos3=strfind(sz,'Cell axes');
-    pos4=strfind(sz(pos3+42:end),'.');
-    sz=str2num(sz(pos3+42:pos3+43+pos4(1)));
-    psize=sz/(s_em(2));ptext='';
-else
-    psize=[];
-    ptext=['NO PIXEL INFORMATION FOUND FOR TOMOGRAM '];
-    disp(ptext);
-end
+% pos1=strfind(emf,'/stac');
+% stfile=emf(1:pos1);
+% pos2=strfind(emf,'aphy/');
+% stfile=[stfile,emf(pos2+5:pos2+10),'_',file,'lma.st'];
+% 
+% if exist(stfile,'file')
+%     [s sz]=unix(['header ',stfile]);
+%     pos3=strfind(sz,'Cell axes');
+%     pos4=strfind(sz(pos3+42:end),'.');
+%     sz=str2num(sz(pos3+42:pos3+43+pos4(1)));
+%     psize=sz/(s_em(2));ptext='';
+% else
+%     psize=[];
+%     ptext=['NO PIXEL INFORMATION FOUND FOR TOMOGRAM '];
+%     disp(ptext);
+% end
 
 %check if already previously picked
-filecheck=exist([outfileroot,file,'_pickspots1.mat']);
-filecheck2=exist([outfileroot,file,'.pickspots1.mat']);
+filecheck=exist([outfileroot,file,'_pickspots1.mat'],'file');
+filecheck2=exist([outfileroot,file,'.pickspots1.mat'],'file');
 
 if filecheck==0 & filecheck2==0
   %import previously clicked positions
@@ -128,7 +128,8 @@ end
 
 status=0;
 while status==0
-    if exist(ip2)>0
+    
+    if exist('ip2','var')>0
         [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
     end
 
@@ -244,7 +245,7 @@ end
    
 % asks for region of interest using the control points
 
-if exist('ipint')==0
+if exist('ipint','var')==0
 
 fluorsel = questdlg('What fluorescence signal are you interested in?','Signal Selector','GFP','RFP','Cancel');
 
@@ -527,7 +528,7 @@ end
 % clear global status
 
 % 
-% if exist([outfileroot,file,'_transforms.mat'])==0
+% if exist([outfileroot,file,'_transforms.mat'],'file')==0
 %     save([outfileroot,file,'_transforms.mat'], 'output');
 % end
 
