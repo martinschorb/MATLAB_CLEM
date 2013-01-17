@@ -276,7 +276,7 @@ The coordinates of the fluorescent spot(s) of interest are also determined by a 
 
 To continue, close the window. 
 
-\lstinputlisting[linerange={291-293,297-298}]{../martin_correlate.m}
+\lstinputlisting[linerange={294-296,300-301}]{../martin_correlate.m}
 
 \begin{figure}
  \centering
@@ -287,18 +287,20 @@ To continue, close the window.
 \end{figure}
 
 \subsubsection{Correction of stage drift in between imaging of the different fluorescence channels}
-The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels. This step can be skipped if not needed. Just close the selection window and select ``Export and Close''. To continue then press any key while having the main MATLAB window active. If you constantly want to skip this correction you can modify your configuration script accordingly.\\
+The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels. This step can be skipped if not needed by. Just close the selection window and select ``Export and Close''. To continue then press any key while having the main MATLAB window active. If you constantly want to skip this correction you can modify your configuration script accordingly.\\
 
 A file selection window will ask for already existing files storing these coordinates.\\
 
-In case no pre-existing shift coordinates are selected a new window will open showing an RGB-overlay of the fiducial fluorescence image in red and the selected fluorescence channel containing the signal of interest in green. (Fig.\,\ref{fig:digitize}) % If a message window pops up stating that the variable called \texttt{XY} already exists, just choose overwriting it 
-Click the obvious bleeding fiducials (both channels show a spot-like signal in close proximity) and close the window, saving the positions. If you cannot find any obvious points, just continue without clicking postitions. The shift correction will then be skipped.\\
+In case no pre-existing shift coordinates are selected a new window will open showing an RGB-overlay of the fiducial fluorescence image in red and the selected fluorescence channel containing the signal of interest in green. (Fig.\,\ref{fig:digitize})
+Click the obvious bleeding fiducials (both channels show a spot-like signal in close proximity) and close the window, saving the positions. The entire shift correction procedure is done by:
+\lstinputlisting[linerange={339-339}]{../martin_correlate.m}
+If you cannot find any obvious points, just continue without clicking postitions. The shift correction will then be skipped.\\
 
 To continue press any key while having the main MATLAB window active.\\
 
 \begin{figure}
  \centering
- \includegraphics[width=.78\textwidth]{images/digitize.jpg}
+ \includegraphics[width=.73\textwidth]{images/digitize.jpg}
  % digitize.jpg: 1600x1153 pixel, 762dpi, 5.33x3.84 cm, bb=0 0 151 109
  \caption{The tool for selecting the fiducials bleeding through to the fluorescence channel of interest. Clicked positions are indicated using blue circles.}
  \label{fig:digitize}
@@ -315,9 +317,7 @@ Based on the set of clicked fiducials, the most accurate linear transformation (
 % \lstinputlisting[linerange={410-411}]{../martin_correlate.m}
 
 The resulting best coordinate transformation is applied to all cordinates and presented in a graphical output window. (Fig.\,\ref{fig:tfm_select}) The beads chosen for the transformation are displayed in the bottom left. Blue positions show the clicked coordinates in the EM-image, green dots represent the transformed position of corresponding fiducial signal from the fluorescence image. To have an idea where the spot of interest is predicted, it is shown by a magenta circle. By clicking the lower button, obiously mispicked beads can be corrected, jumping to the selection step of the algorithm.(\ref{sec:fiducials}) When clicking ``GO'', all output files will be created using the presented coordinate transformation.\\
-
 An overlay image showing the predicted spot(s) within the EM image as a white circle (Fig.\,\ref{fig:tfm_appl}) indicates a successful run of the collelating sript.
-
 \begin{figure}
  \centering
  \includegraphics[width=.7\textwidth]{images/tfm_select.jpg}
