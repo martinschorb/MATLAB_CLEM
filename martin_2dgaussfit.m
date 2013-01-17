@@ -159,7 +159,7 @@ if (interactive + check) > 1
     delete(tbh);
     tbh = findall(hFig,'Type','uitoggletool');
     delete(tbh([1:2,end]));
-    rotate3d on;
+    rotate3d(hFig,'on');
 %     
 
 
@@ -191,7 +191,7 @@ if (interactive + check) > 1
     uiwait
     uiresume
     close all
-
+    
 
 end
 

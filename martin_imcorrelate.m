@@ -1,4 +1,4 @@
-function martin_imcorrelate(lmf,hmf,imf,outfileroot,fmindex)
+function martin_imcorrelate(lmf,hmf,imf,outfileroot,fmindex,imindex)
 
 %version MartinSchorb 100222
 %
@@ -21,6 +21,8 @@ end
 
 file=[];
 
+gaussloc=2;
+fit_interactive=1;
 
 %  if exist([outfileroot,file,'.appltfm.mat'])
 %      load([outfileroot,file,'.appltfm.mat']);
@@ -70,7 +72,7 @@ file=[];
 % end
 % 
 %     
- lm=imread(lmf);
+ lm=imread(lmf,fmindex);
  hm=imread(hmf);
  
  hm=hm(:,:,1);
@@ -94,7 +96,7 @@ else
 end
 
 % % read images and pick
-sm=imread(imf,fmindex);
+sm=imread(imf,imindex);
 % 
 % 
 % 
@@ -137,59 +139,43 @@ file1=file;
 
 %fit beads to get subpixel centres
 
-emboxsize=25; % must be odd number
 
-fmboxsize=49; % must be odd number
-
+imboxsize=7; % must be odd number
+ip1=ip;bp1=bp;ip2=ip;
 %fit beads to get subpixel centres
 ip=round(ip); bp=round(bp);
 
-emsir=(emboxsize-1)/2;
-fmsir=(fmboxsize-1)/2;
-% 
-% for si=1:size(ip,1)
-%     sixe=lm(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
-%     sixe=double(sixe);
-%     sixe=(sixe.*-1)+max(max(sixe));
-% 
-%    
-%     sixf=hm(round(bp(si,2))-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
-%     sixf=double(sixf);
-%     sixf=(sixe.*-1)+max(max(sixf));
-%     
-%     % last argument enables interactive mode to score sub pixel fitting...
-% %      a=cntrd1(sixe,[emsir emsir],emboxsize-12,0);
-% 
-% a=[0 0];
-% [a(1),a(2),sx,sy,peak0D]= Gaussian2D(sixe,gfl,.8*emboxsize);
-% 
-% 
-% %     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
-% 
-% if min(a)>0 & max(a)<emboxsize
-%      ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
-% else
-%      ip2(si,:)=ip(si,:);
-% end
-% %     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
-% %      b=cntrd1(sixf,[fmsir fmsir],fmboxsize-6,0);
-% 
-% b=[0 0];
-% [b(1),b(2),sx,sy,peak0D]= Gaussian2D(sixf,gfl,.8*fmboxsize);
-% 
-% if min(b)>0 & max(b)<fmboxsize
-%     bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
-% else
-%     bp2(si,:)=bp(si,:);
-%    
-% end
-% 
-% end
-% ip=ip2;
-% bp=bp2;
-save([outfileroot,file1,'.lmhmcoos.mat'],'ip','bp');%, 'hmf','smf')
-ip3=ip;
-bp3=bp;
+
+numfids=size(ip,1);
+fm=lm;
+if gaussloc > 1
+    imsir=floor(imboxsize/2);
+for ispot=1:numfids
+    sixf=double(fm(floor(ip(ispot,2))-imsir:floor(ip(ispot,2))+imsir , floor(ip(ispot,1))-imsir:floor(ip(ispot,1))+imsir));
+    [mu,sig,Amp,check] = martin_2dgaussfit(sixf,1,fit_interactive);
+    if isnan(mu)
+        bp1(ispot,:)=[NaN,NaN];
+    else
+    if check
+        bp1(ispot,:)=bp(ispot,:);
+        
+            
+    else
+        
+        bp2(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+    end
+    end
+
+    
+end
+    nanidx=find(isnan(bp1(:,1)));
+    bp2(nanidx,:)=[];
+    ip2(nanidx,:)=[];    
+end
+
+
+ip3=ip2;
+bp3=bp2;
 % reshows the control points so you can check them...
 % [ip3,bp3]=cpselect(lm,hm,ip2,bp2,'Wait',true);
 
@@ -206,7 +192,21 @@ pickedlm(ip3r(n,2)-1:ip3r(n,2)+1,ip3r(n,1)-1:ip3r(n,1)+1)=10;
 pickedlm(ip3r(n,2),ip3r(n,1))=10;
 end
 
+
+switch mod(imindex,3)
+    case 1
+        file=[file,'_rm'];
+    case 2
+        file=[file,'_gm'];
+    case 3
+        file=[file,'_bm'];
+end
+
+
+
+
 thm=cp2tform(ip3,bp3,'linear conformal');
+save([outfileroot,file1,'.lmhmcoos.mat'],'ip3','bp3');
 % spotpos=tformfwd(thm,impos);
 % hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos),norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,-accuracy])-spotpos)]);
 
@@ -241,7 +241,7 @@ thm=cp2tform(ip3,bp3,'linear conformal');
 % tfmcircle=uint16(tfmcircle/max(max(tfmcircle))*65535);
 %writes output files
 % imwrite(hm,[outfileroot,file,'_hm.tif'],'Compression','none');
-imwrite(lm2,[outfileroot,file,'_lm2hm.tif'],'Compression','none');
+imwrite(lm2,[outfileroot,file,'_tfmed.tif'],'Compression','none');
 % imwrite(sm,[outfileroot,file,'_sm.tif'],'Compression','none');
 % imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
 % imwrite(gm2,[outfileroot,file,'_hm_gm.tif'],'Compression','none');

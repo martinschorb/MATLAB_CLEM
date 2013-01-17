@@ -1,4 +1,4 @@
-function [bluespot,fluospot]=martin_chromaticshift_drift2(bm,bm2,im,im2,bmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot)
+function [bluespot,fluospot]=martin_chromaticshift_drift2(bm,bm_view,im,im_view,bmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot,fit_interactive)
 
 % % version MartinSchorb 101122
 % %
@@ -13,12 +13,11 @@ function [bluespot,fluospot]=martin_chromaticshift_drift2(bm,bm2,im,im2,bmboxsiz
 % % 
 % % 
 
-bmboxsize=bmboxsize+2;
+bmboxsize = bmboxsize + 2;
+imboxsize = imboxsize + 2;
 
 gfl=0.1;
 
-% rm=imadjust(imread(rmf));gm=imadjust(imread(gmf));%bm=imadjust(imread(bmf));
-% 
 
 [filename, pathname] = uigetfile({'shiftcoos.mat'},'select previously picked fluoshift coordinates',loc_shiftcoos);
  
@@ -26,12 +25,13 @@ disp(['filename: ',filename]);
 
 if isequal(filename,0)
             disp('No previously picked positions selected');
-            rgb=imadjust(bm);
-            rgb(:,:,2)=imadjust(im);
+            rgb=bm_view;
+            rgb(:,:,2)=im_view;
             % rgb(:,:,3)=imadjust(bm);
             rgb(1,2,3)=0;
-%             imwrite(rgb,[outfileroot,'rgbtmp.tif'],'Compression','none');
+
             martin_digitize2(rgb);
+            
             disp('Press a key to continue...')
             pause;
             XY=evalin('base', 'XY');
@@ -44,92 +44,61 @@ if isequal(filename,0)
 save([outfileroot,'_',fluorsel,'_fluoshift.shiftcoos.mat'],'XY')
 
 
-
-
-
-% bm=rm;
 %fit intensity peak to get subpixel centre
 
 % % bmboxsize=15; % must be odd number
 bmsir=(bmboxsize-1)/2;
-% bmF=fspecial('gaussian',3,2);
 
 % % imboxsize=15; % must be odd number
 imsir=(imboxsize-1)/2;
 
-% gmF=fspecial('gaussian',3,2);
-
 mm=max([bmsir imsir]);
+
 if ~isempty(XY)
+%     clean points too close to edge of images
 l=length(XY);
-
-t=find(XY<mm+1);
-ii=(mod(t,l)==0)*l+mod(t,l);
-XY(ii,:)=[];
-
 s=size(im);
 
+t=find(XY(:)<mm+1);
+[row,col]=ind2sub(size(XY),t);
+XY(row,:)=[];
+
 t=find(XY(:,2)>s(1)-mm-1);
-ii=(mod(t,l)==0)*l+mod(t,l);
-XY(ii,:)=[];
+XY(t,:)=[];
 
 t=find(XY(:,1)>s(2)-mm-1);
-ii=(mod(t,l)==0)*l+mod(t,l);
-XY(ii,:)=[];
+XY(t,:)=[];
 
 XY=round(XY);
 
-bm_filtered=tom_bandpass1(double(bm2),35,max(size(bm2)),2);
-bm_filtered=double(uint16(bm_filtered));
-
-% im_filtered=tom_bandpass1(double(im2),70,1344,2);
-% im_filtered=double(uint16(im_filtered));
-im_filtered=im2;
-
  bluespot=XY;
  fluospot=XY;
+ 
+% fit 2D Gaussian
 
     for si=1:size(XY,1)
-        for iii=1:4
-        sixb=bm_filtered(floor(bluespot(si,2))-bmsir:floor(bluespot(si,2))+bmsir,floor(bluespot(si,1))-bmsir:floor(bluespot(si,1))+bmsir);
+
+        sixb=bm(floor(bluespot(si,2))-bmsir:floor(bluespot(si,2))+bmsir,floor(bluespot(si,1))-bmsir:floor(bluespot(si,1))+bmsir);
+
+        [mu,sig,Amp,check] = martin_2dgaussfit(sixb,1,fit_interactive);
         
-%         sixb=double(ideal_high(sixb,.15));
-%         sixb=imfilter(sixb,bmF);
-        
-
-        sixg=im_filtered(floor(fluospot(si,2))-imsir:floor(fluospot(si,2))+imsir,floor(fluospot(si,1))-imsir:floor(fluospot(si,1))+imsir);
-%         sixg=double(ideal_high(sixg,.15));
-%         sixg=imfilter(sixg,gmF);   
-        
-      
-
-        % last argument enables interactive mode to score sub pixel fitting...
-           a=cntrd1(sixb,[bmsir bmsir]+[1 1],bmboxsize-12,0);
-
-
-%      a=[0 0];
-%      [a(1),a(2),sx,sy,peak0D]= Gaussian2D(sixb,gfl,.75*bmboxsize);
-
-
-    bluespot(si,1)=floor(bluespot(si,1))+a(1)-1-bmsir; bluespot(si,2)=floor(bluespot(si,2))+a(2)-1-bmsir;
-    % %     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
-
-
-    b=cntrd1(sixg,[imsir imsir]+[1 1],imboxsize-12,0);
-
-%      
-%     b=[0 0];
-%     [b(1),b(2),sx,sy,peak0D]= Gaussian2D(sixf,gfl,.75*imboxsize); 
-
-
-    fluospot(si,1)=floor(fluospot(si,1))+b(1)-1-imsir; fluospot(si,2)=floor(fluospot(si,2))+b(2)-1-imsir;
+        if ~check
+             bluespot(si,:)=floor(bluespot(si,:))+mu(1:2)-[1 1]-[bmsir bmsir];
         end
 
+            
+        sixg=im(floor(fluospot(si,2))-imsir:floor(fluospot(si,2))+imsir,floor(fluospot(si,1))-imsir:floor(fluospot(si,1))+imsir);
+
+        [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
+        
+        if ~check
+             fluospot(si,:)=floor(fluospot(si,:))+mu(1:2)-[1 1]-[imsir imsir];
+        end
 
     end
 else
 
-fluospot=ones(2);
-bluespot=ones(2);
+fluospot=NaN;
+bluespot=NaN;
 end
 

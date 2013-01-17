@@ -151,8 +151,7 @@ fm2=fm;
 [mlen,idx]=max(s_fm);
 
 numfids=size(ip,1);
-bp=floor(bp);ip2=ip;bp2=bp;bp1=bp;
-
+ip2=ip;bp2=bp;bp1=bp;
 if gaussloc > 1
     imsir=floor(imboxsize/2);
 for ispot=1:numfids
@@ -260,18 +259,21 @@ end
 numspots=1;
 if multispot==1;
     numq='s';
-    ipint=[0 0];
-    bpint=[0 0];    
+    ipint=[];
+    bpint=[];    
     while ~strcmp(numq,'Correct')
         [ipint,bpint]=cpselect(em,im_view,ip4,bp4,'Wait',true);
+        if size(ipint,1)==numfids
+                k=msgbox('No spot selected!');
+                uiwait(k);
+                continue
+        end
+        
         ipint=ipint(numfids+1:end,:);
         bpint=bpint(numfids+1:end,:);
         numspots=size(bpint,1);
         numq = questdlg(['You have selected ' num2str(numspots) ' fluorescent spots of interest'],'Check number of spots','Correct','No select again','Cancel');
     end
-
-
-
 
 else
     ipint=[0 0];
@@ -289,22 +291,19 @@ numspots=size(bpint,1);
 
 if mod(gaussloc,2) == 1
     imsir=floor(imboxsize/2);
-for ispot=1:numspots
-    sixg=double(im(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir , floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
-    [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
-    if check
-        bpint1(ispot,:)=bpint(ispot,:);
-    else
-        
-        bpint1(ispot,:)=floor(bpint(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+    for ispot=1:numspots
+        sixg=double(im(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir , floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
+        [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
+        if check
+            bpint1(ispot,:)=bpint(ispot,:);
+        else
+
+            bpint1(ispot,:)=floor(bpint(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+        end
     end
+else
+    bpint1=bpint;
 end
-end
-
-
-
-
-
 
 
 
@@ -326,86 +325,86 @@ end
 
 [ipint,bpint]=cpselect(em,im_view,ipint,bpint1,'Wait',true) ;
 
-gm1(:,:,2)=gm(:,:,1);
-gm1(:,:,3)=gm(:,:,1);
-    for ispot=1:numspots
-        gm1(bpint(ispot,1)-1:bpint(ispot,1)+1,bpint(ispot,2)-1:bpint(ispot,2)+1,2:3)=65000;
-    end
-end
-% if exist(['medshift_',fluorsel]) == 0
 
+
+end
+
+
+
+
+
+% 336
 % runs fluorescence image drift correction
 if ~shift_skip
-    [bluespot,fluospot]=martin_chromaticshift_drift2(fm',fm2',im',im_filtered',fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot);
-    if isequal(fluospot,ones(2))
+    [bluespot,fluospot]=martin_chromaticshift_drift2(fm,fm_view,im,im_view,fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot,fit_interactive);
+    if isnan(fluospot)
         k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
         uiwait(k);
-    %     [bluespot,fluospot]=martin_chromaticshift_drift(fm',gm',gfl,fmboxsize,imboxsize,outfileroot);
-    end    
+        medshift=[]
+    else  
 
     sdiff=fluospot-bluespot
-
-
-    %%%%%%%%%% reversing x and y coordinates of difference because they were
-    %%%%%%%%%% calculated for transposed images JB
-    sdiff=circshift(sdiff,[0 1]);
-    %%%%%%%%%% ---------------------------
 
     fspot=find(abs(sdiff)>5);
     idspot=mod(fspot,length(sdiff));
     idspot=idspot+(idspot==0)*length(sdiff);
     sdiff(idspot,:)=[];
 
-    %n_shift=length(diff);
-    %medshift=median(diff);
-    %shifterr=std(diff)/sqrt(n_shift);
-
-    %%%%%%%%% making dimension specific else fails for 1 bead JB
-
     n_shift=size(sdiff,1);
     medshift=median(sdiff,1);
     shifterr=std(sdiff)/sqrt(n_shift);
-    if isnan(medshift) medshift=[0 0];end
-
-    disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
-    switch fluorsel
-        case 'GFP'
-            medshift_GFP=medshift;
-        case 'RFP'
-            medshift_RFP=medshift;
+    
+    if isnan(medshift)
+        medshift=[];
     end
 
-
-    % else
-    % 
-    % medshift=eval(genvarname(['medshift_',fluorsel]));
-    % 
-    % end
-
+    disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
     disp('---  ---  ---  ---  ---  ---  ---  ---  ---');
     % disp(['Shift correction in pixel: ', num2str(medshift)]);
     %corrects for median shift of bleed-thru beads
     bpint2=bpint;
     bpint=bpint-repmat(medshift,[numspots,1]);
     show=[bpint(:,2) bpint(:,1);bpint2(:,2) bpint2(:,1)];
+    end
+    
+    switch fluorsel
+        case 'GFP'
+            medshift_GFP=medshift;
+        case 'RFP'
+            medshift_RFP=medshift;
+    end
     
 else
     medshift_GFP=[];
     medshift_RFP=[];
 end
 
-% [ipint7,bpint7]=cpselect(em,im',[ipint;ipint],show,'Wait',true) ;
-
-%runs the transformation accuracy prediction
-
-% [output,pickedem]=martin_ls_blind5(ip4,bp4,ipint,bpint,em,3,accuracy,outfileroot);
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% % pasted new martin_ls_blind algorithm
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% 407
 [output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,trafo,outfileroot);
 % clear test
 
@@ -642,8 +641,8 @@ file_2 = fopen([outfileroot,file,'_transform.log'],'w');
 fprintf(file_2,[outfileroot,file,'_transform.log      ---   Logfile of transformation\n\n']);
 fprintf(file_2,['Selected transformation used: ', beads,'\n\n EM Stack: ',emf,'\n Fluorospheres: ',fmf,'\n GFP Image: ',gmf, '\n RFP Image: ',rmf,'\n\n-----\n']);
 % fprintf(file_2,['Shift error (pixel):  ',int2str(shifterr),'   #of spots used for shift: ',int2str(n_shift),'\n\n-----\n']);
-fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
-fprintf(file_2,'%2.3g',psize);
+% fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
+% fprintf(file_2,'%2.3g',psize);
 fprintf(file_2,'\n coordinates of transformed fluorescence spot:\n');
 fprintf(file_2,'%2.2f %2.2f\n',impos);
 fprintf(file_2,['\n\n prediction circle radius (px): ',int2str(accuracy),'\n\n-----------------\n']);
