@@ -74,10 +74,21 @@ pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm
 hmaccuracy=accuracy*pixelsize_lm/pixelsize_hm;
 
+
 % check Toolbox
 
 a=ver('optim');
 if isempty(a)
     warning('Optimization Toolbox not found! Not using subpixel localization.');
     gaussloc = 0;
+end
+clear a
+
+% have all init variables ready in a structure to pass to succeeding
+% functions
+
+WSVARS = evalin('caller', 'who');
+for wscon=1:size(WSVARS,1)
+    thisvar=evalin('caller', WSVARS{wscon});
+    init.(WSVARS{wscon})=thisvar;
 end

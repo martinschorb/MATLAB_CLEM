@@ -1,4 +1,4 @@
-function [outfile,in_dir,pxs,trafo,minbeads]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo,minbeads)
+function [outfile,in_dir,pxs,trafo,minbeads]=martin_correlate_init(loc_pickspots,pixelsize_lm,trafo,minbeads)
 
 close all
 % need to run this outside because of nested functions

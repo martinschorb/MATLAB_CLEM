@@ -130,7 +130,7 @@ status=0;
 while status==0
     
     if exist('ip2','var')>0
-        [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
+        [ip,bp]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
     end
 
 % 135
