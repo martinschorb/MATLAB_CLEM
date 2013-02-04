@@ -343,7 +343,7 @@ if ~shift_skip
         medshift=[]
     else  
 
-    sdiff=fluospot-bluespot
+    sdiff=fluospot-bluespot;
 
     fspot=find(abs(sdiff)>5);
     idspot=mod(fspot,length(sdiff));

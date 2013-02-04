@@ -82,18 +82,18 @@ XY=round(XY);
 
         [mu,sig,Amp,check] = martin_2dgaussfit(sixb,1,fit_interactive);
         
-        if ~check
+%         if ~check    % SATURATION PROBLEM!
              bluespot(si,:)=floor(bluespot(si,:))+mu(1:2)-[1 1]-[bmsir bmsir];
-        end
+%         end
 
             
         sixg=im(floor(fluospot(si,2))-imsir:floor(fluospot(si,2))+imsir,floor(fluospot(si,1))-imsir:floor(fluospot(si,1))+imsir);
 
         [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
         
-        if ~check
+%         if ~check
              fluospot(si,:)=floor(fluospot(si,:))+mu(1:2)-[1 1]-[imsir imsir];
-        end
+%         end
 
     end
 else
