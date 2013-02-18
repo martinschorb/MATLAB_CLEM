@@ -84,7 +84,7 @@ output.blind.sel=struct;
      %calculate current transformation
      tfm=cp2tform(bp2,ip2,trafo);
      output.all.tfm=tfm;           %(*)martin_ls_blind3.m
-     output.all.circle=martin_circle(em,accuracy,tformfwd(tfm,round(bpint)));
+     output.all.circle=martin_circle(em,accuracy,tformfwd(tfm,bpint));
      %transform coordinates 
      bptfm=tformfwd(tfm,bp2);
      output.all.bptfm=bptfm;

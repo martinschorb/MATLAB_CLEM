@@ -28,7 +28,7 @@ end
 
 %  initialization and GUI
 
-[outfile,in_dir,pxs,trafo,minbeads]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo,kmin);
+[outfile,in_dir,pxs,trafo,minbeads,maxbeads,maxdist]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo,kmin);
 
 if isempty(outfile) | isempty(minbeads) | isempty(pxs)
     error('Please provide initial values');
@@ -77,6 +77,16 @@ for fileidx=1:size(filename,2) %file list index
         ntot=size(ip,1);
         totnum(fileidx)=ntot;
         
+%         maximum number of beads
+   
+        
+%         radius cleaning
+
+alldists=squareform(pdist(ip));
+
+        
+        
+        
 if ntot<12 & ntot > kmin
 %         nblind=1;
 %         alli=y;
@@ -88,15 +98,35 @@ for nblind=1:ntot  % blind bead index
     ip=ip2;
     bp=bp2;
     
-
-   selection=[nblind];
+    
+   if isempty(maxdist)
+       selbeads = [];
+   else
+    dists=alldists(:,nblind);
+    selbeads = find(dists>(maxdist/pxs*1000));
+   end
+       
+    
+    
+    
+    
+    
+   selection=[nblind;selbeads];
     ip(selection,:)=[];
     bp(selection,:)=[]; 
     
-     n = ntot-1; %total number of picked beads
+     n = size(ip,1); %total number of picked beads
+     if n<kmin
+         continue
+     end
      
      
-
+%         if isempty(maxbeads)
+            currmax = n;
+%         else
+%             currmax = min(maxbeads,n);
+%         end
+        
 % pt of interest....
 % 
 pt1 = ip2(nblind,:);    
@@ -131,11 +161,11 @@ pt1 = ip2(nblind,:);
 %  data.corr(z).blind(nblind).ipall=ip;
 %  data.corr(z).blind(nblind).bpall=bp;
 
-        for k=kmin:n  % # of trafo base index
-            tsize=nchoosek(n,k);
-            permidx=combnk(1:n,k);
-            
+        for k=kmin%:currmax  % # of trafo base index
+            tsize=nchoosek(currmax,k);
+            permidx=combnk(1:currmax,k);
 
+            
             for cnt=1:tsize %index to go through the possible transformations
                 
              
@@ -369,7 +399,7 @@ end
      end
 end
 
-data.allerrors = sortrows(data.prederr*pxs);
+data.allerrors = sortrows(data.prederr*pxs)
  
 data.besterrors = sortrows(data.minprederr'*pxs);
 

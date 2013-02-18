@@ -1,4 +1,4 @@
-function [outfile,in_dir,pxs,trafo,minbeads]=martin_correlate_init(loc_pickspots,pixelsize_lm,trafo,minbeads)
+function [outfile,in_dir,pxs,trafo,minbeads,maxbeads,maxdist]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo,minbeads)
 
 close all
 % need to run this outside because of nested functions
@@ -24,6 +24,8 @@ outfile = 'corr_accuracy';
 f = figure('Visible','off','Position',[0,120,1000,1000],'NumberTitle','off','Menubar','none','Name','Correlation Accuracy Determination - Initial Configuration');
 
 
+
+
 t_outfile = uipanel('Title','output file name','FontSize',12,'BackgroundColor',[0.85 0.85 0.85],...
           'Position',[0.05,0.8,0.4,0.08]);
 c_outfile = uicontrol('Parent',t_outfile,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
@@ -39,9 +41,14 @@ but_dir = uicontrol('Parent',t_dir,'Style','pushbutton','BackgroundColor',[0.95 
 %   ---      
       
 t_px = uipanel('Title','EM pixel size [nm]','FontSize',12,'BackgroundColor',[0.85 0.85 0.85],...
-          'Position',[0.05,0.6,0.4,0.08]);
+          'Position',[0.05,0.6,0.15,0.08]);
 ct_px = uicontrol('Parent',t_px,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
-          'Position',[10,10,300,40],'String',pxs); 
+          'Position',[10,10,100,40],'String',pxs); 
+      
+ t_r = uipanel('Title','Maximum distance between beads [um]','FontSize',10,'BackgroundColor',[0.85 0.85 0.85],...
+          'Position',[0.2,0.6,0.25,0.08]);
+ct_r = uicontrol('Parent',t_r,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
+          'Position',[10,10,90,40],'String','');      
 
 %   ---
     
@@ -68,12 +75,18 @@ switch trafo
 
 
 %   ---
-t_bds = uipanel('Title','Minimum number of beads','FontSize',12,'BackgroundColor',[0.85 0.85 0.85],...
-          'Position',[0.05,0.35,0.4,0.08]);
-ct_bds = uicontrol('Parent',t_bds,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
-           'Position',[160,10,40,40],'String',minbeads); 
+t_minbds = uipanel('Title','Minimum number of beads','FontSize',10,'BackgroundColor',[0.85 0.85 0.85],...
+          'Position',[0.05,0.35,0.2,0.08]);
+ct_minbds = uicontrol('Parent',t_minbds,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
+           'Position',[70,10,40,40],'String',minbeads); 
 
 
+t_maxbds = uipanel('Title','Maximum number of beads','FontSize',10,'BackgroundColor',[0.85 0.85 0.85],...
+          'Position',[0.25,0.35,0.2,0.08]);
+ct_maxbds = uicontrol('Parent',t_maxbds,'Style','edit','BackgroundColor',[0.95 0.95 0.95],...
+           'Position',[70,10,40,40],'String',''); 
+       
+       
 
 %   ---
 go = uicontrol('Style','pushbutton','BackgroundColor',[0.95 0.95 0.95],...
@@ -101,13 +114,13 @@ function  selcbk(source,eventdata)
         case 'linear conformal (default)'
             trafo = 'linear conformal';
             minbeads = 3;
-            set(ct_bds,'String','3');
+            set(ct_minbds,'String','3');
         case 'affine'
             minbeads = 3;
-            set(ct_bds,'String','3');
+            set(ct_minbds,'String','3');
         case 'projective'
             minbeads = 4;
-            set(ct_bds,'String','4')
+            set(ct_minbds,'String','4')
     end
 end
 
@@ -116,7 +129,9 @@ function go_Callback(source,eventdata)
     outfile = get(c_outfile,'String');
     in_dir = get(ct_dir,'String');
     pxs = str2num(get(ct_px,'String'));
-    minbeads = str2num(get(ct_bds,'String'));
+    minbeads = str2num(get(ct_minbds,'String'));
+    maxbeads = str2num(get(ct_maxbds,'String'));
+    maxdist = str2num(get(ct_r,'String'));
     close(f);
 end
 

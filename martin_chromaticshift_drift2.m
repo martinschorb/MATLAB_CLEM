@@ -82,20 +82,37 @@ XY=round(XY);
 
         [mu,sig,Amp,check] = martin_2dgaussfit(sixb,1,fit_interactive);
         
-%         if ~check    % SATURATION PROBLEM!
+        if isnan(mu)
+            bluespot(si,1)=NaN;
+            continue
+        end
+        
+        if ~check 
              bluespot(si,:)=floor(bluespot(si,:))+mu(1:2)-[1 1]-[bmsir bmsir];
-%         end
+        end
 
             
         sixg=im(floor(fluospot(si,2))-imsir:floor(fluospot(si,2))+imsir,floor(fluospot(si,1))-imsir:floor(fluospot(si,1))+imsir);
 
         [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
         
-%         if ~check
+        if isnan(mu)
+            bluespot(si,1)=NaN;
+            continue
+        end
+        
+        if ~check 
              fluospot(si,:)=floor(fluospot(si,:))+mu(1:2)-[1 1]-[imsir imsir];
-%         end
-
+        end
+       
+        
+        
     end
+    
+    nanidx = find(isnan(bluespot(:,1)));
+    bluespot(nanidx,:)=[];
+    fluospot(nanidx,:)=[];
+    
 else
 
 fluospot=NaN;

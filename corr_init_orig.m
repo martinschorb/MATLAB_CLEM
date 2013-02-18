@@ -23,17 +23,17 @@ flip = 0;
 
 % Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;1 - open adjustment window)
 
-contr_b = 1;
-contr_g = 0;
-contr_r = 0;
+contr_fid = 1;
+contr_poi = 0;
+% obsolete contr_other = 0;
 
 % Skip the shift adjustment between channels (active if 1)
 
 shift_skip = 0;
 
-% Size of prediction circle in pixel
+% Size of prediction circle in nanometers
 
-accuracy=36;  
+accuracy=50;  
 
 % write overlay images for high-mag correlation (files will be written if 1)
 
@@ -73,7 +73,7 @@ fmfilter = 45;
 pixelsize_lm = 5.068; % pixel size lowmag tomogram in nm
 pixelsize_hm = 1.18 ; % pixel size highmag tomogram in nm
 hmaccuracy=accuracy*pixelsize_lm/pixelsize_hm;
-
+minbeads = 3;
 
 % check Toolbox
 
@@ -81,14 +81,4 @@ a=ver('optim');
 if isempty(a)
     warning('Optimization Toolbox not found! Not using subpixel localization.');
     gaussloc = 0;
-end
-clear a
-
-% have all init variables ready in a structure to pass to succeeding
-% functions
-
-WSVARS = evalin('caller', 'who');
-for wscon=1:size(WSVARS,1)
-    thisvar=evalin('caller', WSVARS{wscon});
-    init.(WSVARS{wscon})=thisvar;
 end

@@ -9,6 +9,7 @@
 % given, the spots are numbered
 
 r=round(error);
+fluortfm = round(fluortfm);
 m = 2*r;
 x = 0:(m-1) ;
 cent = (m-1)/2;

@@ -75,7 +75,7 @@ if exist([outfileroot,file1,'.lmhmcoos.mat'])
     load([outfileroot,file1,'.lmhmcoos.mat'])
     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
 else
-    [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads','/struct/briggs/wanda/DataLightMicroscopy/100119');%,'/struct/briggs/wanda/DataLightMicroscopy');
+    [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads',loc_hmcoos);
     if ~isstr(filename1)
         [ip,bp]=cpselect(lm,hm,'Wait',true);
     elseif exist([pathname1,filename1])==2    
@@ -180,11 +180,11 @@ fclose(file_2);
 
 save([outfileroot,file,'.sliceinfo.mat'],'slice','hm_accuracy','spotpos');
 
-tfmcircle=uint16(tfmcircle*65535);
+tfmcircle=uint8(tfmcircle*255);
 %writes output files
-imwrite(hm,[outfileroot,file,'_hm.tif'],'Compression','none');
+imwrite(uint8(hm/255),[outfileroot,file,'_hm.jpg']);
 % imwrite(lm2,[outfileroot,file,'_lm2hm.tif'],'Compression','none');
-imwrite(sm,[outfileroot,file,'_sm.tif'],'Compression','none');
+imwrite(uint8(sm/255),[outfileroot,file,'_sm.tif'],'Compression','none');
 imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
 
 if hm_overlays
@@ -194,8 +194,8 @@ if hm_overlays
  imwrite(rm2,[outfileroot,file,'_hm_rm.tif'],'Compression','none');
 end
 
-impred=tfmcircle+sm;
-imwrite(impred,[outfileroot,file,'_hm_prd_overlay.tif'],'Compression','none');
+impred=tfmcircle+uint8(sm/255);
+imwrite(impred,[outfileroot,file,'_hm_prd_overlay.jpg']);
 
 
 imshow(impred);

@@ -1,4 +1,4 @@
-function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
+function martin_correlate(varargin)
 
 % % version MartinSchorb 130107
 % % 
@@ -7,8 +7,9 @@ function martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 %         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  
 % =========================================================================    
 % %
-% % usage is martin_correlate('beadimage','emimage','gfpimage','rfpimage','outputfileroot')
-% %
+% % usage is martin_correlate('beadimage','emimage','spotimage','outputfileroot','fluorsel','otherimage (optional)','omfluor (optional)')
+% %   minimal alternative:  - no parameters
+% %                         - martin_correlate(outfileroot)  
 % % designed for correlating light and em images using fluorescent electron
 % % dense fiducials.
 % % 
@@ -44,35 +45,68 @@ end
 % global status 
 status=0;
 
-if exist('gaussloc','var')~=1 
+if exist('init')~=1 
     a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); gaussloc = 0;
 end
 
+
+
+
+
+if nargin>1
+   fmf = varargin{1};
+   emf = varargin{2};
+   imf = varargin{3};
+   outfileroot=varargin{4};
+   fluorsel='other';
+    if nargin>4
+        fluorsel = varargin{5};
+    end
+    if nargin>5
+        omf = varargin{6};
+        omfluor = varargin{7};
+        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
+    else
+        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf);
+    end
+else
+    if nargin==1
+        outfileroot = varargin{1};
+    else
+        outfileroot = '';
+    end
+    [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot);
+end
+
+outfileroot = outfile;
+
+accuracy = init.accuracy/init.pixelsize_lm;
 % read images and pick beads
 em=imread(emf);
-fm=imread(fmf);gm=imread(gmf);rm=imread(rmf);
+fm=imread(fmf,slices.fm);im=imread(imf,slices.im);
+if ~isempty(omf)
+    om=imread(omf,slices.om);
+else
+    om=zeros(4);
+end
 
 % adjust flip/orientation of fluorescence images
 if flip==1
-    fm=fm';gm=gm';rm=rm';
+    fm=fm';im=im';om=om';
 end
 % adjust contrast of images according to init values
 em=imadjust(em);
-if contr_b==0
+if contr_fid==0
     fm_view=imadjust(fm);
 else
     fm_view=martin_contrast(fm);
 end
-if contr_g==0
-    gm_view=imadjust(gm);
+if contr_poi==0
+    im_view=imadjust(im);
 else
-    gm_view=martin_contrast(gm);
+    im_view=martin_contrast(im);
 end
-if contr_r==0
-    rm_view=imadjust(rm);
-else
-    rm_view=martin_contrast(rm);
-end
+
 if isa(em,'uint16')
     em2=em;
     em=uint8(em/256);
@@ -131,44 +165,45 @@ while status==0
     
     if exist('ip2','var')>0
         [ip,bp]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
+    else
+        ip2=ip;bp2=bp;
     end
-
 % 135
-while size(ip,1) <5
-    k=msgbox('you need at least 5 pairs for fit','Error','modal');
+while size(ip2,1) < init.minbeads
+    k=msgbox(['you need at least ',num2str(init.minbeads),' pairs for this transformation'],'Error','modal');
     uiwait(k);
-    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
+    [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true);
 end
 
 % computation warning
 if size(ip,1) >14
     k=msgbox('Accuracy estimation might take a while when choosing too many fiducials.');
     uiwait(k);
-    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
+    [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true);
 end
     
 fm2=fm;
 [mlen,idx]=max(s_fm);
 
-numfids=size(ip,1);
-ip2=ip;bp2=bp;bp1=bp;
+numfids=size(ip2,1);
+bp1=bp2;
 if gaussloc > 1
     imsir=floor(imboxsize/2);
 for ispot=1:numfids
-    sixf=double(fm(floor(bp(ispot,2))-imsir:floor(bp(ispot,2))+imsir , floor(bp(ispot,1))-imsir:floor(bp(ispot,1))+imsir));
+    sixf=double(fm(floor(bp2(ispot,2))-imsir:floor(bp2(ispot,2))+imsir , floor(bp2(ispot,1))-imsir:floor(bp2(ispot,1))+imsir));
     [mu,sig,Amp,check] = martin_2dgaussfit(sixf,1,fit_interactive);
     if isnan(mu)
         bp1(ispot,:)=[NaN,NaN];
     else
     if check
-        bp1(ispot,:)=bp(ispot,:);
+        bp1(ispot,:)=bp2(ispot,:);
         
             
         
    % 168     
     else
         
-        bp2(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+        bp2(ispot,:)=floor(bp2(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
     end
 
@@ -225,20 +260,24 @@ end
 
 % 226
 %reshows the control points so you can check them...
-% ip4=ip;bp4=bp;
+%  ip4=ip;bp4=bp;
     [ip4,bp4]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
-     ip2=ip4;bp2=bp4;
+     ip2=ip4;bp2=bp4;ip=ip4;bp=bp4;
      numfids=size(ip2,1);
 %export pixel values
-    output=[ip2,bp2];
+    output=[ip4,bp4];
 % 234
+
+    save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','slices','fluorsel','omfluor'); 
+
     file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
-    fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'\n Fluorospheres: ',fmf,'\n GFP-Image:',gmf,'\n RFP-Image',rmf,'\n-----------\n EM image -  FM image\n']);
+    fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'  slice:',num2str(slices.em),'\n Fluorospheres: ',...
+        fmf,'  slice:',num2str(slices.fm),'\n fluorescence image of interest:',imf,'  slice:',num2str(slices.im),'\n other image',omf,'  slice:',num2str(slices.om),...
+        '\n-----------\n EM image -  FM image\n']);
     fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',output'); 
     fclose(file_1);
     
     
-   save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf'); 
     
    
    
@@ -246,16 +285,17 @@ end
 
 if exist('ipint','var')==0
 
-fluorsel = questdlg('What fluorescence signal are you interested in?','Signal Selector','GFP','RFP','Cancel');
-
-switch fluorsel
-    case ''
-        return
-    case 'GFP'
-        im=gm;im_view=gm_view;imtxt='gm';
-    case 'RFP'
-        im=rm;im_view=rm_view;imtxt='rm';
-end
+% fluorsel = questdlg('What fluorescence signal are you interested in?','Signal Selector','GFP','RFP','Cancel');
+        k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
+        uiwait(k);
+% switch fluorsel
+%     case ''
+%         return
+%     case 'GFP'
+%         im=gm;im_view=gm_view;imtxt='gm';
+%     case 'RFP'
+%         im=rm;im_view=rm_view;imtxt='rm';
+% end
 numspots=1;
 if multispot==1;
     numq='s';
@@ -294,7 +334,7 @@ if mod(gaussloc,2) == 1
     for ispot=1:numspots
         sixg=double(im(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir , floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
         [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
-        if check
+        if check | isnan(mu)
             bpint1(ispot,:)=bpint(ispot,:);
         else
 
@@ -343,7 +383,7 @@ if ~shift_skip
         medshift=[]
     else  
 
-    sdiff=fluospot-bluespot;
+    sdiff=fluospot-bluespot
 
     fspot=find(abs(sdiff)>5);
     idspot=mod(fspot,length(sdiff));
@@ -405,7 +445,7 @@ end
 
 
 % 407
-[output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,trafo,outfileroot);
+[output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,init.trafo,outfileroot);
 % clear test
 
 % test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
@@ -541,7 +581,7 @@ end
 
 ip=ip4;
 bp=bp4;
-save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf',['medshift_',fluorsel],'bpint'); 
+save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf',['medshift_',fluorsel],'bpint','slices'); 
 
 
 % 
@@ -597,8 +637,11 @@ end
 % transform the fluorescence microscopy images
 
 [fm2 xdata ydata]=imtransform(fm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
-[gm2 xdata ydata]=imtransform(gm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
-[rm2 xdata ydata]=imtransform(rm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+[gm2 xdata ydata]=imtransform(im,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+if ~isempty(omf)
+    [om2 xdata ydata]=imtransform(om,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+end
+
 % [picked2 xdata ydata]=imtransform(picked,tfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
 
 
@@ -620,7 +663,7 @@ impred=uint8(circle1*255)+em;
 
 
 imwrite(circle1,[outfileroot,file,'_prediction.tif'],'Compression','none');
-imwrite(impred,[outfileroot,file,'_pred_overlay.tif'],'Compression','none');
+imwrite(impred,[outfileroot,file,'_pred_overlay.jpg']);
 
 
 
@@ -628,18 +671,22 @@ imwrite(impred,[outfileroot,file,'_pred_overlay.tif'],'Compression','none');
 imwrite(fm2,[outfileroot,file,'_fm.tif'],'Compression','none');
 imwrite(em,[outfileroot,file,'_em.tif'],'Compression','none');
 imwrite(gm2,[outfileroot,file,'_gm.tif'],'Compression','none');
-imwrite(rm2,[outfileroot,file,'_rm.tif'],'Compression','none');
+
+if ~isempty(omf)
+    imwrite(om2,[outfileroot,file,'_',omfluor,'.tif'],'Compression','none');
+end
 imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
 imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');
-imwrite(rgb,[outfileroot,file,'_predictions.tif'],'Compression','none');
+imwrite(rgb,[outfileroot,file,'_predictions.jpg']);
 
-save([outfileroot,file,'.appltfm.mat'],'appltfm','emf','file','circle1','fluorsel','accuracy','impos');
+save([outfileroot,file,'.appltfm.mat'],'appltfm','emf','imf','omf','slices','file','circle1','fluorsel','accuracy','impos');
 
 % save([outfileroot,file,'_tfmaccuracy.mat'],'prederrlist','allerrlist');
 
 file_2 = fopen([outfileroot,file,'_transform.log'],'w');
 fprintf(file_2,[outfileroot,file,'_transform.log      ---   Logfile of transformation\n\n']);
-fprintf(file_2,['Selected transformation used: ', beads,'\n\n EM Stack: ',emf,'\n Fluorospheres: ',fmf,'\n GFP Image: ',gmf, '\n RFP Image: ',rmf,'\n\n-----\n']);
+fprintf(file_2,['Selected transformation used: ', beads,'\n\n EM Stack: ',emf,'\n Fluorospheres: ',fmf,'  slice:',num2str(slices.fm),...
+    '\n fluorescence image of interest:',imf,'  slice:',num2str(slices.im),'\n other image',omf,'  slice:',num2str(slices.om),'\n\n-----\n']);
 % fprintf(file_2,['Shift error (pixel):  ',int2str(shifterr),'   #of spots used for shift: ',int2str(n_shift),'\n\n-----\n']);
 % fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
 % fprintf(file_2,'%2.3g',psize);
