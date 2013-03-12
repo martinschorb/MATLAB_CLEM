@@ -161,7 +161,7 @@ pt1 = ip2(nblind,:);
 %  data.corr(z).blind(nblind).ipall=ip;
 %  data.corr(z).blind(nblind).bpall=bp;
 
-        for k=kmin%:currmax  % # of trafo base index
+        for k=kmin:currmax  % # of trafo base index
             tsize=nchoosek(currmax,k);
             permidx=combnk(1:currmax,k);
 

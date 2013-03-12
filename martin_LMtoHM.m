@@ -1,6 +1,7 @@
-function martin_LMtoHM(hmf,smf,outfileroot)
+function martin_LMtoHM(hmf,smf,outfileroot,fit)
 
-%version MartinSchorb 120222
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 %
 %usage is martin_LMtoHM('highmaggold_image','highmag slice of interest', 'outputfileroot')
 %
@@ -28,10 +29,26 @@ end
 if exist('hm_overlays')~=1 
     a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); hm_overlays = 0; 
 end
+accuracy1 = accuracy;
+
+
+if exist([outfileroot,'.appltfm.mat'],'file')
+    load([outfileroot,'.appltfm.mat']);
+    pathname=[];file=[];file1=[];
+    namebase = outfileroot;
+else
 
 [filename, pathname] = uigetfile({'appltfm.mat'},'select correlation transform',loc_hmcoos);%,'/struct/briggs/wanda/DataLightMicroscopy');
 load([pathname,filename]);
 
+dpod=strfind(filename,'.appl');
+namebase=filename(1:dpod-1);
+
+%generate filename
+s=strfind(file,'_');
+file1=file(1:s(end)-1);
+end
+accuracy = accuracy1;
 % 
 % gm=imread([outfileroot,file,'_gm.tif']);
 % rm=imread([outfileroot,file,'_rm.tif']);
@@ -41,19 +58,39 @@ load([pathname,filename]);
 
 slice=0;
 
-%generate filename
-s=strfind(file,'_');
-file1=file(1:s(end)-1);
 
 
-dpod=strfind(filename,'.appl');
-namebase=filename(1:dpod-1);
+
 
 lm=imread([pathname,namebase,'_em.tif']);
 
 % read images and pick beads
 %  lm=imread(lmf);
-hm=imread(hmf);sm=imread(smf);
+
+
+
+
+   
+    
+if ~isempty(strfind(smf,'tif'))
+    sm=imread(smf);
+elseif or(~isempty(strfind(smf,'mrc')),~isempty(strfind(smf,'st')))
+    sm1=tom_mrcreadimod(smf);
+    sm =sm1.Value;
+    pixelsize_hm = sm1.Header.xlen/sm1.Header.mx/10;
+end
+    
+if strcmp(smf,hmf)
+    hm = sm;
+else
+    if ~isempty(strfind(hmf,'tif'))
+        hm=imread(hmf);
+    elseif or(~isempty(strfind(hmf,'mrc')),~isempty(strfind(hmf,'st')))
+        hm1=tom_mrcreadimod(hmf);
+        hm = hm1.Value;
+    end
+end
+
 if hm_overlays
     gm=imread([pathname,namebase,'_gm.tif']);
     rm=imread([pathname,namebase,'_rm.tif']);
@@ -63,18 +100,21 @@ lm=imadjust(lm);
  
 % gm=conv8to16bit(gm);
 % rm=conv8to16bit(rm);
-hm=conv8to16bit(hm);
-sm=conv8to16bit(sm);
+% hm=conv8to16bit(hm);
+% sm=conv8to16bit(sm);
 % lm=conv8to16bit(lm);
 
-hm=imadjust(hm);
-sm=imadjust(sm);
+hm=imadjust(uint16(hm'));
+sm=imadjust(uint16(sm'));
 
 
-if exist([outfileroot,file1,'.lmhmcoos.mat'])
+if exist([outfileroot,file1,'.lmhmcoos.mat'],'file')
     load([outfileroot,file1,'.lmhmcoos.mat'])
     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
 else
+    
+    
+    
     [filename1, pathname1] = uigetfile({'lmhmcoos.mat'},'select existing picked beads',loc_hmcoos);
     if ~isstr(filename1)
         [ip,bp]=cpselect(lm,hm,'Wait',true);
@@ -93,6 +133,13 @@ while size(ip,1) <4
     uiwait(k);
     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
 end
+
+
+
+
+
+
+
 save([outfileroot,file1,'.lmhmcoos.mat'],'ip','bp', 'hmf','smf')
 
 %fit beads to get subpixel centres
@@ -157,10 +204,12 @@ ip3=ip;bp3=bp;
 thm=cp2tform(ip3,bp3,'linear conformal');
 spotpos=tformfwd(thm,impos);
 % hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos),norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,-accuracy])-spotpos)]);
+hmaccuracy=accuracy/pixelsize_hm;
 hm_accuracy=hmaccuracy;
 tfmcircle=martin_circle(sm,hmaccuracy,round(spotpos));
+if exist('fluorsel','var')
 file=[file,'_',fluorsel];
-
+end
 %convert to 16 bit
 tfmcircle=conv8to16bit(tfmcircle);
 % 
@@ -198,6 +247,6 @@ impred=tfmcircle+uint8(sm/255);
 imwrite(impred,[outfileroot,file,'_hm_prd_overlay.jpg']);
 
 
-imshow(impred);
+% imshow(impred);
 
 

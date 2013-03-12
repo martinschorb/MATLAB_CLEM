@@ -1,6 +1,7 @@
 function [bluespot,fluospot]=martin_chromaticshift_drift2(bm,bm_view,im,im_view,bmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot,fit_interactive)
 
-% % version MartinSchorb 101122
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % %
 % % usage is martin_chromaticshift_drift2(beadimage , fluorimage ,  boxsize for beads , boxsize for fluo-image , file root);
 % %

@@ -1,10 +1,13 @@
 function [mu,sig,A,check] = martin_2dgaussfit(im,linear,interactive,c0)
 
+
+% % % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
+% 
 % 2D-Gauss Fit (i.e. of one peak to a PSF-convolved image)
 % 
 % usage is [mu,sig,check] = martin_2dgaussfit(image,linear_background_enable,interactive_mode_enable,initial_guess_of_center)
 % 
-% version MartinSchorb 130107
 % 
 % with the inputs: image (has to be square) , indicators whether linear
 % background subtraction and interactive mode should be enabled, and
@@ -218,21 +221,52 @@ end
 
 function manualbutton(h_manualbutton,event)
     close all
-    [xxx,mu] = cpselect(uint16(im1),imadjust(uint16(im1)),mu,mu,'Wait',true);
+    
+    checkspot = sz -mu;
+    
+    if sum([checkspot<0 checkspot>(min(sz))])
+        mu=middle;
+    end
+    if isa(im,'double')    
+        im2=uint16(im);
+    else
+        im2 = im;
+    end
+    [mu_a,mu_b] = cpselect(im2,imadjust(im2),mu,mu,'Wait',true);
+    
+    if sum(mu_a-mu)<0.01
+        mu = mu_b;
+    elseif sum(mu_b-mu)<0.01
+        mu = mu_a;
+    else
+        mu = mean([mu_a;mu_b]);
+    end
+    
+    
     
 %     reduce box size
-    cs = round(log2(sz));
-    newsize = max(sz - 2*cs,[3 3]);
+    cs = round(log2(sz))+1;
+    newsize = max(ceil(sz/3),[5 5]);
+    
+    
+    
     dis1 = ceil(newsize/2)-1;
-    corner = min(max(round(mu)-dis1,1),sz-newsize+1);
+    corner = round(mu)-dis1;
     im1 = imcrop(im,[corner,newsize-1]);
-    c1 = max(mu-corner+dis1-1,[1 1]);
-    [mu1,sig,A,check] = martin_2dgaussfit(im1,linear,2,c1);
-    if c1 == [1 1]
-        mu = mu1;
-    else
-        mu = mu1-dis1+corner;
+    
+    if or(any(mu<1),any(mu>newsize(1)))
+        mu = dis1;
     end
+    
+    if or(size(im1,1)<newsize(1),size(im1,2)<newsize(2))
+        warning('clicked point is too close to edge of image')
+        im1=im;
+    end
+    
+    [mu1,sig,A,check] = martin_2dgaussfit(im1,linear,2,mu);
+  
+    mu = mu1+corner-[1 1];
+
 end
 
 

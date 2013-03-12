@@ -1,7 +1,7 @@
 function martin_correlate(varargin)
 
-% % version MartinSchorb 130107
-% % 
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % %
 % =========================================================================
 %         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  
@@ -14,7 +14,7 @@ function martin_correlate(varargin)
 % % dense fiducials.
 % % 
 % % looks for previously picked fiducial coordinates
-% % 
+% % 4
 % % calls cpselect for control point registration and uses cp2tform
 % % 
 % % corrects for image shift between channels using bleed-thru beads
@@ -49,10 +49,6 @@ if exist('init')~=1
     a=msgbox('Initialization script is not the newest version, please update!');uiwait(a); gaussloc = 0;
 end
 
-
-
-
-
 if nargin>1
    fmf = varargin{1};
    emf = varargin{2};
@@ -79,7 +75,6 @@ else
 end
 
 outfileroot = outfile;
-
 accuracy = init.accuracy/init.pixelsize_lm;
 % read images and pick beads
 em=imread(emf);
@@ -119,29 +114,10 @@ s_fm=size(fm);
 %generate filename
 file='';
 
-% get pixel size of em-tom
-% pos1=strfind(emf,'/stac');
-% stfile=emf(1:pos1);
-% pos2=strfind(emf,'aphy/');
-% stfile=[stfile,emf(pos2+5:pos2+10),'_',file,'lma.st'];
-% 
-% if exist(stfile,'file')
-%     [s sz]=unix(['header ',stfile]);
-%     pos3=strfind(sz,'Cell axes');
-%     pos4=strfind(sz(pos3+42:end),'.');
-%     sz=str2num(sz(pos3+42:pos3+43+pos4(1)));
-%     psize=sz/(s_em(2));ptext='';
-% else
-%     psize=[];
-%     ptext=['NO PIXEL INFORMATION FOUND FOR TOMOGRAM '];
-%     disp(ptext);
-% end
-
 %check if already previously picked
-filecheck=exist([outfileroot,file,'_pickspots1.mat'],'file');
-filecheck2=exist([outfileroot,file,'.pickspots1.mat'],'file');
+filecheck=exist([outfileroot,file,'.pickspots1.mat'],'file');
 
-if filecheck==0 & filecheck2==0
+if filecheck==0 
   %import previously clicked positions
 pause(0.001)
   [filename, pathname] = uigetfile('*.pickspots1.mat','select previously picked beads',loc_pickspots);
@@ -159,16 +135,14 @@ status=0;
 else
     load([outfileroot,file,'.pickspots1.mat']);
 end
-
 status=0;
-while status==0
-    
+while status==0  
     if exist('ip2','var')>0
         [ip,bp]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
     else
         ip2=ip;bp2=bp;
     end
-% 135
+% 145
 while size(ip2,1) < init.minbeads
     k=msgbox(['you need at least ',num2str(init.minbeads),' pairs for this transformation'],'Error','modal');
     uiwait(k);
@@ -192,15 +166,16 @@ if gaussloc > 1
 for ispot=1:numfids
     sixf=double(fm(floor(bp2(ispot,2))-imsir:floor(bp2(ispot,2))+imsir , floor(bp2(ispot,1))-imsir:floor(bp2(ispot,1))+imsir));
     [mu,sig,Amp,check] = martin_2dgaussfit(sixf,1,fit_interactive);
+    
     if isnan(mu)
         bp1(ispot,:)=[NaN,NaN];
     else
+        
     if check
         bp1(ispot,:)=bp2(ispot,:);
         
-            
-        
-   % 168     
+                   
+   % 178     
     else
         
         bp2(ispot,:)=floor(bp2(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
@@ -213,16 +188,6 @@ end
     bp2(nanidx,:)=[];
     ip2(nanidx,:)=[];    
 end
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -277,10 +242,6 @@ end
     fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',output'); 
     fclose(file_1);
     
-    
-    
-   
-   
 % asks for region of interest using the control points
 
 if exist('ipint','var')==0
@@ -307,8 +268,7 @@ if multispot==1;
                 k=msgbox('No spot selected!');
                 uiwait(k);
                 continue
-        end
-        
+        end        
         ipint=ipint(numfids+1:end,:);
         bpint=bpint(numfids+1:end,:);
         numspots=size(bpint,1);
@@ -328,7 +288,6 @@ else
 end
 
 numspots=size(bpint,1);
-
 if mod(gaussloc,2) == 1
     imsir=floor(imboxsize/2);
     for ispot=1:numspots
@@ -344,6 +303,7 @@ if mod(gaussloc,2) == 1
 else
     bpint1=bpint;
 end
+
 
 
 

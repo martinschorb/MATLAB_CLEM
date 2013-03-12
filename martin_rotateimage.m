@@ -1,6 +1,7 @@
 function [outim,rotid] = martin_rotateimage(em,im)
 
-% version MartinSchorb 120201
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % 
 % usage is [output_image2, rotation parameter] = martin_rotateimage(input_image1,input_image2-to be turned); 
 % 

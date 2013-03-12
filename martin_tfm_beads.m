@@ -1,14 +1,16 @@
  function [output,pickedem] = martin_tfm_beads(ip,bp,pos,bpint,em,kmin,accuracy,trafo,outfileroot)
  
-% %version MartinSchorb 120725
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % %
 % %usage is martin_tfm_beads(bead coordinates,position of interest,EM image,minimum number of beads used for transformations,acc,transformation type, output folder);
 % %
 % % 
 % %
 % %designed for estimating the accuracy of correlating light and em images using fluorescent electron
-% %dense fiducials.
-% %
+% %dense fiducials. 
+% % Modified to always use the transform given by all beads (the choice of
+% transform is sample depentend, this does perform reliably in any case.
 % % 
 % output is a struct including
 %     for each blind fiducial a set of:  

@@ -1,20 +1,22 @@
-%% corr_init()
-%
-% Version Martin Schorb 130107
+% corr_init()
+% ----------------------------------------
+% version MartinSchorb 130312
+% Copyright EMBL 2013, All rights reserved
+% 
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
 % Location to search for fiducial coordinate file - *.pickspots.mat
 
-loc_pickspots = '/struct/briggs/wanda/DataLightMicroscopy/';
+loc_pickspots = '/directory/to/correlation';
 
 % Location to search for shift correction coordinate file - *.shiftcoos.mat
 
-loc_shiftcoos = '/struct/briggs/wanda/DataLightMicroscopy/';
+loc_shiftcoos = '/directory/to/correlation';
 
 % Location to search for Highmag Fiducial coordinate file - *.lmhmcoos.mat
 
-loc_hmcoos = '/struct/briggs/wanda/DataLightMicroscopy/';
+loc_hmcoos = '/directory/to/HMcorrelation/';
 
 % Flip fluorescence images (different grid orientation in LM and EM)
 % flip = 1 if images should be flipped // flip = 0 if images are in same orientation
@@ -64,7 +66,6 @@ trafo = 'linear conformal';
 % trafo = 'affine';
 % trafo = 'projective';
 
-% emboxsize=57; % must be odd number   -  size of box for EM-image subpixel fitting
 fmboxsize=11; % must be odd number   -  size of box for bead-image subpixel fitting
 imboxsize=11; % must be odd number   -  size of box for fluo-image subpixel fitting
 

@@ -1,4 +1,10 @@
 function martin_digitize2(varargin)
+
+% % version MartinSchorb 130312
+% based on digitize07, submitted to MATLABcentral by Todd C Pataky on 18 Apr 2007
+% http://www.mathworks.de/matlabcentral/fileexchange/14703-digitize07
+% 
+% 
 %DIGITIZE07  Digitze points on an image using the mouse  
 %   DIGITIZE07(filename) displays an image and allows the user to 
 %   digitize points using the mouse, similar to MATLAB's built-in GINPUT

@@ -1,6 +1,7 @@
 function status=martin_corr_gui4(input,tfmselect,status)
 
-% %version MartinSchorb 100119
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % %
 % %usage is martin_corr_gui(struct from martin_ls_blind2); status is needed
 % as status variable

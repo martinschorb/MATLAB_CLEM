@@ -1,6 +1,7 @@
 function out=martin_coordinate_sort(coos,rotid,imsize)
 
-% version MartinSchorb 120201
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % 
 % manages coordinates after #of 90degree rotations (rotid)
 

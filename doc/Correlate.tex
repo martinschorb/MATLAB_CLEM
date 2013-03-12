@@ -151,7 +151,7 @@ In the init script you can specify the following settings:
 
 
 \newpage
- \lstinputlisting[linerange={1-75}]{../corr_init_orig.m}
+ \lstinputlisting[linerange={1-78}]{../corr_init_orig.m}
 \newpage
 \section{Correlation from LightMicroscopy to LowMag EM image}
 
@@ -162,7 +162,7 @@ To execute the script and start the correlation simply run \begin{verbatim}
  martin_correlate(fmf,emf,gmf,rmf,outfileroot)
 \end{verbatim}
  in the MATLAB command line.
- \lstinputlisting[linerange={1-33}]{../martin_correlate.m}
+ \lstinputlisting[linerange={1-35}]{../martin_correlate.m}
 It requires the following input parameters:
 \begin{enumerate}
  \item\texttt{fmf} -- path to FM image file containing fiducial information (1344$\times$1024 pixel, 8 or 16bit tiff-file)
@@ -246,7 +246,7 @@ Fiducial positions in the light microscopy image are fitted with sub-pixel accur
 You can specify in the init file that you want to check the fit and adjust each fiducial pair individually.
 The fitted positions are presented again using a \texttt{cpselect} dialog.\,(Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
 
- \lstinputlisting[linerange={157-159,170-171}]{../martin_correlate.m}
+ \lstinputlisting[linerange={167-169,180-181}]{../martin_correlate.m}
 
 \subsubsection{Selection of fluorescence channel}
 A popup window will ask you to determine the fluorescence channel in which your signal of interest is imaged.(Fig.\,\ref{fig:fluorsel})
@@ -341,7 +341,7 @@ To execute the script and start the correlation simply run \begin{verbatim}
 \end{verbatim}
  in the MATLAB command line.
 
-\lstinputlisting[linerange={1-8}]{../martin_LMtoHM.m}
+\lstinputlisting[linerange={1-18}]{../martin_LMtoHM.m}
 It requires the following input parameters:
 \begin{enumerate}
  \item\texttt{hmf} -- path to high mag. electron tomogram slice containing fiducial information (usually 2048$\times$2048 pixel, 8 or 16bit tiff-file)

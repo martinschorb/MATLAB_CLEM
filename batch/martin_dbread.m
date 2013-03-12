@@ -37,7 +37,7 @@ end
 
 val={};
 
-if isnumeric(search)
+if isnumeric(search)       
     for i = 1:length(search)
         for j = 1:length(colnum)
             val{i,j} = db{floor(search(i)),colnum(j)};
@@ -63,8 +63,14 @@ else
     [I,J]=ind2sub(size(db),IDX(indeces));
     
     for i = 1:length(I)
+        if colnum == 0;
+            val = I;
+        else
+        
         for j = 1:length(colnum)
             val{i,j} = db{I(i),colnum(j)};
+        end
+        
         end
     end
     

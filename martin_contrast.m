@@ -1,6 +1,7 @@
 function outim = martin_contrast(im)
 
-% version MartinSchorb 120312
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % 
 % usage is output_image = martin_conrast(input_image); 
 % 
