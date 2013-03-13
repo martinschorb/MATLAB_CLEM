@@ -61,7 +61,7 @@ if nargin>1
     if nargin>5
         omf = varargin{6};
         omfluor = varargin{7};
-        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor-trash,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
+        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor_trash,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
     else
         [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf);
     end
