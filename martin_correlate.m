@@ -84,7 +84,7 @@ if ~isempty(omf)
 else
     om=zeros(4);
 end
-
+flip = init.flip;
 % adjust flip/orientation of fluorescence images
 if flip==1
     fm=fm';im=im';om=om';
