@@ -21,6 +21,10 @@ switch imname
         imtitle='GFP';
     case 'rm'
         imtitle='RFP';
+    case 'im'
+        imtitle='Fluorescence spot of interest'; 
+    case 'om'
+        imtitle='Fluorescence spot of interest - second channel';     
     otherwise
         imtitle='Fluorescence';
 end

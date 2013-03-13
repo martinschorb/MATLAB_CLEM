@@ -14,7 +14,7 @@ function martin_correlate(varargin)
 % % dense fiducials.
 % % 
 % % looks for previously picked fiducial coordinates
-% % 4
+% % 
 % % calls cpselect for control point registration and uses cp2tform
 % % 
 % % corrects for image shift between channels using bleed-thru beads
@@ -61,7 +61,7 @@ if nargin>1
     if nargin>5
         omf = varargin{6};
         omfluor = varargin{7};
-        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
+        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor-trash,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
     else
         [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf);
     end
@@ -597,7 +597,7 @@ end
 % transform the fluorescence microscopy images
 
 [fm2 xdata ydata]=imtransform(fm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
-[gm2 xdata ydata]=imtransform(im,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+[im2 xdata ydata]=imtransform(im,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
 if ~isempty(omf)
     [om2 xdata ydata]=imtransform(om,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
 end
@@ -630,10 +630,10 @@ imwrite(impred,[outfileroot,file,'_pred_overlay.jpg']);
 % write output files
 imwrite(fm2,[outfileroot,file,'_fm.tif'],'Compression','none');
 imwrite(em,[outfileroot,file,'_em.tif'],'Compression','none');
-imwrite(gm2,[outfileroot,file,'_gm.tif'],'Compression','none');
+imwrite(im2,[outfileroot,file,'_im.tif'],'Compression','none');
 
 if ~isempty(omf)
-    imwrite(om2,[outfileroot,file,'_',omfluor,'.tif'],'Compression','none');
+    imwrite(om2,[outfileroot,file,'_',omfluor,'_om.tif'],'Compression','none');
 end
 imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
 imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');

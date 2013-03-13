@@ -6,17 +6,20 @@
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
 
-% Location to search for fiducial coordinate file - *.pickspots.mat
 
-loc_pickspots = '/directory/to/correlation';
+% ---------  replace > pwd < by the directory of choice in parentheses ----
+
+% Location to search for fiducial coordinate file - *.pickspots.mat 
+
+loc_pickspots = pwd; %    '/directory/to/correlation';
 
 % Location to search for shift correction coordinate file - *.shiftcoos.mat
 
-loc_shiftcoos = '/directory/to/correlation';
+loc_shiftcoos = pwd; %    '/directory/to/correlation';
 
 % Location to search for Highmag Fiducial coordinate file - *.lmhmcoos.mat
 
-loc_hmcoos = '/directory/to/HMcorrelation/';
+loc_hmcoos = pwd; %    '/directory/to/HMcorrelation/';
 
 % Flip fluorescence images (different grid orientation in LM and EM)
 % flip = 1 if images should be flipped // flip = 0 if images are in same orientation
@@ -56,7 +59,7 @@ gaussloc = 3;
 
 % interactive mode for fitting (0 - inactive, 1 - active, 2 - always active)
 
-fit_interactive = 0;
+fit_interactive = 2;
 
 %  ------------------------------------------------------------------------
 
