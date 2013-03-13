@@ -53,7 +53,7 @@
 \section{Introduction}
 This document describes the usage of the algorithms designed for correlation of fluorescence microscopy images to their corresponing EM image.\\
 
-The correlation procedure, as described in Kukulski et al.,2011 JCB, consists of two major coordinate transformations. The first one uses fluorescent microspheres to calculate the mapping of a single point fluorescent signal onto an electron microscopy image of low resolution ($4-10 $k$\times$). The obtained coordinates can then be transformed further using a different fiducial system (in this case the gold beads used for tomogram reconstruction) to a high magnification image.\\
+The correlation procedure, as described in Kukulski et al., JCB (2011) and in more detail in Kukulski et al., MethCellBiol (2012) consists of two major coordinate transformations. The first one uses fluorescent microspheres to calculate the mapping of a single point fluorescent signal onto an electron microscopy image of low resolution ($4-10 $k$\times$). The obtained coordinates can then be transformed further using a different fiducial system (in this case the gold beads used for tomogram reconstruction) to a high magnification image.\\
 
 This document provides a step by step manual in how to use the algorithms, their parameters and outputs and shows the corresponding code snippets to give an idea of the points at which certain things happen while running the script.\\
 
@@ -61,7 +61,9 @@ This document provides a step by step manual in how to use the algorithms, their
 \section{Installation and requirements}
 
 \subsection{System and software requirements}A MATLAB\textsuperscript{\textregistered} 
-installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. This should be independent on the type of operating system used. However the function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
+installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. The Optimization Toolbox is required for sub-pixel Gaussian fitting of the fluorescent spots but the correlation procedure can be run without it. 
+
+The scripts should run independent from the type of operating system used. However its function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
 \\
 
 In order to access the newest version of the scripts, a Git\footnote{See \url{http://git.embl.de/},\; \url{http://en.wikipedia.org/wiki/Git_(software)}} client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download a snapshot of the scripts directory at \url{http://git.embl.de/gitweb/?p=schorb/corr.git;a=snapshot;h=master} or all its files individually from the webserver (\texttt{http://git.embl.de/cgit/schorb/corr/tree/}, not recommended).
