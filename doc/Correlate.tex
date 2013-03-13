@@ -34,15 +34,17 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\lhead[\thepage]{Correlation procedure for CLEM -- commit \gitAbbrevHash , \gitCommitterDate}
+\lhead[\thepage]{Correlation procedure for CLEM -- \textcopyright~EMBL -- version 2013.3}
 \rhead[\leftmark]{\thepage}
 
 \title{Correlative Microscopy - Algorithm overview}
 \author{Martin Schorb, \href{mailto:martin.schorb@embl.de}{martin.schorb@embl.de}}
 
 
-\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit \gitAbbrevHash\;commited at \gitCommitterIsoDate}\\\small{ of \texttt{martin\_correlate.m} at \url{http://git.embl.de/cgit/schorb/corr/}
-}}
+\publishers{Copyright EMBL 2013}
+
+% \textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit \gitAbbrevHash\;commited at \gitCommitterIsoDate}\\\small{ of \texttt{martin\_correlate.m} at \url{http://git.embl.de/cgit/schorb/corr/}
+% }}
 
 \setlength{\columnsep}{10pt}
 
@@ -66,76 +68,76 @@ installation version 7.4.0 onwards including the Image Processing Toolbox is req
 The scripts should run independent from the type of operating system used. However its function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
 \\
 
-In order to access the newest version of the scripts, a Git\footnote{See \url{http://git.embl.de/},\; \url{http://en.wikipedia.org/wiki/Git_(software)}} client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download a snapshot of the scripts directory at \url{http://git.embl.de/gitweb/?p=schorb/corr.git;a=snapshot;h=master} or all its files individually from the webserver (\texttt{http://git.embl.de/cgit/schorb/corr/tree/}, not recommended).
-
-
-\subsection{Obtaining the newest version of the correlation algorithms}
-The main scripts as well as all supporting underlying algorithms and this documentation are stored in a central Git repository which is accessible from within the EMBL network.
-\subsubsection*{First installation}
-To get the most recent version of algorithms and documentation files for the first time, you need to copy the code from the server into the directory where you want to store these files. 
-Open a Unix Terminal shell and change to the directory in which you want the scripts to end up.
-To get the scripts type:
-\begin{verbatim}
- git clone git://git.embl.de/schorb/corr.git XXX
-\end{verbatim}
-Where \texttt{XXX} is an optional directory name where the scripts will be copied into. If no directory name is specified a folder \texttt{corr/} containing all files will be generated. Accept the encryption certificate.\\
-
-You should see a result similar to this:
-\begin{verbatim}
-% git clone git://git.embl.de/schorb/corr.git XXX
-Cloning into 'XXX'...
-remote: Counting objects: 61, done.
-remote: Compressing objects: 100% (60/60), done.
-remote: Total 61 (delta 7), reused 0 (delta 0)
-Receiving objects: 100% (61/61), 4.79 MiB | 9.05 MiB/s, done.
-Resolving deltas: 100% (7/7), done.
-\end{verbatim}
-
-Now you have a local working copy of the most recent versions of the correlation files.\\
-\textcolor{blue}{You can also now find the most up-to-date copy of this manual in the \texttt{doc/} subfolder.}\\
-
-Add this directory including all subdirectories to the MATLAB path by adding the following line to MATLAB's \texttt{startup.m} script, that is usually located in a MATLAB related folder within your home directory (\texttt{$\sim$/.matlab/startup.m}) when working in a Linux environment. 
-\begin{verbatim}
- addpath (genpath('/path/to/your/directory'),'-begin')
-\end{verbatim}
-On Macintosh or Windows systems you have to add the path by using MATLAB's preferences. Make sure that also the subdirectories are added.\\
-\subsubsection*{Updating your existing scripts}
-
-To have your scripts and documentation files always up to date according to the current revision, update them from the repository by simply executing
-\begin{verbatim}
- git pull
-\end{verbatim}
- in the directory in which you put the scripts.\\
- 
-A successful update of the scripts will look like this:
-\begin{verbatim}
- remote: Counting objects: 9, done.
- ...
- Updating f98710a..d4e01df
- ...
- doc/Correlate.tex |    8 +++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
-\end{verbatim}
-
-If you get an error stating: \texttt{
- fatal: Not a git repository ...}\\
-Make sure your active terminal is in the correct directory.\\
-
-If you receive another error message, this most likely means that you've edited some of the scripts yourself and thus there's a conflict resulting, because the file you want to update from the server is different from what the program expects. The easiest solution to this is save your initialization script (see \ref{sec:init}) to another directory and delete the entire script directory (including all hidden files). Then perform a clean new installation of the scripts as described above.
+Make sure you add the directory where the scripts are located in your MATLAB path.
+% 
+% In order to access the newest version of the scripts, a Git\footnote{See \url{http://git.embl.de/},\; \url{http://en.wikipedia.org/wiki/Git_(software)}} client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download a snapshot of the scripts directory at \url{http://git.embl.de/gitweb/?p=schorb/corr.git;a=snapshot;h=master} or all its files individually from the webserver (\texttt{http://git.embl.de/cgit/schorb/corr/tree/}, not recommended).
+% 
+% 
+% \subsection{Obtaining the newest version of the correlation algorithms}
+% The main scripts as well as all supporting underlying algorithms and this documentation are stored in a central Git repository which is accessible from within the EMBL network.
+% \subsubsection*{First installation}
+% To get the most recent version of algorithms and documentation files for the first time, you need to copy the code from the server into the directory where you want to store these files. 
+% Open a Unix Terminal shell and change to the directory in which you want the scripts to end up.
+% To get the scripts type:
+% \begin{verbatim}
+%  git clone git://git.embl.de/schorb/corr.git XXX
+% \end{verbatim}
+% Where \texttt{XXX} is an optional directory name where the scripts will be copied into. If no directory name is specified a folder \texttt{corr/} containing all files will be generated. Accept the encryption certificate.\\
+% 
+% You should see a result similar to this:
+% \begin{verbatim}
+% % git clone git://git.embl.de/schorb/corr.git XXX
+% Cloning into 'XXX'...
+% remote: Counting objects: 61, done.
+% remote: Compressing objects: 100% (60/60), done.
+% remote: Total 61 (delta 7), reused 0 (delta 0)
+% Receiving objects: 100% (61/61), 4.79 MiB | 9.05 MiB/s, done.
+% Resolving deltas: 100% (7/7), done.
+% \end{verbatim}
+% 
+% Now you have a local working copy of the most recent versions of the correlation files.\\
+% \textcolor{blue}{You can also now find the most up-to-date copy of this manual in the \texttt{doc/} subfolder.}\\
+% 
+% Add this directory including all subdirectories to the MATLAB path by adding the following line to MATLAB's \texttt{startup.m} script, that is usually located in a MATLAB related folder within your home directory (\texttt{$\sim$/.matlab/startup.m}) when working in a Linux environment. 
+% \begin{verbatim}
+%  addpath (genpath('/path/to/your/directory'),'-begin')
+% \end{verbatim}
+% On Macintosh or Windows systems you have to add the path by using MATLAB's preferences. Make sure that also the subdirectories are added.\\
+% \subsubsection*{Updating your existing scripts}
+% 
+% To have your scripts and documentation files always up to date according to the current revision, update them from the repository by simply executing
+% \begin{verbatim}
+%  git pull
+% \end{verbatim}
+%  in the directory in which you put the scripts.\\
+%  
+% A successful update of the scripts will look like this:
+% \begin{verbatim}
+%  remote: Counting objects: 9, done.
+%  ...
+%  Updating f98710a..d4e01df
+%  ...
+%  doc/Correlate.tex |    8 +++++++-
+%  2 files changed, 7 insertions(+), 1 deletion(-)
+% \end{verbatim}
+% 
+% If you get an error stating: \texttt{
+%  fatal: Not a git repository ...}\\
+% Make sure your active terminal is in the correct directory.\\
+% 
+% If you receive another error message, this most likely means that you've edited some of the scripts yourself and thus there's a conflict resulting, because the file you want to update from the server is different from what the program expects. The easiest solution to this is save your initialization script (see \ref{sec:init}) to another directory and delete the entire script directory (including all hidden files). Then perform a clean new installation of the scripts as described above.
 
 \subsubsection*{Editing the scripts}
-You are able manipulate and edit your local working copy of the scripts (activate or remove sub-pixel fitting, shift correction etc.). However these changes will be reverted while updating to a newer revision. \textcolor{red}{Therefore please be really cautious while doing this! Use the initialization script instead to personalize the correlation procedure or let me know if there's substantial changes that you need.}\\
-
-Also note that there will be some hidden files and directories (\texttt{.git} etc.) written while checking out. These contain important information needed by Git and should not be modified or deleted.
+You are technically able to manipulate and edit your local working copy of the scripts. However the license agreement for this software does not allow modifications with exception of the personalizations in the init script described below. In case you have problems with any part of the software, feel free to contact me.
 
 
-\newpage
+ \newpage
 \subsection{Initialization - the init script}
 \label{sec:init}
-You can adjust key parameters of the correlation scripts by modifying the initialization script as shown below. When checking out the repository a file called \texttt{corr\_init\_orig.m} will appear. You can simply rename this file to \texttt{corr\_init.m} and change the parameters and paths according to your needs. This file will then stay in your local scripts directory and will not be overwritten while updating the scripts with the newest version from the repository.\\
+You can adjust key parameters of the correlation scripts by modifying the initialization script as shown below. Save the modified file to \texttt{corr\_init.m} and change the parameters and paths according to your needs. In case something goes wrong, you will have the \texttt{corr\_init\_orig.m} file as a backup.
 
 \begin{quote}\textcolor{red}{
-   It might occur that in future revisions additional parameters will be added to this script, so in case you run into an error message stating this, just update your local \texttt{corr\_init.m} with the changes you find in the downloaded and most up-to-date \texttt{corr\_init\_orig.m}.}
+   It might occur that in future versions additional parameters will be added to this script, so in case you run into an error message stating this, just update your local \texttt{corr\_init.m} with the changes you find in the downloaded and most up-to-date \texttt{corr\_init\_orig.m}.}
  \end{quote}
 
 In the init script you can specify the following settings:
