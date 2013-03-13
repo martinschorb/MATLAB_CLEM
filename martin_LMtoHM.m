@@ -142,68 +142,10 @@ end
 
 save([outfileroot,file1,'.lmhmcoos.mat'],'ip','bp', 'hmf','smf')
 
-%fit beads to get subpixel centres
-% 
-% emboxsize=17; % must be odd number
-% emsir=(emboxsize-1)/2;
-% fmboxsize=13; % must be odd number
-% fmsir=(fmboxsize-1)/2;
-% 
-% emF=fspecial('gaussian',emsir-5,emsir/5);
-% fmF=fspecial('gaussian',fmsir-5,fmsir/5);
-% ip=round(ip);
-% bp=round(bp);
-% 
-% for si=1:size(ip,1)
-%     sixe=lm(ip(si,2)-emsir:ip(si,2)+emsir,ip(si,1)-emsir:ip(si,1)+emsir);
-%     sixe=(sixe.*-1)+max(max(sixe));
-%     sixe=double(sixe);
-%    
-% %     imshow(imadjust(sixe));pause
-%     sixe=(imfilter(sixe,emF)); 
-%      
-%         
-%     sixf=hm(bp(si,2)-fmsir:bp(si,2)+fmsir,bp(si,1)-fmsir:bp(si,1)+fmsir);
-%     sixf=(sixf.*-1)+max(max(sixf));
-%     
-% %     imshow(imadjust(sixf));pause 
-%     sixf=double(imfilter(sixf,fmF));   
-% 
-%     
-%     
-%     % last argument enables interactive mode to score sub pixel fitting...
-%     a=cntrd1(sixe,[emsir+1, emsir+1],round(emsir/2)*2-5,0);
-% 
-% %     [xpeak,ypeak,junk]=john_findpeak(sixe,1);
-%      ip2(si,1)=ip(si,1)+a(1)-1-emsir; ip2(si,2)=ip(si,2)+a(2)-1-emsir;
-%     
-%      
-% %     [xpeak,ypeak,junk]=john_findpeak(sixf,1);
-%    b=cntrd1(sixf,[fmsir+1, fmsir+1],round(fmsir/2)*2-5,0);
-%      
-%     bp2(si,1)=bp(si,1)+b(1)-1-fmsir; bp2(si,2)=bp(si,2)+b(2)-1-fmsir;
-% end
-% 
-% 
-% % reshows the control points so you can check them...
-% [ip3,bp3]=cpselect(lm,hm,ip2,bp2,'Wait',true);
 ip3=ip;bp3=bp;
-
-% pickedhm=zeros(size(hm));
-% bp3r=round(bp3);
-% for n=1:size(bp3,1)
-% picked(bp3r(n,2),bp3r(n,1))=10;
-% end
-% pickedlm=zeros(size(lm));
-% ip3r=round(ip3);
-% for n=1:size(ip3,1)
-% pickedlm(ip3r(n,2)-1:ip3r(n,2)+1,ip3r(n,1)-1:ip3r(n,1)+1)=10;
-% pickedlm(ip3r(n,2),ip3r(n,1))=10;
-% end
 
 thm=cp2tform(ip3,bp3,'linear conformal');
 spotpos=tformfwd(thm,impos);
-% hm_accuracy=mean([norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,accuracy])-spotpos),norm(tformfwd(thm,impos+sqrt(.5)*[accuracy,-accuracy])-spotpos)]);
 hmaccuracy=accuracy/pixelsize_hm;
 hm_accuracy=hmaccuracy;
 tfmcircle=martin_circle(sm,hmaccuracy,round(spotpos));

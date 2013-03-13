@@ -1,6 +1,7 @@
   function outcircle = martin_circle(em,error,fluortfm)
  
-% %version MartinSchorb 120222
+% % version MartinSchorb 130312
+% % Copyright EMBL 2013, All rights reserved
 % %
 % % martin_circle(EM-image, accuracy of transformation, coordinate of spot
 % %    of interest)
