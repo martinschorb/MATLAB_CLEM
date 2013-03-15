@@ -58,16 +58,18 @@ accuracy = accuracy1;
 
 slice=0;
 
+lmf = [pathname,namebase];
 
-lmf = [pathname,namebase,'_em.tif'];
-if strfind(lmf,'tif')
-    lm=imread([pathname,namebase,'_em.tif']);
-elseif strfind(lmf,'jpg')
-    lm=imread([pathname,namebase,'_em.jpg']);
+if exist([lmf,'_em.tif'],'file')    
+    lmf = [pathname,namebase,'_em.tif'];
+elseif exist([lmf,'_em.jpg'],'file') 
+    lmf = [pathname,namebase,'_em.jpg'];
+else
+    error('LM image file not found');
 end
-    
+
 % read images and pick beads
-%  lm=imread(lmf);
+lm=imread(lmf);
 
 
 
