@@ -59,11 +59,13 @@ accuracy = accuracy1;
 slice=0;
 
 
-
-
-
-lm=imread([pathname,namebase,'_em.tif']);
-
+lmf = [pathname,namebase,'_em.tif'];
+if strfind(lmf,'tif')
+    lm=imread([pathname,namebase,'_em.tif']);
+elseif strfind(lmf,'jpg')
+    lm=imread([pathname,namebase,'_em.jpg']);
+end
+    
 % read images and pick beads
 %  lm=imread(lmf);
 
