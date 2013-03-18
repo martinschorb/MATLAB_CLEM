@@ -58,14 +58,18 @@ accuracy = accuracy1;
 
 slice=0;
 
+lmf = [pathname,namebase];
 
-
-
-
-lm=imread([pathname,namebase,'_em.tif']);
+if exist([lmf,'_em.tif'],'file')    
+    lmf = [pathname,namebase,'_em.tif'];
+elseif exist([lmf,'_em.jpg'],'file') 
+    lmf = [pathname,namebase,'_em.jpg'];
+else
+    error('LM image file not found');
+end
 
 % read images and pick beads
-%  lm=imread(lmf);
+lm=imread(lmf);
 
 
 
@@ -76,7 +80,7 @@ if ~isempty(strfind(smf,'tif'))
     sm=imread(smf);
 elseif or(~isempty(strfind(smf,'mrc')),~isempty(strfind(smf,'st')))
     sm1=tom_mrcreadimod(smf);
-    sm =sm1.Value;
+    sm =sm1.Value';
     pixelsize_hm = sm1.Header.xlen/sm1.Header.mx/10;
 end
     
@@ -87,7 +91,7 @@ else
         hm=imread(hmf);
     elseif or(~isempty(strfind(hmf,'mrc')),~isempty(strfind(hmf,'st')))
         hm1=tom_mrcreadimod(hmf);
-        hm = hm1.Value;
+        hm = hm1.Value';
     end
 end
 
@@ -104,8 +108,8 @@ lm=imadjust(lm);
 % sm=conv8to16bit(sm);
 % lm=conv8to16bit(lm);
 
-hm=imadjust(uint16(hm'));
-sm=imadjust(uint16(sm'));
+hm=imadjust(uint16(hm));
+sm=imadjust(uint16(sm));
 
 
 if exist([outfileroot,file1,'.lmhmcoos.mat'],'file')
