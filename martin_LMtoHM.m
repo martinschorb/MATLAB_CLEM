@@ -78,10 +78,8 @@ lm=imread(lmf);
     
 if ~isempty(strfind(smf,'tif'))
     sm=imread(smf);
-elseif or(~isempty(strfind(smf,'mrc')),~isempty(strfind(smf,'st')))
-    sm1=tom_mrcreadimod(smf);
-    sm =sm1.Value';
-    pixelsize_hm = sm1.Header.xlen/sm1.Header.mx/10;
+else
+    error('wrong file format, needs to be TIFF');
 end
     
 if strcmp(smf,hmf)
@@ -89,9 +87,8 @@ if strcmp(smf,hmf)
 else
     if ~isempty(strfind(hmf,'tif'))
         hm=imread(hmf);
-    elseif or(~isempty(strfind(hmf,'mrc')),~isempty(strfind(hmf,'st')))
-        hm1=tom_mrcreadimod(hmf);
-        hm = hm1.Value';
+    else
+        error('wrong file format, needs to be TIFF');
     end
 end
 
