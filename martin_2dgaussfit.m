@@ -131,9 +131,6 @@ sig = fitparams(4);
 
 % check feasability of parameters
 
-if abs(log(A)-log(maxpeak)) > 1;
-    check = 1;
-end
 
 if sig > sz(1)^2
     check = 1;
@@ -150,7 +147,7 @@ end
 if min(mu) < 2
     check = 1;   
 end
-check = 1;
+
     
 if (interactive + check) > 1
     [X1,Y1]=meshgrid(1:0.2:sz,1:0.2:sz);
