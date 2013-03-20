@@ -293,7 +293,7 @@ if mod(gaussloc,2) == 1
     for ispot=1:numspots
         sixg=double(im(floor(bpint(ispot,2))-imsir:floor(bpint(ispot,2))+imsir , floor(bpint(ispot,1))-imsir:floor(bpint(ispot,1))+imsir));
         [mu,sig,Amp,check] = martin_2dgaussfit(sixg,1,fit_interactive);
-        if check | isnan(mu)
+        if isnan(mu)
             bpint1(ispot,:)=bpint(ispot,:);
         else
 
