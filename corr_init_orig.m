@@ -86,3 +86,12 @@ if isempty(a)
     warning('Optimization Toolbox not found! Not using subpixel localization.');
     gaussloc = 0;
 end
+clear a
+
+% have all init variables ready in a structure to pass to succeeding
+% functions 
+
+vars=who;
+for i=1:length(vars)
+    init.(vars{i})=evalin('caller', vars{i});
+end
