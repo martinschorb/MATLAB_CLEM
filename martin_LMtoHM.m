@@ -114,7 +114,7 @@ sm=imadjust(uint16(sm));
 
 if exist([outfileroot,file1,'.lmhmcoos.mat'],'file')
     load([outfileroot,file1,'.lmhmcoos.mat'])
-    [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
+%     [ip,bp]=cpselect(lm,hm,ip,bp,'Wait',true);
 else
     
     
