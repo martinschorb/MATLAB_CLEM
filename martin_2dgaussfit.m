@@ -242,8 +242,8 @@ function manualbutton(h_manualbutton,event)
     
     
 %     reduce box size
-    cs = round(log2(sz))+1;
-    newsize = max(ceil(sz/3),[5 5]);
+
+    newsize = max(ceil(sz/2),[5 5]);
     
     
     
@@ -258,12 +258,12 @@ function manualbutton(h_manualbutton,event)
     if or(size(im1,1)<newsize(1),size(im1,2)<newsize(2))
         warning('clicked point is too close to edge of image')
         im1=im;
-    end
-    
-    [mu1,sig,A,check] = martin_2dgaussfit(im1,linear,2,mu);
+        [mu,sig,A,check] = martin_2dgaussfit(im,linear,2,mu);
+    else
+        [mu1,sig,A,check] = martin_2dgaussfit(im1,linear,2,mu);
   
-    mu = mu1+corner-[1 1];
-
+        mu = mu1+corner-[1 1];
+    end
 end
 
 
