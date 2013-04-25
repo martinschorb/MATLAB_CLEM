@@ -38,7 +38,7 @@ end
 
 if numspots>1
     hf = figure('color','white','units','pixel','Visible', 'off');
-    text('units','pixels','position',[100 100],'HorizontalAlignment','center','fontsize',30,'string',num2str(jj));
+    text('units','pixels','position',[100 100],'HorizontalAlignment','center','fontsize',80,'string',num2str(jj));
     set(gca,'units','pixels','position',[1 1 200 200],'visible','off');
     orig_mode = get(hf, 'PaperPositionMode');
     set(hf, 'PaperPositionMode', 'auto');

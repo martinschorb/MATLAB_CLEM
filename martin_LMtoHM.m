@@ -231,7 +231,7 @@ fprintf(file_2,'%2.3f %2.3f',spotpos);
 fprintf(file_2,['\n prediction circle radius (px): ',int2str(hmaccuracy)]);
 fclose(file_2);
 
-save([outfileroot,file,'.sliceinfo.mat'],'slice','hm_accuracy','spotpos');
+save([outfileroot,file,'.sliceinfo.mat'],'smf','slice','hm_accuracy','spotpos');
 
 tfmcircle=uint8(tfmcircle*255);
 %writes output files
