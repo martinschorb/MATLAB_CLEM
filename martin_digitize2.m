@@ -131,7 +131,7 @@ uimenu(mh,'Label','Points...','callback',@callback_loadPoints);
 mh = uimenu(gcf,'Label','Export XY');
 uimenu(mh,'label','To Workspace','callback',@callback_export2Base)
 uimenu(mh,'label','To .mat File...','callback',{@callback_export2File,'.mat'},'separator','on')
-uimenu(mh,'label','To .dat File...','callback',{@callback_export2File,'.dat'})
+% uimenu(mh,'label','To .dat File...','callback',{@callback_export2File,'.dat'})
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %(c) Marker style functions
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -554,7 +554,7 @@ setappdata(gca,'H',[])
 function closeFigure(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%
 button = questdlg('Export data to Workspace before closing?',...
-    '','Export&Close','Close','Cancel','Export&Close');
+    '','Export&Close','Cancel','Export&Close');
 switch button
     case 'Export&Close'
         [XY] = getXY;
@@ -563,8 +563,8 @@ switch button
 %         fprintf('   Name: ''XY''\n')
 %         fprintf('   Size: [%.0f %.0f]\n\n',size(XY))
         delete(gcf)
-    case 'Close'
-        delete(gcf)
+%     case 'Close'
+%         delete(gcf)
     case 'Cancel'
         return
 end

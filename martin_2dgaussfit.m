@@ -251,9 +251,9 @@ function manualbutton(h_manualbutton,event)
     corner = round(mu)-dis1;
     im1 = imcrop(im,[corner,newsize-1]);
     
-    if or(any(mu<1),any(mu>newsize(1)))
-        mu = dis1;
-    end
+
+    mu = dis1+1;
+    
     
     if or(size(im1,1)<newsize(1),size(im1,2)<newsize(2))
         warning('clicked point is too close to edge of image')
