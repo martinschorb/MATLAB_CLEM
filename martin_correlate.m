@@ -143,7 +143,7 @@ while status==0
 %         ip2=ip;bp2=bp;
 %     end
 % 145
-while size(ip2,1) < init.minbeads
+while size(ip,1) < init.minbeads
     k=msgbox(['you need at least ',num2str(init.minbeads),' pairs for this transformation'],'Error','modal');
     uiwait(k);
     [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
@@ -160,11 +160,11 @@ fm2=fm;
 [mlen,idx]=max(s_fm);
 
 numfids=size(ip,1);
-bp1=bp2;
+bp1=bp;
 if gaussloc > 1
     imsir=floor(imboxsize/2);
 for ispot=1:numfids
-    sixf=double(fm(floor(bp2(ispot,2))-imsir:floor(bp2(ispot,2))+imsir , floor(bp2(ispot,1))-imsir:floor(bp2(ispot,1))+imsir));
+    sixf=double(fm(floor(bp(ispot,2))-imsir:floor(bp(ispot,2))+imsir , floor(bp(ispot,1))-imsir:floor(bp(ispot,1))+imsir));
     [mu,sig,Amp,check] = martin_2dgaussfit(sixf,1,fit_interactive);
     
     if isnan(mu)
@@ -172,7 +172,7 @@ for ispot=1:numfids
     else
         
     if check
-        bp1(ispot,:)=bp2(ispot,:);
+        bp1(ispot,:)=bp(ispot,:);
         
                    
    % 178     
