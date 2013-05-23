@@ -137,29 +137,29 @@ else
 end
 status=0;
 while status==0  
-    if exist('ip2','var')>0
-        [ip,bp]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
-    else
-        ip2=ip;bp2=bp;
-    end
+%     if exist('ip2','var')>0
+        [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true) ;
+%     else
+%         ip2=ip;bp2=bp;
+%     end
 % 145
 while size(ip2,1) < init.minbeads
     k=msgbox(['you need at least ',num2str(init.minbeads),' pairs for this transformation'],'Error','modal');
     uiwait(k);
-    [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true);
+    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
 end
 
 % computation warning
 if size(ip,1) >14
     k=msgbox('Accuracy estimation might take a while when choosing too many fiducials.');
     uiwait(k);
-    [ip2,bp2]=cpselect(em,fm_view,ip2,bp2,'Wait',true);
+    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
 end
     
 fm2=fm;
 [mlen,idx]=max(s_fm);
 
-numfids=size(ip2,1);
+numfids=size(ip,1);
 bp1=bp2;
 if gaussloc > 1
     imsir=floor(imboxsize/2);
@@ -178,15 +178,15 @@ for ispot=1:numfids
    % 178     
     else
         
-        bp2(ispot,:)=floor(bp2(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
+        bp(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
     end
 
     
 end
     nanidx=find(isnan(bp1(:,1)));
-    bp2(nanidx,:)=[];
-    ip2(nanidx,:)=[];    
+    bp(nanidx,:)=[];
+    ip(nanidx,:)=[];    
 end
 
 
@@ -226,11 +226,11 @@ end
 % 226
 %reshows the control points so you can check them...
 %  ip4=ip;bp4=bp;
-    [ip4,bp4]=cpselect(em,fm_view,ip2,bp2,'Wait',true) ;
-     ip2=ip4;bp2=bp4;ip=ip4;bp=bp4;
-     numfids=size(ip2,1);
+    [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true) ;
+%      ip2=ip4;bp2=bp4;ip=ip4;bp=bp4;
+     numfids=size(ip,1);
 %export pixel values
-    output=[ip4,bp4];
+%     output=[ip,bp];
 % 234
 
     save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','slices','fluorsel','omfluor'); 
@@ -263,7 +263,7 @@ if multispot==1;
     ipint=[];
     bpint=[];    
     while ~strcmp(numq,'Correct')
-        [ipint,bpint]=cpselect(em,im_view,ip4,bp4,'Wait',true);
+        [ipint,bpint]=cpselect(em,im_view,ip,bp,'Wait',true);
         if size(ipint,1)==numfids
                 k=msgbox('No spot selected!');
                 uiwait(k);
@@ -281,7 +281,7 @@ else
     while ~(size(ipint,1)==numfids+1&(size(bpint,1)== numfids+1))
         k=msgbox(['Click one spot in both images to pick region of interest     --    ',fluorsel,' Image shown on the right']);
         uiwait(k);
-        [ipint,bpint]=cpselect(em,im_view,ip4,bp4,'Wait',true) ;
+        [ipint,bpint]=cpselect(em,im_view,ip,bp,'Wait',true) ;
     end
     ipint=ipint(end,:);
     bpint=bpint(end,:);
@@ -405,14 +405,14 @@ end
 
 
 % 407
-[output,pickedem]=martin_tfm_beads(ip4,bp4,ipint,bpint,em,3,accuracy,init.trafo,outfileroot);
+[output,pickedem]=martin_tfm_beads(ip,bp,ipint,bpint,em,3,accuracy,init.trafo,outfileroot);
 % clear test
 
 % test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
 output.emsize=s_em;
 output.fmsize=s_fm;
-ip=ip4;
-bp=bp4;
+% ip=ip4;
+% bp=bp4;
 
 %     calculates the accuracy for the predicted region:
 % for i=1:size(output.blind,2)
@@ -539,8 +539,8 @@ status= martin_corr_gui4(output,tfmselect,status);
 end
 
 
-ip=ip4;
-bp=bp4;
+% ip=ip4;
+% bp=bp4;
 save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf',['medshift_',fluorsel],'bpint','slices'); 
 
 
@@ -556,7 +556,7 @@ if tfmselect==0 % transform using all beads has been selected
     beads='all beads.';
     file=[file,'_all'];
     prederrlist=[];
-    a=((output.all.bptfm-ip4)).^2;
+    a=((output.all.bptfm-ip)).^2;
     t=[];
    
 else
