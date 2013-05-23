@@ -230,7 +230,7 @@ end
 %      ip2=ip4;bp2=bp4;ip=ip4;bp=bp4;
      numfids=size(ip,1);
 %export pixel values
-%     output=[ip,bp];
+    pos_log=[ip,bp];
 % 234
 
     save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','slices','fluorsel','omfluor'); 
@@ -239,7 +239,7 @@ end
     fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'  slice:',num2str(slices.em),'\n Fluorospheres: ',...
         fmf,'  slice:',num2str(slices.fm),'\n fluorescence image of interest:',imf,'  slice:',num2str(slices.im),'\n other image',omf,'  slice:',num2str(slices.om),...
         '\n-----------\n EM image -  FM image\n']);
-    fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',output'); 
+    fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',pos_log'); 
     fclose(file_1);
     
 % asks for region of interest using the control points
