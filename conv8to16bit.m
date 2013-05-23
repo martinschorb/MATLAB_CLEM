@@ -14,5 +14,5 @@ if isa(im,'uint8')
     end
     im=im2;
 else
-    disp('ERROR: wrong image format')
+%     disp(' image format')
 end
