@@ -372,13 +372,13 @@ if ~shift_skip
             medshift_GFP=medshift;
         case 'RFP'
             medshift_RFP=medshift;
-    end
-    
+        otherwise
+            medshift_other=medshift;
+    end    
 else
     medshift_GFP=[];
     medshift_RFP=[];
 end
-
 
 
 
