@@ -1,5 +1,10 @@
 function [outfile,in_dir,pxs,trafo,minbeads,maxbeads,maxdist]=martin_corr_accuracy_init(loc_pickspots,pixelsize_lm,trafo,minbeads)
 
+% %version MartinSchorb 130620
+% %
+% % Copyright EMBL 2013, All rights reserved
+
+
 % close all
 % need to run this outside because of nested functions
 % if exist('corr_init')==2
