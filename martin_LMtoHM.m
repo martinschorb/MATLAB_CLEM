@@ -182,9 +182,9 @@ imwrite(uint8(sm/255),[outfileroot,file,'_sm.tif'],'Compression','none');
 imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
 
 if hm_overlays
- [im2 xdata ydata]=imtransform(gm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
+ [im2 xdata ydata]=imtransform(im,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));
  if exist([pathname,namebase,'_om.tif'],'file')
-     [om2 xdata ydata]=imtransform(rm,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));  
+     [om2 xdata ydata]=imtransform(om,thm,'FillValues',128,'XData', [1 size(hm,2)],'YData',[1 size(hm,1)],'Size',size(hm));  
      imwrite(om2,[outfileroot,file,'_hm_om.tif'],'Compression','none');
  end
  imwrite(im2,[outfileroot,file,'_hm_im.tif'],'Compression','none');
