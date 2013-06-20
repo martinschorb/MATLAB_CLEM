@@ -1,4 +1,4 @@
-function [prdr,diffvec] = martin_corr_accuracy(kmin,files)
+function [prdr,diffvec] = martin_accuracy(kmin,files)
 
 % %version MartinSchorb 130620
 % %
@@ -43,7 +43,7 @@ mult = 0;
 kmin=minbeads;
 data=struct;
 stop=0;
-
+corrindex = 1;
 while x>0 & stop==0
 pause(0.001)
 if nargin ~= 2
@@ -112,8 +112,7 @@ for nblind=1:ntot  % blind bead index
 % pt of interest....
 
 pt1 = ip2(nblind,:);    
- corrindex=1;
-         
+
                  tip=ip;
                  tbp=bp;
                  st = size(tip,1);
@@ -127,12 +126,12 @@ pt1 = ip2(nblind,:);
 
                 usedbeads(corrindex) = st;
                 
-                prederr = norm(ip2(nblind,:)-bptfm2(nblind,:));
+                prederr = norm(ip2(nblind,:)-bptfm2(nblind,:))*pxs;
                 
                              
                 prdr(corrindex)=prederr;
                 
-                diffvec(corrindex,:) = ip2(nblind,:)-bptfm2(nblind,:);
+                diffvec(corrindex,:) = (ip2(nblind,:)-bptfm2(nblind,:))*pxs;
                 
               %counter for data file
                corrindex = corrindex+1;
