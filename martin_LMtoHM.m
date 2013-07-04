@@ -64,14 +64,14 @@ if exist([lmf,'_em.tif'],'file')
     lmf = [pathname,namebase,'_em.tif'];
 elseif exist([lmf,'_em.jpg'],'file') 
     lmf = [pathname,namebase,'_em.jpg'];
+elseif exist([lmf,'_pred_overlay.jpg'],'file') 
+    lmf = [pathname,namebase,'_pred_overlay.jpg'];
 else
     error('LM image file not found');
 end
 
 % read images and pick beads
 lm=imread(lmf);
-
-
 
 
    
