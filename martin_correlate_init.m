@@ -67,6 +67,23 @@ if nargin>8
     slices = varargin{9};
 end
 
+
+switch init.trafo
+        case 'linear conformal'
+            init.minbeads = 3;
+        case 'affine'
+            init.minbeads = 3;
+        case 'projective'
+            init.minbeads = 4;
+	otherwise
+	    init.minbeads = 5;
+end
+
+
+
+
+
+
 % GUI
 
 f = figure('Visible','off','Position',[0,120,1000,1000],'NumberTitle','off','Menubar','none','Name','EM/FM Correlation - Initial Configuration');
