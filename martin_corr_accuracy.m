@@ -202,7 +202,7 @@ pt1 = ip2(nblind,:);
 %                 m4(k-kmin+1,cnt)=ls/usedbeads;
                 
                 prederr = norm(ip2(nblind,:)-bptfm2(nblind,:));
-                
+                data.blinddev(x,:)=ip2(nblind,:)-bptfm2(nblind,:);
                 data.prederr(x,1)=prederr;
                 
                 data.k_all(x)=k;
@@ -215,6 +215,7 @@ pt1 = ip2(nblind,:);
             end
             if cnt==1
                 data.allbeads_err(y) = prederr;
+                data.allbeaddiffv(y,:) = ip2(nblind,:)-bptfm2(nblind,:);
             end
 
         end

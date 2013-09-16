@@ -332,13 +332,18 @@ function but_emdir_Callback(source,eventdata)
     emf = get(ct_emdir,'String');
     if ~isempty(emf)
         dirpos = strfind(emf,'/');
+        
+        
         emdir = emf(1:dirpos(end));
     else
         emdir=pwd;
     end
     
-    [emf,emdir] = uigetfile('*.tif','select EM image file to correlate',emdir);
-    emf = [emdir,emf];
+    [emf1,emdir] = uigetfile('*.tif','select EM image file to correlate',emdir);
+    if ~isequal(emdir,0)
+      emf = [emdir,emf1];     
+    end
+    
     set(ct_emdir,'String',emf)
 end
 
@@ -349,13 +354,16 @@ function but_fmdir_Callback(source,eventdata)
     fmf = get(ct_fmdir,'String');
     if ~isempty(fmf)
         dirpos = strfind(fmf,'/');
-        fmdir = emf(1:dirpos(end));
+        fmdir = fmf(1:dirpos(end));
     else
         fmdir=pwd;
     end
    
-    [fmf,fmdir] = uigetfile('*.tif','select Fiducial image file to correlate',fmdir);
-    fmf = [fmdir,fmf];
+    [fmf1,fmdir] = uigetfile('*.tif','select Fiducial image file to correlate',fmdir);
+    if ~isequal(fmdir,0)
+      fmf = [fmdir,fmf1];
+    end
+       
     set(ct_fmdir,'String',fmf)
 end
 
@@ -384,8 +392,11 @@ function but_imdir_Callback(source,eventdata)
         imdir=pwd;
     end
    
-    [imf,imdir] = uigetfile('*.tif','select Fluorescence image of interest to correlate',imdir);
-    imf = [imdir,imf];
+    [imf1,imdir] = uigetfile('*.tif','select Fluorescence image of interest to correlate',imdir);
+     if ~isequal(imdir,0)
+      imf = [imdir,imf1];
+    end
+    
     set(ct_imdir,'String',imf)
 end
 
@@ -429,8 +440,10 @@ function but_omdir_Callback(source,eventdata)
         omdir=pwd;
     end
     
-    [omf,omdir] = uigetfile('*.tif','select Fluorescence image of interest to correlate',omdir);
-    omf = [omdir,omf];
+    [omf1,omdir] = uigetfile('*.tif','select Fluorescence image of interest to correlate',omdir);
+    if ~isequal(omdir,0)
+      omf = [omdir,omf1];
+    end
     set(ct_omdir,'String',omf)
 end
 

@@ -279,7 +279,7 @@ end
 
 % -----------------------------------
 
-function kickbutton(h_redobutton,event)
+function kickbutton(h_kickbutton,event)
     close all
     mu = NaN;
     A=NaN; sig=NaN;
