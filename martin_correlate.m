@@ -1,6 +1,6 @@
 function martin_correlate(varargin)
 
-% % version MartinSchorb 130312
+% % version MartinSchorb 131106
 % % Copyright EMBL 2013, All rights reserved
 % %
 % =========================================================================
@@ -336,7 +336,7 @@ end
 % 336
 % runs fluorescence image drift correction
 if ~shift_skip
-    [bluespot,fluospot]=martin_chromaticshift_drift2(fm,fm_view,im,im_view,fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot,fit_interactive);
+    [bluespot,fluospot]=martin_chromaticshift_drift2(fm,fm_view,im,im_view,fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot,0);
     if isnan(fluospot)
         k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
         uiwait(k);
@@ -503,7 +503,7 @@ end
 %     colmin=output.blind(i).colmin;
 %     test(i+1)=output.blind(i).minimum;
 % %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
-%     
+%     http://www.faz.net/
 % end    
 % 
 % [mmum select]=min(test);
@@ -541,7 +541,7 @@ end
 
 % ip=ip4;
 % bp=bp4;
-save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf',['medshift_',fluorsel],'bpint','slices'); 
+save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','bpint','slices'); 
 
 
 % 
