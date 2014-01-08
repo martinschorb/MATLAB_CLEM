@@ -6,7 +6,7 @@ pxs_fm=64.5;
 pxs_em=2.53;
 
 
-numbad = 3;         % number of potential bad beads to omit.
+numbad = 2;         % number of potential bad beads to omit.
 
 
 dist_thr = 10;      % distance threshold in nm while selecting "twin" beads based on distance (should be < accuracy)
@@ -20,15 +20,15 @@ num_trafo = 20;
 
 
 %% ----------------------------------------------------------
+sze = size(e,1);
+szf = size(f,1);
 
-
-n=min(size(e,1),size(f,1));
+n=min(sze,szf);
 
 data_all=[];
 
 
 e0 = e - repmat(e(beadchoiceindex,:),[size(e,1) 1]);
-
 
 [edist, e_idx] = sort(sqrt(sum(e0.^2,2)));
 
@@ -36,7 +36,12 @@ e_twins = find(abs(diff(edist))*pxs_em < dist_thr);
 
 e_ds = e(e_idx,:);
 
-f0 = f - repmat(e(beadchoiceindex,:),[size(e,1) 1]);
+
+counter = 0;
+
+for i_fbead=1:szf
+
+f0 = f - repmat(e(i_fbead,:),[size(e,1) 1]);
 
 [fdist, f_idx] = sort(sqrt(sum(f0.^2,2)));
 
@@ -84,10 +89,14 @@ for i_bad=0:numbad
 
     e_size{i_bad+1} = size(e_sel,1);
     f_size{i_bad+1} = size(f_sel,1);
+    
+   
 
     for ix=1:e_size{i_bad+1};
         Xe = e_ds(e_sel(ix,:)',:);
         for jx=1:f_size{i_bad+1}
+            counter = counter + 1;
+            
             Xf = f_ds(f_sel(jx,:)',:);
 
              [d z tr] = procrustes(Xe,Xf,'reflection',false, 'scaling', true);       % requires the statistics toolbox
@@ -97,24 +106,27 @@ for i_bad=0:numbad
 
             dist = sqrt(sum(sum((z-Xe).^2))) / size(Xe,1);           % use geometric distances instead of procrustes because otherwise we cannot compare different numbers of "bad" beads                         
 
-            dmx{i_bad+1}(ix,jx)= dist;            % store the residuals
-            scale{i_bad+1}(ix,jx) = tr.b;         % store the scales
-            rel_scale{i_bad+1}(ix,jx) = tr.b / scale0;
+            dmx(counter)= dist;            % store the residuals
+            scale(counter) = tr.b;         % store the scales
+            rel_scale(counter) = tr.b / scale0;
 
-            T{i_bad+1}{ix,jx} = tr;               % store the transformations
+            T{counter} = tr;               % store the transformations
+            numbeads(counter) = n-i_bad;
         end  
     end
 
-    [d_sorted{i_bad+1},idx_sorted{i_bad+1}] = sort(dmx{i_bad+1}(:)/(n-i_bad));
-    data_all=[data_all;idx_sorted{i_bad+1} repmat(i_bad,size(d_sorted{i_bad+1})) d_sorted{i_bad+1} reshape(abs(rel_scale{i_bad+1}(idx_sorted{i_bad+1})-1),size(d_sorted{i_bad+1}))];
-
+    
 
 end
 
-scale_score = cellfun(@(x) abs(x-1),rel_scale,'UniformOutput',0);
+end
 
+[d_sorted,idx_sorted] = sort(dmx./numbeads);
+scale_score = abs(rel_scale-1);    
 
-data_clean=sortrows(data_all,3);
+data_all=[idx_sorted' n-numbeads(idx_sorted)' d_sorted' scale_score(idx_sorted)'];
+
+data_clean=data_all;
 
 data_clean(data_clean(:,4)>scale_thr,:)=[];
 
@@ -122,11 +134,9 @@ data_clean(data_clean(:,4)>scale_thr,:)=[];
 
 for i_good=1:num_trafo
     
-    g_idx = data_clean(i_good,2);
-    
-    [aa,bb]=ind2sub([e_size{g_idx+1},f_size{g_idx+1}],data_clean(i_good,1));
-    
-    good_T(i_good) = T{g_idx+1}{aa,bb};
+    g_idx = data_clean(i_good,1);
+      
+    good_T(i_good) = T{g_idx};
     
     good_z(:,:,i_good) = good_T(i_good).b*f*good_T(i_good).T+repmat(good_T(i_good).c(1,:),[size(f,1) 1]);                 %   b*Y*T+c.
        
