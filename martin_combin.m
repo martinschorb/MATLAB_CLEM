@@ -21,7 +21,7 @@ else
       a=2^n;
       sel=zeros(a,n);
       for ii=1:n
-        binary=[repmat(0,[a/(2^ii) 1]);repmat(1,[a/(2^ii) 1])];
+        binary=[zeros([a/(2^ii) 1]);ones([a/(2^ii) 1])];
         sel(:,ii)=repmat(binary,[2^(ii-1) 1]);
       end
 
