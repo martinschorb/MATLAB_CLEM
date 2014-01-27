@@ -1,7 +1,10 @@
 tic
 
-pxs_fm=139;
-pxs_em=3.8936;
+% pxs_fm=139;
+pxs_fm = 62.5;
+
+% pxs_em=3.8936;
+pxs_em = 2.53;
 
 imsz = [4096,4096];
 
@@ -17,7 +20,7 @@ d_thr_match = 100;  % distance threshold in nm for possible bead combinations
 
 scale0 = pxs_fm/pxs_em;
 
-scale_thr = 0.03;
+scale_thr = 0.08;
 
 num_trafo = 20;
 
@@ -75,7 +78,7 @@ corrs = [];
 
         % clean for misassigned beads
 
-        edists = round(sort(sqrt(sum((e-repmat(e(4,:),[sze,1])).^2,2)))/100);
+        edists = round(sort(sqrt(sum((e-repmat(e(i_check,:),[sze,1])).^2,2)))/100);
 
         cleanidx=[];
 
@@ -101,7 +104,7 @@ corrs = [];
 
 
 %            av_select = otsu(pd,2);
-           sel_idx = find(otsu(pd,4)==1);
+           sel_idx = find(otsu(pd,2)==1);
 
            for k = sel_idx
                scales(k) = T_good{pdi(k)}.b;
