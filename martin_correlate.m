@@ -651,7 +651,7 @@ fprintf(file_2,['Selected transformation used: ', beads,'\n\n EM Stack: ',emf,'\
 % fprintf(file_2,['lowmag tomogram: ',stfile,'   Pixel size: ']);
 % fprintf(file_2,'%2.3g',psize);
 fprintf(file_2,'\n coordinates of transformed fluorescence spot:\n');
-fprintf(file_2,'%2.2f %2.2f\n',impos);
+fprintf(file_2,'%2.2f %2.2f\n',impos');
 fprintf(file_2,['\n\n prediction circle radius (px): ',int2str(accuracy),'\n\n-----------------\n']);
 % fprintf(file_2,[ptext,t]);
 % if isequal(psize,[])
