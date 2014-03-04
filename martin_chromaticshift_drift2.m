@@ -37,6 +37,8 @@ if isequal(filename,0)
             pause;
             XY=evalin('base', 'XY');
             evalin('base','clear XY');
+            
+            
         else          
             load([pathname,filename]);
             

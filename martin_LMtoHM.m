@@ -168,7 +168,7 @@ file_2 = fopen([outfileroot,file,'_hm_transform.log'],'w');
 fprintf(file_2,[outfileroot,file,'_hm_transform.log      ---   Logfile of LowMag2HighMag-transformation\n\n']);
 fprintf(file_2,['lowmag file: ',outfileroot,file,'_em.tif  --  highmag file: ',hmf,'  --  slice of interest: ',smf1,'\n\n']);
 fprintf(file_2,'coordinates of transformed fluorescence spot:');
-fprintf(file_2,'%2.3f %2.3f',spotpos);
+fprintf(file_2,'%2.3f %2.3f',spotpos');
 fprintf(file_2,['\n prediction circle radius (px): ',int2str(hmaccuracy)]);
 fclose(file_2);
 
