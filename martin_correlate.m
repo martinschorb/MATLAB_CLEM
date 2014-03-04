@@ -90,7 +90,7 @@ if flip==1
     fm=fm';im=im';om=om';
 end
 % adjust contrast of images according to init values
-em=imadjust(em);
+% em=imadjust(em);
 if contr_fid==0
     fm_view=imadjust(fm);
 else
@@ -101,15 +101,15 @@ if contr_poi==0
 else
     im_view=martin_contrast(im);
 end
-
+em2=em;
 if isa(em,'uint16')
-    em2=em;
     em=uint8(em/256);
-else
-    em2=em;
+elseif isa(em,'int16')
+    em=uint8((em-min(em(:)))/256);
 end
 s_em=size(em);
 s_fm=size(fm);
+em=imadjust(em);
 
 %generate filename
 file='';

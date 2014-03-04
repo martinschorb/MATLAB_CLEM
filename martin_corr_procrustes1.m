@@ -1,17 +1,17 @@
 tic
 
-% pxs_fm=139;
-pxs_fm = 62.5;
+pxs_fm=139;
+% pxs_fm = 64.5;
 
-% pxs_em=3.8936;
-pxs_em = 2.53;
+pxs_em=3.8936;
+% pxs_em = 2.53;
 
 imsz = [4096,4096];
 
-n_max = 12;
+n_max = 14;
 n_min = 4;
 
-numbad = 2;         % number of potential bad beads to omit.
+numbad = 3;         % number of potential bad beads to omit.
 
 
 dist_thr = 50;      % distance threshold in nm while selecting "twin" beads based on distance (should be < accuracy)
@@ -100,12 +100,14 @@ corrs = [];
            % this bead/feature in EM seems to have no correcponding detected
            % fluorescence signal position
            disp(['mismatch EM bead # ',num2str(i_check),' -> pd = ',num2str(pd),' ... skipping']);
+           z_av(:,:,i_check) = NaN*ones(size(f));
         else
 
 
 %            av_select = otsu(pd,2);
-           sel_idx = find(otsu(pd,2)==1);
-
+           sel_idx = find(otsu(pd,4)==1);
+           
+           
            for k = sel_idx
                scales(k) = T_good{pdi(k)}.b;
                rotation(k,:) = T_good{pdi(k)}.T(1:2);
@@ -122,7 +124,8 @@ corrs = [];
            R{i_check} = [av_rot{i_check}(1) -av_rot{i_check}(2);fliplr(av_rot{i_check})];
            
            z_av(:,:,i_check) = av_scale{i_check}* f *R{i_check}/sqrt(det(R{i_check})) + repmat(av_trans{i_check},[szf,1]);
-           av_error{i_check} = min(sqrt(sum((z_av(:,:,i_check)-repmat(e(i_check,:),[szf,1])).^2,2)));
+           [av_error{i_check},f_idx(i_check)] = min(sqrt(sum((z_av(:,:,i_check)-repmat(e(i_check,:),[szf,1])).^2,2))*pxs_em);
+           err1{i_check}=pd(1:5);
 
            corrs = [corrs; e(i_check,:) av_scale{i_check} av_rot{i_check} av_trans{i_check} av_error{i_check}];
 
