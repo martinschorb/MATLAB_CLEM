@@ -26,6 +26,10 @@ loc_hmcoos = pwd; %    '/directory/to/HMcorrelation/';
 
 flip = 0;
 
+% automatic hm correlation (hmauto=2 means interactive)
+
+hmauto = 2; hmcrop = 1; magx=0;
+
 % Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;1 - open adjustment window)
 
 contr_fid = 1;
