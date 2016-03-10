@@ -24,7 +24,6 @@
 , keywordstyle=\color{Blue}\pmb
 , breaklines=true
 , commentstyle=\color{OliveGreen} 
-, 
 }
 \lstset{numbers=left, stepnumber=2, numberstyle=\tiny, numbersep=5pt
 %, frame=tb
@@ -32,22 +31,25 @@
 
 \input{gitHeadInfo}
 
-
 \pagestyle{fancy}
 \fancyhf{}
-\lhead[\thepage]{Correlation procedure for CLEM -- commit \gitAbbrevHash , \gitCommitterDate}
+\lhead[\thepage]{Correlation procedure for CLEM -- commit \gitshash}
 \rhead[\leftmark]{\thepage}
 
 \title{Correlative Microscopy - Algorithm overview}
 \author{Martin Schorb, \href{mailto:martin.schorb@embl.de}{martin.schorb@embl.de}}
 
+%\newcommand{\gitshash}{b24aecc}
 
-\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit \git-shash\;commited at \git-shash}\\\small{ of \texttt{martin\_correlate.m} at \url{https://git.embl.de/schorb/corr}
+\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit xx \;commited at xx }\\\small{ of \texttt{martin\_correlate.m} at \url{https://git.embl.de/schorb/corr}
 }}
 
 \setlength{\columnsep}{10pt}
 
+
 \begin{document}
+
+
 \maketitle
 \tableofcontents
  \newpage
