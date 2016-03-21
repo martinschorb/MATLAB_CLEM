@@ -1,6 +1,6 @@
 % corr_init()
 % ----------------------------------------
-% version MartinSchorb 130312
+% version MartinSchorb 160321
 % Copyright EMBL 2013, All rights reserved
 % 
 % Initializes pathnames and parameters for LM/EM Correlation script

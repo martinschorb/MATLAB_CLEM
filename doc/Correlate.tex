@@ -33,7 +33,7 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\lhead[\thepage]{Correlation procedure for CLEM -- commit \gitshash}
+\lhead[\thepage]{Correlation procedure for CLEM -- commit \gitshash  on \gitcommsdate}
 \rhead[\leftmark]{\thepage}
 
 \title{Correlative Microscopy - Algorithm overview}
@@ -41,7 +41,7 @@
 
 %\newcommand{\gitshash}{b24aecc}
 
-\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit xx \;commited at xx }\\\small{ of \texttt{martin\_correlate.m} at \url{https://git.embl.de/schorb/corr}
+\publishers{\textcolor{blue}{This document can be found in your scripts directory, subfolder \texttt{doc/}}\\ \vspace{2mm} \small{corresponds to commit \gitshash \;commited at \gitcommidate }\\\small{ of \texttt{martin\_correlate.m} at \url{https://git.embl.de/schorb/corr}
 }}
 
 \setlength{\columnsep}{10pt}
@@ -64,7 +64,9 @@ This document provides a step by step manual in how to use the algorithms, their
 \section{Installation and requirements}
 
 \subsection{System and software requirements}A MATLAB\textsuperscript{\textregistered} 
-installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. The Optimization Toolbox is required for sub-pixel Gaussian fitting of the fluorescent spots but the correlation procedure can be run without it. Automatic cross-correlation-based mapping of low-mag EM images to higher magnifications requires both MATLAB and the Image Processing Tollbox to be newer than Version 8.3 (R2014a).
+installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. The Optimization Toolbox is required for sub-pixel Gaussian fitting of the fluorescent spots but the correlation procedure can be run without it. Automatic cross-correlation-based mapping of low-mag EM images to higher magnifications requires both MATLAB and the Image Processing Toolbox to be newer than Version 8.3 (R2014a).
+
+The initial coordinate selection can be performed using the third-party software ICy, that can be obtained here: \url{http://icy.bioimageanalysis.org/}.
 
 The scripts should run independent from the type of operating system used. However its function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
 \\
@@ -79,13 +81,13 @@ To get the most recent version of algorithms and documentation files for the fir
 Open a Unix Terminal shell and change to the directory in which you want the scripts to end up.
 To get the scripts type:
 \begin{verbatim}
- git clone git://git.embl.de/schorb/corr.git XXX
+ git clone git://https.embl.de/schorb/corr.git XXX
 \end{verbatim}
 Where \texttt{XXX} is an optional directory name where the scripts will be copied into. If no directory name is specified a folder \texttt{corr/} containing all files will be generated. Accept the encryption certificate.\\
 
 You should see a result similar to this:
 \begin{verbatim}
-% git clone git://git.embl.de/schorb/corr.git XXX
+% git clone https://git.embl.de/schorb/corr.git XXX
 Cloning into 'XXX'...
 remote: Counting objects: 61, done.
 remote: Compressing objects: 100% (60/60), done.
@@ -145,6 +147,7 @@ In the init script you can specify the following settings:
 \begin{itemize}
  \item directories or directory roots where you typically store your correlations and thus the fiducial, shift and highmag coordinate files.
  \item whether or not the fluorescence image is flipped compared to the EM image. (This depends on the orientation of the grid in the EM)
+ \item whether you want to do an automatic low-magnificcation to high-magnification image registration
  \item manual contrast settings for the FM images
  \item skipping of shift correction
  \item size of the prediction circle

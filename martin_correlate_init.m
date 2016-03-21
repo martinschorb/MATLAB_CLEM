@@ -103,7 +103,7 @@ end
 
 % GUI
 
-f = figure('Visible','off','Position',[0,120,1000,1000],'NumberTitle','off','Menubar','none','Name','EM/FM Correlation - Initial Configuration');
+f = figure('Visible','off','Position',[0,120,1100,1000],'NumberTitle','off','Menubar','none','Name','EM/FM Correlation - Initial Configuration','Color',backcol1);
 
 
 t_outfile = uipanel('Title','output file name prefix','FontSize',12,'BackgroundColor',backcol1,...
@@ -112,9 +112,9 @@ c_outfile = uicontrol('Parent',t_outfile,'Style','edit','BackgroundColor',backco
            'Position',[10,10,380,40],'String',outfile); 
        
 t_load = uipanel('Title','','FontSize',1,'BackgroundColor',backcol1,'BorderType','none',...
-          'Position',[0.55,0.91,0.1,0.03]);       
+          'Position',[0.55,0.92,0.12,0.09]);       
 go = uicontrol('Style','pushbutton','Parent',t_load,'BackgroundColor',backcol2,...
-           'Position',[-1 -1 120 40],'String','load settings','Callback',{@load_Callback}); 
+           'Position',[2 2 120 40],'String','load settings','Callback',{@load_Callback}); 
        
        
 %    --- EM
