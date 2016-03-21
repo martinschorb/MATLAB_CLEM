@@ -1,7 +1,7 @@
 function [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(varargin)
 
-% % version MartinSchorb 130312
-% % Copyright EMBL 2013, All rights reserved
+% % version MartinSchorb 160321
+% % Copyright EMBL 2016, All rights reserved
 % %
 % =========================================================================
 %         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  

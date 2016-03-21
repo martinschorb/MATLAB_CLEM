@@ -1,7 +1,7 @@
 function martin_correlate(varargin)
 
-% % version MartinSchorb 131106
-% % Copyright EMBL 2013, All rights reserved
+% % version MartinSchorb 160321
+% % Copyright EMBL 2016, All rights reserved
 % %
 % =========================================================================
 %         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  
