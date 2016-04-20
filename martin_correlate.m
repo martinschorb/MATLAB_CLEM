@@ -119,8 +119,6 @@ else
 end
 
 
-
-
 em2=em;
 if isa(em,'uint16')
     em=uint8(em/256);
@@ -141,8 +139,6 @@ if s_im(3)>1
     im=im(:,:,slices.im);
 end
    
-
-
 
 %generate filename
 file='';
@@ -191,7 +187,7 @@ while status==0
 %     else
 %         ip2=ip;bp2=bp;
 %     end
-% 145
+% 190
 
 while size(ip,1) < init.minbeads
     
@@ -242,47 +238,12 @@ end
     ip(nanidx,:)=[];    
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% 226
+% 241
 %reshows the control points so you can check them...
 %  ip4=ip;bp4=bp;
     [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true) ;
 %      ip2=ip4;bp2=bp4;ip=ip4;bp=bp4;
 
-% 234
 end
 
 %export pixel values
@@ -357,21 +318,6 @@ if mod(gaussloc,2) == 1
 else
     bpint1=bpint;
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -468,56 +414,7 @@ output.fmsize=s_fm;
 % ip=ip4;
 % bp=bp4;
 
-%     calculates the accuracy for the predicted region:
-% for i=1:size(output.blind,2)
-%     rowmin=output.blind(i).rowmin;
-%     colmin=output.blind(i).colmin;
-%     test(i+1)=output.blind(i).minimum;
-% %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
-%     
-% end    
-
-% [mmum select]=min(test);
-
-% the index of selected transformation
-% tfmselect=select-1;
-tfmselect = 0; % temporarily always use tfm using all beads until accuracy issue is solved!
-if tfmselect>0
-%     nblind=select;
-%     %generate images
-%     tfmed=uint8(zeros(s_em));
-%     bpot2=tformfwd(output.blind(nblind).optimtfm,output.blind(nblind).sel(rowmin,colmin).bp);
-%     bpr=round(bpot2);
-%     bpotfm=output.blind(nblind).bpotfm;
-%     pred=uint8(zeros(size_em));
-%     ppr=round([bpotfm;output.blind(nblind).sel(rowmin,colmin).blindtfm]);
-%     m_bp=max(bpr);m_all=max([bpr;ppr]);
-%     if (m_all(1)<s_em(1)-6) && (m_all(2)<s_em(2)) && (min(min([bpr;ppr]))>6)
-% 
-%         for n=1:size(bpr,1)
-%             tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=10;
-%             tfmed(bpr(n,2),bpr(n,1))=10;
-%         end
-% 
-% 
-% 
-%         for n=1:size(ppr,1)
-%             pred(ppr(n,2)-5:ppr(n,2)+5,ppr(n,1)-5:ppr(n,1)+5)=10;
-%             pred(ppr(n,2),ppr(n,1))=10;
-%         end
-% 
-% 
-%         newColorImage(:,:,1) =pred/10*255+uint8(output.blind(nblind).circle*255)+em;
-%         newColorImage(:,:,2) =tfmed/10*255+em;
-%         newColorImage(:,:,3) =pickedem/10*255+uint8(output.blind(nblind).circle*255)+em;
-%         output.blind(nblind).image=newColorImage;
-%     else
-%         output.blind(nblind).image=['blind: ',int2str(nblind),' -- ',output.blind(nblind).sel(rowmin,colmin).beads];
-%         disp( ['Bad transformation using bead ',int2str(nblind),' as blind bead']);disp(['and beads ',output.blind(nblind).sel(rowmin,colmin).beads,' as transformation base.']);
-%     end
-%     
-    
-else
+tfmselect=0;
     %      generate images
          tfmed=uint8(zeros(s_em));
          newColorImage=uint8(zeros([s_em,3]));
@@ -535,57 +432,6 @@ else
         newColorImage(:,:,2) =tfmed+0.8*em;
         newColorImage(:,:,3) =pickedem/10*255+uint8(output.all.circle*255)+0.8*em;
         output.all.image=newColorImage;
-%     else
-%        output.all.image=['Bad transformation using all beads as transformation base.'];
-%        disp( ['Bad transformation using all beads as transformation base.']);
-%     end
-    
-    
-end
-%%%%%%%%%%%%%%%%%%% end of pasted ls_blind
-
-
-% clear test
-% test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
-% ip=ip4;
-% bp=bp4;
-% 
-% %     
-% %     calculates the accuracy for the predicted region:
-% for i=1:size(output.blind,2)
-%     rowmin=output.blind(i).rowmin;
-%     colmin=output.blind(i).colmin;
-%     test(i+1)=output.blind(i).minimum;
-% %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
-%     http://www.faz.net/
-% end    
-% 
-% [mmum select]=min(test);
-% 
-% % the index of selected transformation
-% tfmselect=select-1;
-% 
-% 
-%  % shows the GUI to select the transformation
-% status= martin_corr_gui3(output,tfmselect,status);
-%     
-% end
-% 
-% 
-% ip=ip4;
-% bp=bp4;
-% save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf',['medshift_',fluorsel],'bpint'); 
-% 
-% 
-% % 
-% clear global status
-
-% 
-% if exist([outfileroot,file,'_transforms.mat'],'file')==0
-%     save([outfileroot,file,'_transforms.mat'], 'output');
-% end
-
-
 
  % shows the GUI to select the transformation
 status= martin_corr_gui4(output,tfmselect,status);
@@ -626,26 +472,8 @@ else
 % output a list of errors for all predicted beads to estimate accuracy
     prederrlist=output.blind(tfmselect).preddev;
     prederrlist(2,:)=sqrt(prederrlist(1,:));
-%     if ~isempty(psize)
-%         prederrlist(3,:)=prederrlist(2,:)*psize;
-%     end
-    % output a list of errors for all beads to estimate accuracy
-%     a=(output.blind(tfmselect).sel(output.blind(tfmselect).optimum(1),output.blind(tfmselect).optimum(2)).bptfm(:,1:2)-output.blind(tfmselect).ip).^2;
-
-   
     
 end
-
-% allerrlist(1,:)=a(:,1)+a(:,2);
-% allerrlist(2,:)=sqrt(allerrlist(1,:));
-% 
-% if ~isempty(psize) 
-%     
-%     allerrlist(3,:)=allerrlist(2,:)*psize;
-% end
-
-
-
 
 
 % transform the fluorescence microscopy images
@@ -675,11 +503,8 @@ circle1=martin_circle(em,accuracy,impos1);
 impred=uint8(circle1*255)+em;
 
 
-
 imwrite(circle1,[outfileroot,file,'_prediction.tif'],'Compression','none');
 imwrite(impred,[outfileroot,file,'_pred_overlay.jpg']);
-
-
 
 % write output files
 % imwrite(fm2,[outfileroot,file,'_fm.tif'],'Compression','none');
@@ -780,16 +605,9 @@ imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
 impred=tfmcircle+hm;
 imwrite(impred,[outfileroot,file,'_hm_prd_overlay.tif']);
 
-
 figure
 imshow(impred);
 
-    
-    
-    
-    
-    
-    
     
 end
 

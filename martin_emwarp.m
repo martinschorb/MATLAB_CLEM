@@ -70,6 +70,8 @@ if crop==0
     cvec = [(sz_l-l_sz)/2 l_sz-1];    
     lm1=imcrop(lm,cvec);    
 else
+    k=msgbox(['Select area that fits the high-mag image around the region of interest.']);
+    uiwait(k);
     [lm1,cvec]=imcrop(imadjust(lm));
     close gcf
 end

@@ -56,7 +56,7 @@
 \section{Introduction}
 This document describes the usage of the algorithms designed for correlation of fluorescence microscopy images to their corresponing EM image.\\
 
-The correlation procedure, as described in Kukulski et al., JCB (2011) and in more detail in Kukulski et al., MethCellBiol (2012) consists of two major coordinate transformations. The first one uses fluorescent microspheres to calculate the mapping of a single point fluorescent signal onto an electron microscopy image of low resolution ($4-10 $k$\times$). The obtained coordinates can then be transformed further using a different fiducial system (in this case the gold beads used for tomogram reconstruction) to a high magnification image.\\
+The correlation procedure, as described in \href{http://dx.doi.org/10.1083/jcb.201009037}{Kukulski et al., JCB (2011)}, \href{}{Schorb et al., J. Struct. Biol. (2016)} and in more detail in \href{http://dx.doi.org/10.1016/B978-0-12-416026-2.00013-3}{Kukulski et al., MethCellBiol (2012)} consists of two major coordinate transformations. The first one uses fluorescent microspheres to calculate the mapping of a single point fluorescent signal onto an electron microscopy image of low resolution ($4-10 $k$\times$). The obtained coordinates can then be transformed further using a different fiducial system (in this case the gold beads used for tomogram reconstruction) to a high magnification image.\\
 
 This document provides a step by step manual in how to use the algorithms, their parameters and outputs and shows the corresponding code snippets to give an idea of the points at which certain things happen while running the script.\\
 
@@ -66,12 +66,12 @@ This document provides a step by step manual in how to use the algorithms, their
 \subsection{System and software requirements}A MATLAB\textsuperscript{\textregistered} 
 installation version 7.4.0 onwards including the Image Processing Toolbox is required for succesfully running the scripts. The Optimization Toolbox is required for sub-pixel Gaussian fitting of the fluorescent spots but the correlation procedure can be run without it. Automatic cross-correlation-based mapping of low-mag EM images to higher magnifications requires both MATLAB and the Image Processing Toolbox to be newer than Version 8.3 (R2014a).
 
-The initial coordinate selection can be performed using the third-party software ICy, that can be obtained here: \url{http://icy.bioimageanalysis.org/}.
-
-The scripts should run independent from the type of operating system used. However its function was so far only successfully tested on Linux and Mac OS X 10.4  environments. 
+The initial coordinate selection can be performed using the third-party software Icy, that can be obtained here: \url{http://icy.bioimageanalysis.org/}.
+\\
+The scripts should run independent from the type of operating system used. However the full functionality was so far only successfully tested on Linux (RHEL/CentOS) and Windows 7 environments.
 \\
 
-In order to access the newest version of the scripts, a Git\footnote{See \url{http://git.embl.de/},\; \url{http://en.wikipedia.org/wiki/Git_(software)}} client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download a snapshot of the scripts directory at \url{http://git.embl.de/gitweb/?p=schorb/corr.git;a=snapshot;h=master} or all its files individually from the webserver (\texttt{http://git.embl.de/cgit/schorb/corr/tree/}, not recommended).
+In order to access the newest version of the scripts, a Git\footnote{See \url{https://git.embl.de/},\; \url{https://en.wikipedia.org/wiki/Git_(software)}} client is needed. It is usually included in most Linux distributions and easy to obtain for other operating systems. In case you don't have access to a software capable of checking out subversion repositories, you can simply download a snapshot of the scripts directory at \url{https://git.embl.de/schorb/corr/tree/release}.
 
 
 \subsection{Obtaining the newest version of the correlation algorithms}
@@ -81,7 +81,7 @@ To get the most recent version of algorithms and documentation files for the fir
 Open a Unix Terminal shell and change to the directory in which you want the scripts to end up.
 To get the scripts type:
 \begin{verbatim}
- git clone git://https.embl.de/schorb/corr.git XXX
+ git clone git://https.git.embl.de/schorb/corr.git XXX
 \end{verbatim}
 Where \texttt{XXX} is an optional directory name where the scripts will be copied into. If no directory name is specified a folder \texttt{corr/} containing all files will be generated. Accept the encryption certificate.\\
 
@@ -175,8 +175,8 @@ To execute the script and start the correlation simply run \begin{verbatim}
 \subsubsection{Optional parameters}
 The following input parameters can be provided in as optional command line parameters:
 \begin{enumerate}
- \item\texttt{fmf} -- path to FM image file containing fiducial information (8 or 16bit TIFF-file)
- \item\texttt{emf} -- path to EM image file containing visible fiducials (8 or 16bit TIFF-file)
+ \item\texttt{fmf} -- path to FM image file containing fiducial information
+ \item\texttt{emf} -- path to EM image file containing visible fiducials
  \item\texttt{imf} -- path to FM image file containing point of interest in first channel
  \item\texttt{outfileroot} -- directory and name base for generating output files.
  \item\texttt{fluorsel} -- suffix to specify type of fluorophore used (\verb|'GFP'|, \verb|'YFP'|, ...)
@@ -215,16 +215,21 @@ The following files are generated by the correlation script during runtime. The 
 The first step in the correlation procedure presents a graphical interface (Fig.\,\ref{fig:init-gui}) that lets you select the input files and adjust a few parameters (all others can be set by the init script -- see \ref{sec:init}). Images for registration can be in either TIF or MRC format. Multi-slice and RGB stacks are also supported.  The slice numbers refer to a multi-image stack, for example when providing multi-colour light microscopy images or a 3D tomogram. If provided, the script will automatically use the command line parameters as initial values. 
 \begin{figure}
  \centering
- \includegraphics[width=0.75\textwidth]{images/corr_gui}
+ \includegraphics[scale=0.5]{images/corr_gui}
  \caption{Initialization dialog}
  \label{fig:init-gui}
 \end{figure}
 
+Click "Go".
 
 A file selection dialog will ask to open already existing fiducial coordinate files from a previously performed registration. If the selected images have never been used for correlating before, just close that window.\\
 
-\subsection{Initial Fiducial selection using icy}
-If you have Icy installed you can youse it to initially select the positions of the fiducial markers in both images. Compared to the built-in MATLAB tools it allows you to load image stacks (in z, or multi-channel) or to adjust bit-depth or contrast levels and to seamlessly scale and rotate images on the fly. The ecCLEM plugin is also a good choice to generate overlays of LM images on top of EM data.
+You can choose to use Icy (an image processing software toolbox\footnote{\url{http://icy.bioimageanalysis.org/}}) for initially selecting fiducial coordinates (see \ref{icysel}). If the script does not find the files that are generated by Icy, it will continue and you can select the coordinates within MATLAB (see \ref{matlabsel}).
+
+\subsection{Initial Fiducial selection using Icy}
+\label{icysel}
+If you have Icy installed, you can youse it to initially select the positions of the fiducial markers in both images. Compared to the built-in MATLAB tools it allows you to load image stacks (in z, or multi-channel) or to adjust bit-depth or contrast levels of the data and to seamlessly scale and rotate images on the fly. The ec-CLEM plugin\footnote{\url{http://icy.bioimageanalysis.org/plugin/ec-CLEM}} also is a really good choice to generate overlays of LM images on top of EM data.
+
 \begin{figure}
  \centering
  \includegraphics[width=0.85\textwidth]{images/icy}
@@ -232,17 +237,21 @@ If you have Icy installed you can youse it to initially select the positions of 
  \label{fig:icy}
 \end{figure}
 
+\subsubsection{Required fiducial selection procedure}
 
+The Matlab script requires the point coordinates for both the original FM image as well as for the EM image. Whenever you assign annotations, such as ROIs or point sleections, to an image, Icy will save an XML file with the same file name where your image is stored. If you work with shared data, make sure the directory you are working in is writable. This XML file is needed for the Matlab script to recognize the coordinates.
 
+\subsubsection{Using the ec-CLEM plugin for initial image registration}
+You can use the ec-CLEM plugin to register your FM and EM images. However the plugin will perform an on-the-fly transformation of you FM image once you have clicked 3 points. Therefore it will not store the clicked coordinatees in the original FM image. You need to open a the FM image a second time and click the points using "File \& ROI tools" -> "Point". Make sure the order of the points you click here corresponds to the order of points you clicked while using the ec-CLEM plugin. Simply close the EM and FM image to hav Icy store the coordinate files.
 
 \subsection{Initial Fiducial selection using MATLAB}
-
+\label{matlabsel}
 \subsubsection{Contrast adjustment - optional}
 If this option is enabled in the initialization script, the contrast of each fluorescent image can be adjusted. This is done using the script \verb|martin_contrast($image)|. The contrast can be adjusted either manually or automatically.
 
 \begin{figure}[h!]
  \centering
- \includegraphics[width=0.2\textwidth]{images/contr_overview.jpg}\includegraphics[width=0.6\textwidth]{images/contr.jpg}
+ \includegraphics[width=0.25\textwidth]{images/contr_overview.jpg}\includegraphics[width=0.7\textwidth]{images/contr.jpg}
  % contr.jpg: 1085x942 pixel, 762dpi, 3.62x3.14 cm, bb=0 0 103 89
  \caption{Contrast adjustment tool}
  \label{fig:contrast}
@@ -255,7 +264,7 @@ If no previous fiducial coordinates could be found you can rotate the fluorecenc
 
 \begin{figure}[h]
  \centering
- \includegraphics[width=0.5\textwidth]{images/rotate.jpg}
+ \includegraphics[width=0.555\textwidth]{images/rotate.jpg}
  % rotate.jpg: 713x686 pixel, 762dpi, 2.38x2.29 cm, bb=0 0 67 65
  \caption{Image rotation window for initial correlation}
  \label{fig:rotate}
@@ -271,12 +280,13 @@ Fiducial pairs are selected in both LM and EM image using the \texttt{cpselect} 
 
 \begin{figure}[ht!]
  \centering
- \includegraphics[width=.83\textwidth]{images/cpsel_fid1.jpg}
+ \includegraphics[width=.92\textwidth]{images/cpsel_fid1.jpg}
  % cpsel_fid1.png: 1600x1153 pixel, 72dpi, 56.44x40.68 cm, bb=0 0 1600 1153
  \caption{\texttt{cpselect} -- graphical interface for picking and checking fiducial positions}
  \label{fig:cpsel_fid1}
 \end{figure}
 
+\newpage
 \subsection{Image processing and registration}
 
 \subsubsection{Fiducial sub-pixel fitting and display}
@@ -284,7 +294,7 @@ Fiducial pairs are selected in both LM and EM image using the \texttt{cpselect} 
 Fiducial positions in the light microscopy image are fitted with sub-pixel accuracy using a  2D Gaussian fit \texttt{martin\_2dgaussfit}.
 You can specify in the init file that you want to check the fit and adjust each fiducial pair individually.
 
-If intersctive fitting is desired, a window showing the fit (Fig.\,\ref{fig:gaussfit_gui}) is presented for each of the beads. The fitted 2D-Gaussian is shown as black mesh on top of the pixel intensity visualized as a surface plot. The initially clicked position is indicated by the magenta vertical line. The following options are possible:
+If interactive fitting is desired, a window showing the fit (Fig.\,\ref{fig:gaussfit_gui}) is presented for each of the beads. The fitted 2D-Gaussian is shown as black mesh on top of the pixel intensity visualized as a surface plot. The initially clicked position is indicated by the magenta vertical line. The following options are possible:
 \begin{itemize}
  \item 'keep fit' -- use the fitted coordinates
  \item 'keep original' -- use the original clicked coordinates without fit
@@ -295,7 +305,7 @@ If intersctive fitting is desired, a window showing the fit (Fig.\,\ref{fig:gaus
 
 \begin{figure}[h!]
  \centering
- \includegraphics[width=0.65\textwidth]{images/gaussfit_gui.png}
+ \includegraphics[width=0.68\textwidth]{images/gaussfit_gui.png}
  % gaussfit_gui.png: 908x959 pixel, 72dpi, 32.03x33.83 cm, bb=0 0 908 959
  \caption{Interactive check of the sub-pixel fitting}
  \label{fig:gaussfit_gui}
@@ -305,9 +315,7 @@ If intersctive fitting is desired, a window showing the fit (Fig.\,\ref{fig:gaus
 The fitted positions are presented again using a \texttt{cpselect} dialog.\,(Fig.\,\ref{fig:cpsel_fid1}) To continue, close the window.
 
 
-
-
- \lstinputlisting[linerange={167-169,180-181}]{../martin_correlate.m}
+%  \lstinputlisting[linerange={167-169,180-181}]{../martin_correlate.m}
 
 % \subsubsection{Selection of fluorescence channel}
 % A popup window will ask you to determine the fluorescence channel in which your signal of interest is imaged.(Fig.\,\ref{fig:fluorsel})
@@ -336,8 +344,8 @@ When choosing the \texttt{multispot} option you have to select a pair of coordin
 The coordinates of the fluorescent spot(s) of interest are also determined by a gaussian fit of the image. (For details see \ref{sec:gaussfit}, Fig.\,\ref{fig:gaussfit_gui}) The resulting coordinate(s) will be presented in a new \texttt{cpselect} window. (Fig.\,\ref{fig:cpsel_fluor2})\\
 
 To continue, close the window. 
-
-\lstinputlisting[linerange={294-296,300-301}]{../martin_correlate.m}
+\newpage
+% \lstinputlisting[linerange={294-296,300-301}]{../martin_correlate.m}
 
 \begin{figure}
  \centering
@@ -348,28 +356,31 @@ To continue, close the window.
 \end{figure}
 
 \subsubsection{Correction of stage drift in between imaging of the different fluorescence channels}
-The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels. This step can be skipped if not needed by. Just close the selection window and select ``Export and Close''. To continue then press any key while having the main MATLAB window active. If you constantly want to skip this correction you can modify your configuration script accordingly.\\
-
-A file selection window will ask for already existing files storing these coordinates.\\
-
-In case no pre-existing shift coordinates are selected a new window will open showing an RGB-overlay of the fiducial fluorescence image in red and the selected fluorescence channel containing the signal of interest in green. (Fig.\,\ref{fig:digitize})
-Click the obvious bleeding fiducials (both channels show a spot-like signal in close proximity) and close the window, saving the positions. The entire shift correction procedure is done by:
-\lstinputlisting[linerange={339-339}]{../martin_correlate.m}
-If you cannot find any obvious points, just continue without clicking postitions. The shift correction will then be skipped.\\
-
-To continue press any key while having the main MATLAB window active.\\
 
 \begin{figure}
  \centering
- \includegraphics[width=.75\textwidth]{images/digitize.jpg}
+ \includegraphics[width=.68\textwidth]{images/digitize.jpg}
  % digitize.jpg: 1600x1153 pixel, 762dpi, 5.33x3.84 cm, bb=0 0 151 109
  \caption{The tool for selecting the fiducials bleeding through to the fluorescence channel of interest. Clicked positions are indicated using blue circles.}
  \label{fig:digitize}
 \end{figure}
 
+The possible drift of the light microscope stage in between acquisition of the different flourescence images is accounted for using the fiducial signal that bleeds through into the longer wavelength channels. This step can be skipped if not needed by. Just close the selection window and select ``Export and Close''. To continue then press any key while having the main MATLAB window active. If you constantly want to skip this correction you can modify your configuration script accordingly.\\
+
+A file selection window will ask for already existing files storing these coordinates.\\
+
+In case no pre-existing shift coordinates are selected a new window will open showing an RGB-overlay of the fiducial fluorescence image in red and the selected fluorescence channel containing the signal of interest in green. (Fig.\,\ref{fig:digitize})
+Click the obvious bleeding fiducials (both channels show a spot-like signal in close proximity) and close the window, saving the positions.
+%  The entire shift correction procedure is done by:
+% \lstinputlisting[linerange={339-339}]{../martin_correlate.m}
+If you cannot find any obvious points, just continue without clicking postitions. The shift correction will then be skipped.\\
+
+To continue press any key while having the main MATLAB window active.\\
+
+\newpage
 \subsubsection{Calculation of the optimal transform and predicting fiducial and fluorescent spot EM-coordinates.}
 Based on the set of clicked fiducials, the most accurate linear transformation (consisting of scaling, a translation and a rotation) of coordinates is calculated using the script \texttt{martin\_tfm\_beads}.
-\lstinputlisting[linerange={407-408}]{../martin_correlate.m}
+% \lstinputlisting[linerange={407-408}]{../martin_correlate.m}
 
 % It scores the transformation based on all beads with the optimal transformation obtained by using a subset of beads omitting each selected fiducial pair once by comparing the sum of squares of the deviation from the predicted position of all beads with the clicked position in the EM-image.
 % $$
@@ -378,17 +389,16 @@ Based on the set of clicked fiducials, the most accurate linear transformation (
 % \lstinputlisting[linerange={410-411}]{../martin_correlate.m}
 
 The resulting best coordinate transformation is applied to all cordinates and presented in a graphical output window. (Fig.\,\ref{fig:tfm_select}) The beads chosen for the transformation are displayed in the bottom left. Blue positions show the clicked coordinates in the EM-image, green dots represent the transformed position of corresponding fiducial signal from the fluorescence image. To have an idea where the spot of interest is predicted, it is shown by a magenta circle. By clicking the lower button, obiously mispicked beads can be corrected, jumping to the selection step of the algorithm.(\ref{sec:fiducials}) When clicking ``GO'', all output files will be created using the presented coordinate transformation.\\
-An overlay image showing the predicted spot(s) within the EM image as a white circle (Fig.\,\ref{fig:tfm_appl}) indicates a successful run of the collelating sript.
+An overlay image showing the predicted spot(s) within the EM image as a white circle (Fig.\,\ref{fig:tfm_appl}) indicates a successful run of the correlating script.
 \begin{figure}
  \centering
  \includegraphics[width=.7\textwidth]{images/tfm_select.jpg}
  % tfm_select.jpg: 1200x1153 pixel, 762dpi, 4.00x3.84 cm, bb=0 0 113 109
  \caption{Preview of the coordinate transform. Fiducial selection can be modified by clicking the lower button.}
  \label{fig:tfm_select}
-\end{figure}
 
-\begin{figure}
- \centering
+\vspace{5mm}
+
  \includegraphics[width=.7\textwidth]{images/tfm_appl.jpg}
  % tfm_appl.jpg: 1200x1153 pixel, 762dpi, 4.00x3.84 cm, bb=0 0 113 109
  \caption{Performed correlation. Output position indicated by the white circle overlay.}
@@ -396,10 +406,30 @@ An overlay image showing the predicted spot(s) within the EM image as a white ci
 \end{figure}
 
  \newpage
-\section{Correlation form low magnification tomogram to high magnification EM image}
+\section{Correlation from low magnification tomogram to high magnification EM image}
 
-Correlation from a low resolution EM tomogram slice to a high magnification image of the same sample containing indentifiable fiducial markers such as the gold beads used for tomogram reconstruction is performed using the script \texttt{martin\_LMtoHM.m}.
-\subsection{Executing the script}
+Correlation from a low resolution EM tomogram slice to a high magnification image of the same sample containing indentifiable fiducial markers such as the gold beads used for tomogram reconstruction can be performed using the script \texttt{martin\_LMtoHM.m}.
+
+\subsection{Automated registration}
+
+The automated image registration from low to high magnification uses scripts that are only included in MATLAB and its Image Processing Toolbox newer than Version 8.3 (R2014a).
+
+If selected in the initialization dialog window, the routine will start the procedure automatically, which is found in the script \texttt{martin\_LM2HMauto}. The script uses prior information on the scaling between the two images from their headers (mrc format only). You can also manually define the difference in magnification if the image does not provide this information. The procedure will scale the images and then apply a cross-correlation search to precisely position it inside the low-magnification image.\\
+
+The script offers the possibility to manually define the region in the image where the high-magnification acquisition was done. Otherwise it will look for it in the center of the image.\\
+
+There is also an option to display the result of the registration in a color overlay (Fig.\,\ref{fig:lmhmauto}. 
+
+
+\begin{figure}
+ \centering
+ \includegraphics[width=.68\textwidth]{images/autolmhm}
+ % digitize.jpg: 1600x1153 pixel, 762dpi, 5.33x3.84 cm, bb=0 0 151 109
+ \caption{The color overlay to check successful registration of the high-mag image to the low-mag.}
+ \label{fig:lmhmauto}
+\end{figure}
+
+\subsection{Executing the manual script}
 To execute the script and start the correlation simply run \begin{verbatim}
  martin_LMtoHM(hmf,smf,outfileroot)
 \end{verbatim}
@@ -468,6 +498,10 @@ Coordinates are transformed using all marked fiducials and the output files are 
 \subsection{Overlay of correlated images}
 The correlation procedure writes a variety of images in tiff format that have all be aligned to each other according to the transformation used for correlation. (see\,\ref{sec:lm_output}) These include transformed fluorescence images as well as prediction circles or fiducial positions.
 You can easily superimpose these images to the EM image or even the tomogram.
+
+\subsubsection*{Icy}
+
+Open all images or volumes you want to overlay. Make sure the dimensions and file type match. If not, you can adjust these in "Sequence operation" -> "Conversion" or "Stack(Z)". Then you can merge the channels using the same tols ("Channel(C)").
 
 \subsubsection*{ImageJ (version$>$1.41)}
 Open both the EM image and the image you want to superimpose in ImageJ/Fiji. In Image$>$Color$>$Merge Channels select the colour channel of choice for the overlay(s) and grey for the EM image. You can then adjust the contrast for each channel by selecting the colour using the mouse wheel or the slider at the bottom of the image and the contrast adjustment tool.

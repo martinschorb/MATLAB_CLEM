@@ -11,12 +11,12 @@ function [tfmpts,hm_insert]  = martin_LM2HMauto(pts,inlm,inhm,crop,magx,interact
 %outputs transformed coordinates
 %
 
-if nargin<6
-    slices =[0 0];
+if nargin<7
+    slicenums =[0 0];
 end
 
 
-if nargin<5
+if nargin<6
     interactive=1;
 end
 

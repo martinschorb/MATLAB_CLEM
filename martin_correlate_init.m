@@ -401,10 +401,9 @@ end
 
 function but_emdir_Callback(source,eventdata)
     emf = get(ct_emdir,'String');
-    if ~isempty(emf)
-        dirpos = strfind(emf,'/');
-        
-        
+    dirpos = strfind(emf,filesep);
+    
+    if and(~isempty(emf),~isempty(dirpos))      
         emdir = emf(1:dirpos(end));
     else
         emdir=pwd;
@@ -423,8 +422,9 @@ end
 
 function but_fmdir_Callback(source,eventdata)
     fmf = get(ct_fmdir,'String');
-    if ~isempty(fmf)
-        dirpos = strfind(fmf,'/');
+    dirpos = strfind(fmf,filesep);
+        
+    if and(~isempty(fmf),~isempty(dirpos))
         fmdir = fmf(1:dirpos(end));
     else
         fmdir=pwd;
@@ -456,8 +456,9 @@ end
 
 function but_imdir_Callback(source,eventdata)
     imf = get(ct_imdir,'String');
-    if ~isempty(imf)
-        dirpos = strfind(imf,'/');
+    dirpos = strfind(imf,filesep);
+        
+    if and(~isempty(imf),~isempty(dirpos))
         imdir = imf(1:dirpos(end));
     else
         imdir=pwd;
@@ -504,8 +505,9 @@ end
 function but_omdir_Callback(source,eventdata)
     omf = get(ct_omdir,'String');
     omf = get(ct_imdir,'String');
-    if ~isempty(omf)
-        dirpos = strfind(omf,'/');
+    dirpos = strfind(omf,filesep);
+        
+    if and(~isempty(omf),~isempty(dirpos))
         omdir = omf(1:dirpos(end));
     else
         omdir=pwd;
@@ -569,9 +571,9 @@ end
 
 function but_hmdir_Callback(source,eventdata)
     hmf = get(ct_hmdir,'String');
-    if ~isempty(hmf)
-        dirpos = strfind(hmf,'/');       
+    dirpos = strfind(hmf,filesep);       
         
+    if and(~isempty(hmf),~isempty(dirpos))        
         hmdir = hmf(1:dirpos(end));
     else
         hmdir=pwd;
