@@ -242,7 +242,9 @@ If you have Icy installed, you can youse it to initially select the positions of
 The Matlab script requires the point coordinates for both the original FM image as well as for the EM image. Whenever you assign annotations, such as ROIs or point sleections, to an image, Icy will save an XML file with the same file name where your image is stored. If you work with shared data, make sure the directory you are working in is writable. This XML file is needed for the Matlab script to recognize the coordinates.
 
 \subsubsection{Using the ec-CLEM plugin for initial image registration}
-You can use the ec-CLEM plugin to register your FM and EM images. However the plugin will perform an on-the-fly transformation of you FM image once you have clicked 3 points. Therefore it will not store the clicked coordinatees in the original FM image. You need to open a the FM image a second time and click the points using "File \& ROI tools" -> "Point". Make sure the order of the points you click here corresponds to the order of points you clicked while using the ec-CLEM plugin. Simply close the EM and FM image to hav Icy store the coordinate files.
+You can use the ec-CLEM plugin to register your FM and EM images. However the plugin will perform an on-the-fly transformation of you FM image once you have clicked 3 points. Therefore it will not store the clicked coordinatees in the original FM image.
+% You need to open a the FM image a second time and click the points using "File \& ROI tools" -> "Point". Make sure the order of the points you click here corresponds to the order of points you clicked while using the ec-CLEM plugin.
+Make sure to click "Show ROIs on original source image". Otherwise Matlab will not be able to find the fiducial coordinates from the FM image. Then simply close the EM and FM image to have Icy store the coordinate files.
 
 \subsection{Initial Fiducial selection using MATLAB}
 \label{matlabsel}
