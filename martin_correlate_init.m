@@ -1,7 +1,7 @@
-function [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(varargin)
+function [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(varargin)
 
-% % version MartinSchorb 130312
-% % Copyright EMBL 2013, All rights reserved
+% % version MartinSchorb 160321
+% % Copyright EMBL 2016, All rights reserved
 % %
 % =========================================================================
 %         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  
@@ -23,11 +23,17 @@ close all
 % end 
 
 
+init = varargin{1};
 
 % init values
+if nargin==1
+    
+   outfile='';
+else
 
-init = varargin{1};
 outfile = varargin{2};
+
+end
 
 pxs = init.pixelsize_lm;
 slices = struct;
@@ -36,6 +42,8 @@ slices.em = 1;
 slices.fm = 1;
 slices.im = 1;
 slices.om = 1;
+slices.hm = 1;
+
 backcol1 = [0.85 0.85 0.85];
 backcol2 = [0.95 0.95 0.95];
 
@@ -45,6 +53,7 @@ if nargin<3
     fmf='';
     imf='';
     omf='';
+    hmf='';
     fluorsel = 'GFP';   
 elseif nargin<4
     error('wrong number of input arguments')
@@ -54,6 +63,7 @@ else
     fmf = varargin{5};
     imf = varargin{6};
     omf='';
+    hmf='';
 end
 
 if nargin<8
@@ -61,10 +71,13 @@ if nargin<8
 else
     omf = varargin{7};
     omfluor = varargin{8};
+    hmf = varargin{9};
 end
 
-if nargin>8
-    slices = varargin{9};
+
+
+if nargin>9
+    slices = varargin{10};
 end
 
 
@@ -80,13 +93,17 @@ switch init.trafo
 end
 
 
-
+if init.hmauto > 0
+    hmvis='on';
+else
+    hmvis='off';
+end
 
 
 
 % GUI
 
-f = figure('Visible','off','Position',[0,120,1000,1000],'NumberTitle','off','Menubar','none','Name','EM/FM Correlation - Initial Configuration');
+f = figure('Visible','off','Position',[0,120,1100,1000],'NumberTitle','off','Menubar','none','Name','EM/FM Correlation - Initial Configuration','Color',backcol1);
 
 
 t_outfile = uipanel('Title','output file name prefix','FontSize',12,'BackgroundColor',backcol1,...
@@ -95,9 +112,9 @@ c_outfile = uicontrol('Parent',t_outfile,'Style','edit','BackgroundColor',backco
            'Position',[10,10,380,40],'String',outfile); 
        
 t_load = uipanel('Title','','FontSize',1,'BackgroundColor',backcol1,'BorderType','none',...
-          'Position',[0.55,0.91,0.01,0.03]);       
+          'Position',[0.55,0.92,0.12,0.09]);       
 go = uicontrol('Style','pushbutton','Parent',t_load,'BackgroundColor',backcol2,...
-           'Position',[-1 -1 120 40],'String','load settings','Callback',{@load_Callback}); 
+           'Position',[2 2 120 40],'String','load settings','Callback',{@load_Callback}); 
        
        
 %    --- EM
@@ -271,6 +288,48 @@ t_bds = uipanel('Title','Minimum number of beads','FontSize',12,'BackgroundColor
           'Position',[0.05,0.15,0.4,0.08]);
 ct_bds = uicontrol('Parent',t_bds,'Style','edit','BackgroundColor',backcol2,...
            'Position',[160,10,40,40],'String',init.minbeads); 
+       
+       
+%   ---
+
+t_hmdir = uipanel('Title','HighMag EM image','FontSize',12,'BackgroundColor',backcol1,...
+           'Position',[0.48,0.3,0.4,0.08], 'Visible', hmvis);
+ct_hmdir = uicontrol('Parent',t_hmdir,'Style','edit','BackgroundColor',backcol2,...
+           'Position',[10,10,300,40],'String',hmf);       
+but_hmdir = uicontrol('Parent',t_hmdir,'Style','pushbutton','BackgroundColor',backcol2,...
+           'Position',[315,10,65,40],'String','Browse','Callback',{@but_hmdir_Callback});          
+       
+     
+t_hmslice = uipanel('Title','Slice number','FontSize',10,'BackgroundColor',backcol1,...
+           'Position',[0.88,0.3,0.1,0.08], 'Visible', hmvis);
+ct_hmslice = uicontrol('Parent',t_hmslice,'Style','edit','BackgroundColor',backcol2,...
+           'Position',[10,10,50,40],'String',slices.hm);       
+       
+     
+%   ---
+
+
+g_hm = uibuttongroup('Title','Auto HM correlation?','FontSize',12,'BackgroundColor',backcol1,...
+          'Position',[0.48,0.4,0.21,0.09]);
+hm0 = uicontrol('Style','Radio','String','no','BackgroundColor',backcol1,...
+    'pos',[10 45 110 20],'parent',g_hm,'HandleVisibility','on');
+hm1 = uicontrol('Style','Radio','String','yes','BackgroundColor',backcol1,...
+    'pos',[10 25 110 20],'parent',g_hm);
+hm2 = uicontrol('Style','Radio','String','interactive','BackgroundColor',backcol1,...
+    'pos',[10 5 110 20],'parent',g_hm);
+
+% Initialize button group properties. 
+set(g_hm,'SelectionChangeFcn',@hmselcbk);      
+    switch init.hmauto
+        case 0
+            set(g_hm,'SelectedObject',hm0);            
+        case 1
+            set(g_hm,'SelectedObject',hm1);
+        case 2
+            set(g_hm,'SelectedObject',hm2);
+    end    
+
+  
 
 
 
@@ -289,7 +348,7 @@ set(f,'Visible','on');
 % load
 
 function load_Callback(source,eventdata)
-    [matfile,matdir] = uigetfile('*.pickspots1.mat','select existing correlation');
+    [matfile,matdir] = uigetfile('*.pickspots1.mat','select existing correlation',init.loc_pickspots);
     if ~isnumeric(matfile)
         if exist([matdir,matfile],'file')
             a = load([matdir,matfile]);
@@ -318,11 +377,23 @@ function load_Callback(source,eventdata)
         else
             a.fluorsel = 'RFP';
             a.omfluor = 'GFP';
-        end
+        end 
     end
+    
+     
+    if ~isfield(a,'hmf')
+        a.hmf='';
+        a.slices.hmf=1;
+    end
+    
+      if ~isfield(a,'outfileroot')
+        a.outfileroot='';
+      end
+    
+    
           
     
-    [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfile,a.fluorsel,a.emf,a.fmf,a.imf,a.omf,a.omfluor,a.slices);
+    [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(init,a.outfileroot,a.fluorsel,a.emf,a.fmf,a.imf,a.omf,a.omfluor,a.hmf,a.slices);
 end
 
 
@@ -330,16 +401,15 @@ end
 
 function but_emdir_Callback(source,eventdata)
     emf = get(ct_emdir,'String');
-    if ~isempty(emf)
-        dirpos = strfind(emf,'/');
-        
-        
+    dirpos = strfind(emf,filesep);
+    
+    if and(~isempty(emf),~isempty(dirpos))      
         emdir = emf(1:dirpos(end));
     else
         emdir=pwd;
     end
     
-    [emf1,emdir] = uigetfile('*.tif','select EM image file to correlate',emdir);
+    [emf1,emdir] = uigetfile({'*.tif;*.mrc;*.st;*.rec','Image files';'*.*',  'All Files (*.*)'},'select EM image file to correlate',emdir);
     if ~isequal(emdir,0)
       emf = [emdir,emf1];     
     end
@@ -352,8 +422,9 @@ end
 
 function but_fmdir_Callback(source,eventdata)
     fmf = get(ct_fmdir,'String');
-    if ~isempty(fmf)
-        dirpos = strfind(fmf,'/');
+    dirpos = strfind(fmf,filesep);
+        
+    if and(~isempty(fmf),~isempty(dirpos))
         fmdir = fmf(1:dirpos(end));
     else
         fmdir=pwd;
@@ -385,8 +456,9 @@ end
 
 function but_imdir_Callback(source,eventdata)
     imf = get(ct_imdir,'String');
-    if ~isempty(imf)
-        dirpos = strfind(imf,'/');
+    dirpos = strfind(imf,filesep);
+        
+    if and(~isempty(imf),~isempty(dirpos))
         imdir = imf(1:dirpos(end));
     else
         imdir=pwd;
@@ -433,8 +505,9 @@ end
 function but_omdir_Callback(source,eventdata)
     omf = get(ct_omdir,'String');
     omf = get(ct_imdir,'String');
-    if ~isempty(omf)
-        dirpos = strfind(omf,'/');
+    dirpos = strfind(omf,filesep);
+        
+    if and(~isempty(omf),~isempty(dirpos))
         omdir = omf(1:dirpos(end));
     else
         omdir=pwd;
@@ -475,6 +548,47 @@ function  selcbk(source,eventdata)
 end
 
 
+function  hmselcbk(source,eventdata)
+    hmauto = get(eventdata.NewValue,'String');
+    switch hmauto
+        case 'no'
+            init.hmauto = 0;
+            hmvis='off';
+            set(t_hmdir,'Visible',hmvis);
+            set(t_hmslice,'Visible',hmvis);
+        case 'yes'
+            init.hmauto = 1;
+            hmvis='on';
+            set(t_hmdir,'Visible',hmvis);
+            set(t_hmslice,'Visible',hmvis);
+        case 'interative'
+            init.hmauto = 2;
+            hmvis='on';
+            set(t_hmdir,'Visible',hmvis);
+            set(t_hmslice,'Visible',hmvis);
+    end
+end
+
+function but_hmdir_Callback(source,eventdata)
+    hmf = get(ct_hmdir,'String');
+    dirpos = strfind(hmf,filesep);       
+        
+    if and(~isempty(hmf),~isempty(dirpos))        
+        hmdir = hmf(1:dirpos(end));
+    else
+        hmdir=pwd;
+    end
+    
+    [hmf1,hmdir] = uigetfile({'*.tif;*.mrc;*.st;*.rec','Image files';'*.*',  'All Files (*.*)'},'select HighMag EM image file',hmdir);
+    if ~isequal(hmdir,0)
+      hmf = [hmdir,hmf1];     
+    end
+    
+    set(ct_hmdir,'String',hmf)
+end
+
+
+
 function go_Callback(source,eventdata)
     evalfields(source,eventdata);
     close(f);
@@ -488,6 +602,7 @@ function evalfields(source,eventdata)
     fmf = get(ct_fmdir,'String');
     imf = get(ct_imdir,'String');
     omf = get(ct_omdir,'String');
+    hmf = get(ct_hmdir,'String');
     
     slices.em = str2num(get(ct_emslice,'String'));
     if isempty(slices.em)
@@ -504,6 +619,10 @@ function evalfields(source,eventdata)
     slices.om = str2num(get(ct_omslice,'String'));
     if isempty(slices.om)
         slices.om = 1;
+    end
+    slices.hm = str2num(get(ct_hmslice,'String'));
+    if isempty(slices.hm)
+        slices.hm = 1;
     end
     
     init.pixelsize_lm = str2double(get(ct_px,'String'));
