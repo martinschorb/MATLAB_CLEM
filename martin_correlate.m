@@ -1,7 +1,9 @@
 function martin_correlate(varargin)
 
-% % version MartinSchorb 140304
-% % Copyright EMBL 2014, All rights reserved
+
+% % version MartinSchorb 160321
+% % Copyright EMBL 2016, All rights reserved
+
 % %
 % =========================================================================
 %         DO NOT MODIFY !!!!!  use init script to set up parameters!!!  
@@ -52,6 +54,15 @@ end
 if nargin>1
    fmf = varargin{1};
    emf = varargin{2};
+   if nargin<3
+     imf=fmf;
+     outfileroot=[fmf,'_corr'];
+     [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(init,outfileroot,'GFP',emf,fmf,imf);
+   elseif nargin==3
+       outfileroot=varargin{3};
+       imf=fmf;
+[init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(init,outfileroot,'GFP',emf,fmf,imf);
+  else
    imf = varargin{3};
    outfileroot=varargin{4};
    fluorsel='other';
@@ -61,26 +72,31 @@ if nargin>1
     if nargin>5
         omf = varargin{6};
         omfluor = varargin{7};
-        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor_trash,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
+        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor_trash,slices,hmf]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf,omf,omfluor);
     else
-        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf);
+        [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(init,outfileroot,fluorsel,emf,fmf,imf);
     end
+   end
 else
     if nargin==1
         outfileroot = varargin{1};
     else
         outfileroot = '';
     end
-    [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices]=martin_correlate_init(init,outfileroot);
+    [init,emf,fmf,imf,omf,outfile,fluorsel,omfluor,slices,hmf]=martin_correlate_init(init,outfileroot);
 end
 
 outfileroot = outfile;
 accuracy = init.accuracy/init.pixelsize_lm;
+
+
+
 % read images and pick beads
-em=imread(emf);
-fm=imread(fmf,slices.fm);im=imread(imf,slices.im);
+em=martin_loadim(emf,slices.em);
+fm=martin_loadim(fmf,slices.fm);im=martin_loadim(imf,slices.im);
+
 if ~isempty(omf)
-    om=imread(omf,slices.om);
+    om=martin_loadim(omf,slices.om);
 else
     om=zeros(4);
 end
@@ -90,26 +106,41 @@ if flip==1
     fm=fm';im=im';om=om';
 end
 % adjust contrast of images according to init values
-em=imadjust(em);
+% em=imadjust(em);
+
+
 if contr_fid==0
-    fm_view=imadjust(fm);
+    fm_view=(fm);
 else
     fm_view=martin_contrast(fm);
 end
 if contr_poi==0
-    im_view=imadjust(im);
+    im_view=(im);
 else
     im_view=martin_contrast(im);
 end
 
+
+em2=em;
 if isa(em,'uint16')
-    em2=em;
     em=uint8(em/256);
-else
-    em2=em;
+elseif isa(em,'int16')
+    em=uint8(imadjust(uint16(em))/256);
 end
+
 s_em=size(em);
 s_fm=size(fm);
+s_im=size(im);
+em=imadjust(em);
+
+if s_fm(3)>1
+    fm=fm(:,:,slices.fm);
+end
+
+if s_im(3)>1
+    im=im(:,:,slices.im);
+end
+   
 
 %generate filename
 file='';
@@ -122,28 +153,46 @@ if filecheck==0
 pause(0.001)
   [filename, pathname] = uigetfile('*.pickspots1.mat','select previously picked beads',loc_pickspots);
         if isequal(filename,0)
-            disp('No previously picked positions selected');            
-            [fm_view1,rotid] = martin_rotateimage(em,fm_view);
-            [ip,bp]=cpselect(em,fm_view1,'Wait',true); 
-            bp=martin_coordinate_sort(bp,rotid,s_fm);
+            disp('No previously picked positions selected, looking for icy coordinate files.');
+            clickskip=0;
+            em_ext=strfind(emf,'.');
+            em_base=emf(1:em_ext(end)-1);
+            emxml = [em_base,'.xml'];
+            ip = xml_ec_point_import(emxml);
+            
+            fm_ext=strfind(fmf,'.');
+            fm_base=fmf(1:fm_ext(end)-1);
+            fmxml = [fm_base,'.xml'];
+            bp = xml_ec_point_import(fmxml);
+            
+            
+            [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true); 
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
                 [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
-status=0;
+            clickskip=0;%1;
         end
 else
-    load([outfileroot,file,'.pickspots1.mat']);
+    in1=load([outfileroot,file,'.pickspots1.mat']);
+    clickskip=1;
+    ip=in1.ip;
+    bp=in1.bp;
+    
 end
+
+
 status=0;
 while status==0  
 %     if exist('ip2','var')>0
-        [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true) ;
+%         [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true) ;
 %     else
 %         ip2=ip;bp2=bp;
 %     end
-% 145
+% 190
+
 while size(ip,1) < init.minbeads
+    
     k=msgbox(['you need at least ',num2str(init.minbeads),' pairs for this transformation'],'Error','modal');
     uiwait(k);
     [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
@@ -158,6 +207,8 @@ end
     
 fm2=fm;
 [mlen,idx]=max(s_fm);
+
+if clickskip==0
 
 numfids=size(ip,1);
 bp1=bp;
@@ -189,51 +240,17 @@ end
     ip(nanidx,:)=[];    
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% 226
+% 241
 %reshows the control points so you can check them...
 %  ip4=ip;bp4=bp;
     [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true) ;
 %      ip2=ip4;bp2=bp4;ip=ip4;bp=bp4;
-     numfids=size(ip,1);
+
+end
+
 %export pixel values
     pos_log=[ip,bp];
-% 234
-
-    save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','slices','fluorsel','omfluor'); 
+    save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','hmf','slices','fluorsel','omfluor'); 
 
     file_1 = fopen([outfileroot,file,'_picked1.txt'],'w');
     fprintf(file_1,['Picked pixel values of corresponding fluorospheres \n\n El. Tomogram:',emf,'  slice:',num2str(slices.em),'\n Fluorospheres: ',...
@@ -241,9 +258,9 @@ end
         '\n-----------\n EM image -  FM image\n']);
     fprintf(file_1,'%4.2f,%4.2f  -   %4.2f, %4.2f \n',pos_log'); 
     fclose(file_1);
-    
-% asks for region of interest using the control points
 
+% asks for region of interest using the control points
+numfids=size(ip,1);
 if exist('ipint','var')==0
 
 % fluorsel = questdlg('What fluorescence signal are you interested in?','Signal Selector','GFP','RFP','Cancel');
@@ -303,21 +320,6 @@ if mod(gaussloc,2) == 1
 else
     bpint1=bpint;
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -414,56 +416,7 @@ output.fmsize=s_fm;
 % ip=ip4;
 % bp=bp4;
 
-%     calculates the accuracy for the predicted region:
-% for i=1:size(output.blind,2)
-%     rowmin=output.blind(i).rowmin;
-%     colmin=output.blind(i).colmin;
-%     test(i+1)=output.blind(i).minimum;
-% %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
-%     
-% end    
-
-% [mmum select]=min(test);
-
-% the index of selected transformation
-% tfmselect=select-1;
-tfmselect = 0; % temporarily always use tfm using all beads until accuracy issue is solved!
-if tfmselect>0
-%     nblind=select;
-%     %generate images
-%     tfmed=uint8(zeros(s_em));
-%     bpot2=tformfwd(output.blind(nblind).optimtfm,output.blind(nblind).sel(rowmin,colmin).bp);
-%     bpr=round(bpot2);
-%     bpotfm=output.blind(nblind).bpotfm;
-%     pred=uint8(zeros(size_em));
-%     ppr=round([bpotfm;output.blind(nblind).sel(rowmin,colmin).blindtfm]);
-%     m_bp=max(bpr);m_all=max([bpr;ppr]);
-%     if (m_all(1)<s_em(1)-6) && (m_all(2)<s_em(2)) && (min(min([bpr;ppr]))>6)
-% 
-%         for n=1:size(bpr,1)
-%             tfmed(bpr(n,2)-5:bpr(n,2)+5,bpr(n,1)-5:bpr(n,1)+5)=10;
-%             tfmed(bpr(n,2),bpr(n,1))=10;
-%         end
-% 
-% 
-% 
-%         for n=1:size(ppr,1)
-%             pred(ppr(n,2)-5:ppr(n,2)+5,ppr(n,1)-5:ppr(n,1)+5)=10;
-%             pred(ppr(n,2),ppr(n,1))=10;
-%         end
-% 
-% 
-%         newColorImage(:,:,1) =pred/10*255+uint8(output.blind(nblind).circle*255)+em;
-%         newColorImage(:,:,2) =tfmed/10*255+em;
-%         newColorImage(:,:,3) =pickedem/10*255+uint8(output.blind(nblind).circle*255)+em;
-%         output.blind(nblind).image=newColorImage;
-%     else
-%         output.blind(nblind).image=['blind: ',int2str(nblind),' -- ',output.blind(nblind).sel(rowmin,colmin).beads];
-%         disp( ['Bad transformation using bead ',int2str(nblind),' as blind bead']);disp(['and beads ',output.blind(nblind).sel(rowmin,colmin).beads,' as transformation base.']);
-%     end
-%     
-    
-else
+tfmselect=0;
     %      generate images
          tfmed=uint8(zeros(s_em));
          newColorImage=uint8(zeros([s_em,3]));
@@ -481,57 +434,6 @@ else
         newColorImage(:,:,2) =tfmed+0.8*em;
         newColorImage(:,:,3) =pickedem/10*255+uint8(output.all.circle*255)+0.8*em;
         output.all.image=newColorImage;
-%     else
-%        output.all.image=['Bad transformation using all beads as transformation base.'];
-%        disp( ['Bad transformation using all beads as transformation base.']);
-%     end
-    
-    
-end
-%%%%%%%%%%%%%%%%%%% end of pasted ls_blind
-
-
-% clear test
-% test(1)=sum(sum((output.all.bptfm-ip4).^2))/length(ip4);
-% ip=ip4;
-% bp=bp4;
-% 
-% %     
-% %     calculates the accuracy for the predicted region:
-% for i=1:size(output.blind,2)
-%     rowmin=output.blind(i).rowmin;
-%     colmin=output.blind(i).colmin;
-%     test(i+1)=output.blind(i).minimum;
-% %     output.blind(i).predacc=2*((0.08*output.blind(i).sel(rowmin,colmin).ls)/median(d.ls)+15*d.optcloserr/median(d.optcloserr)+13*d.optclosdist/median(d.optclosdist)).^0.6-1+d.optprederr;
-%     http://www.faz.net/
-% end    
-% 
-% [mmum select]=min(test);
-% 
-% % the index of selected transformation
-% tfmselect=select-1;
-% 
-% 
-%  % shows the GUI to select the transformation
-% status= martin_corr_gui3(output,tfmselect,status);
-%     
-% end
-% 
-% 
-% ip=ip4;
-% bp=bp4;
-% save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','gmf','rmf',['medshift_',fluorsel],'bpint'); 
-% 
-% 
-% % 
-% clear global status
-
-% 
-% if exist([outfileroot,file,'_transforms.mat'],'file')==0
-%     save([outfileroot,file,'_transforms.mat'], 'output');
-% end
-
-
 
  % shows the GUI to select the transformation
 status= martin_corr_gui4(output,tfmselect,status);
@@ -541,7 +443,7 @@ end
 
 % ip=ip4;
 % bp=bp4;
-save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','bpint','slices'); 
+save([outfileroot,file,'.pickspots1.mat'], 'ip','bp','emf','fmf','imf','omf','hmf','bpint','slices','outfileroot'); 
 
 
 % 
@@ -572,45 +474,27 @@ else
 % output a list of errors for all predicted beads to estimate accuracy
     prederrlist=output.blind(tfmselect).preddev;
     prederrlist(2,:)=sqrt(prederrlist(1,:));
-%     if ~isempty(psize)
-%         prederrlist(3,:)=prederrlist(2,:)*psize;
-%     end
-    % output a list of errors for all beads to estimate accuracy
-%     a=(output.blind(tfmselect).sel(output.blind(tfmselect).optimum(1),output.blind(tfmselect).optimum(2)).bptfm(:,1:2)-output.blind(tfmselect).ip).^2;
-
-   
     
 end
-
-% allerrlist(1,:)=a(:,1)+a(:,2);
-% allerrlist(2,:)=sqrt(allerrlist(1,:));
-% 
-% if ~isempty(psize) 
-%     
-%     allerrlist(3,:)=allerrlist(2,:)*psize;
-% end
-
-
-
 
 
 % transform the fluorescence microscopy images
 
-[fm2 xdata ydata]=imtransform(fm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
-[im2 xdata ydata]=imtransform(im,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
-if ~isempty(omf)
-    [om2 xdata ydata]=imtransform(om,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
-end
+% [fm2 xdata ydata]=imtransform(fm,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+% [im2 xdata ydata]=imtransform(im,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+% if ~isempty(omf)
+%     [om2 xdata ydata]=imtransform(om,appltfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
+% end
 
 % [picked2 xdata ydata]=imtransform(picked,tfm,'FillValues',128,'XData', [1 s_em(2)],'YData',[1 s_em(1)],'Size',s_em);
 
 
 %convert to 8 bit
-if isa(em,'uint8')
+% % if isa(em,'uint8')
     
-else
-    em=uint8(em2/256);
-end
+% else
+%     em=uint8(em2/256);
+% end
 
 
 %generate accuracy map
@@ -621,22 +505,19 @@ circle1=martin_circle(em,accuracy,impos1);
 impred=uint8(circle1*255)+em;
 
 
-
 imwrite(circle1,[outfileroot,file,'_prediction.tif'],'Compression','none');
 imwrite(impred,[outfileroot,file,'_pred_overlay.jpg']);
 
-
-
 % write output files
-imwrite(fm2,[outfileroot,file,'_fm.tif'],'Compression','none');
-imwrite(em,[outfileroot,file,'_em.tif'],'Compression','none');
-imwrite(im2,[outfileroot,file,'_im.tif'],'Compression','none');
+% imwrite(fm2,[outfileroot,file,'_fm.tif'],'Compression','none');
+% imwrite(em,[outfileroot,file,'_em.tif'],'Compression','none');
+% imwrite(im2,[outfileroot,file,'_im.tif'],'Compression','none');
 
-if ~isempty(omf)
-    imwrite(om2,[outfileroot,file,'_',omfluor,'_om.tif'],'Compression','none');
-end
-imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
-imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');
+% if ~isempty(omf)
+%     imwrite(om2,[outfileroot,file,'_',omfluor,'_om.tif'],'Compression','none');
+% end
+% imwrite(tfmed,[outfileroot,file,'_tfmed.tif'],'Compression','none');
+% imwrite(pickedem,[outfileroot,file,'_pickedem.tif'],'Compression','none');
 imwrite(rgb,[outfileroot,file,'_predictions.jpg']);
 
 save([outfileroot,file,'.appltfm.mat'],'appltfm','emf','imf','omf','slices','file','circle1','fluorsel','accuracy','impos');
@@ -670,5 +551,65 @@ fclose(file_2);
 
 % show selected transformation prediction
 % imshow(rgb)
-imshow(impred)
+% imshow(impred)
+
+if init.hmauto>0
+   
+   if isempty(hmf)
+      hmf = [emf(1:end-8),'.mrc'];
+   end
+    
+           
+   hm=martin_loadim(hmf,slices.hm);
+   
+   hm=uint8(imadjust(uint16(hm))/256);
+   
+   hmslices=[slices.em,slices.hm];
+   
+   switch init.hmauto
+       case 1
+           spotpos=martin_LM2HMauto(impos,emf,hmf,init.hmcrop,0,0,hmslices); 
+       case 2
+           spotpos=martin_LM2HMauto(impos,emf,hmf,init.hmcrop,0,1,hmslices);
+   end
+    
+   hmaccuracy=init.accuracy/init.pixelsize_hm;
+   hm_accuracy=hmaccuracy;
+   
+   tfmcircle=martin_circle(hm,hmaccuracy,round(spotpos));
+
+%convert to 16 bit
+% tfmcircle=conv8to16bit(tfmcircle);
+% % 
+% if isa(lm2,'uint16')
+%     lm2=lm2;
+% else
+%     lm2=256*uint16(em);
+% end
+
+file_2 = fopen([outfileroot,file,'_hm_transform.log'],'w');
+fprintf(file_2,[outfileroot,file,'_hm_transform.log      ---   Logfile of LowMag2HighMag-transformation\n\n']);
+fprintf(file_2,['lowmag file: ',outfileroot,file,'_em.tif  --  highmag file: ',hmf,'  --  slice of interest: ',slices.hm'\n\n']);
+fprintf(file_2,'coordinates of transformed fluorescence spot:');
+fprintf(file_2,'%2.3f %2.3f',spotpos);
+fprintf(file_2,['\n prediction circle radius (px): ',int2str(hmaccuracy)]);
+fclose(file_2);
+
+save([outfileroot,file,'.sliceinfo.mat'],'hmf','slices','hm_accuracy','spotpos');
+
+tfmcircle=uint8(tfmcircle*255);
+%writes output files
+% imwrite(hm,[outfileroot,file,'_hm.jpg']);
+% imwrite(lm2,[outfileroot,file,'_lm2hm.tif'],'Compression','none');
+% imwrite(uint8(sm/255),[outfileroot,file,'_sm.tif'],'Compression','none');
+imwrite(tfmcircle,[outfileroot,file,'_hm_prediction.tif'],'Compression','none');
+
+impred=tfmcircle+hm;
+imwrite(impred,[outfileroot,file,'_hm_prd_overlay.tif']);
+
+figure
+imshow(impred);
+
+    
+end
 

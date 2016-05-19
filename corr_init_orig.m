@@ -1,7 +1,7 @@
 % corr_init()
 % ----------------------------------------
-% version MartinSchorb 130312
-% Copyright EMBL 2013, All rights reserved
+% version MartinSchorb 160321
+% Copyright EMBL 2016, All rights reserved
 % 
 % Initializes pathnames and parameters for LM/EM Correlation script
 % martin_correlate.m
@@ -25,6 +25,10 @@ loc_hmcoos = pwd; %    '/directory/to/HMcorrelation/';
 % flip = 1 if images should be flipped // flip = 0 if images are in same orientation
 
 flip = 0;
+
+% automatic hm correlation (hmauto=2 means interactive)
+
+hmauto = 2; hmcrop = 1; magx=0;
 
 % Adjust the contrast of display of the fluorescence images (blue, green, red) (0 - auto;1 - open adjustment window)
 
