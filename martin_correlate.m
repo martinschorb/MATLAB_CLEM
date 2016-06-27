@@ -335,50 +335,8 @@ end
 
 % 336
 % runs fluorescence image drift correction
-if ~shift_skip
-    [bluespot,fluospot]=martin_chromaticshift_drift2(fm,fm_view,im,im_view,fmboxsize,imboxsize,fluorsel,loc_shiftcoos,outfileroot,0);
-    if isnan(fluospot)
-        k=msgbox(['No bleed through spots found! ',fluorsel,' Image...']);
-        uiwait(k);
-        medshift=[]
-    else  
-
-    sdiff=fluospot-bluespot
-
-    fspot=find(abs(sdiff)>5);
-    idspot=mod(fspot,length(sdiff));
-    idspot=idspot+(idspot==0)*length(sdiff);
-    sdiff(idspot,:)=[];
-
-    n_shift=size(sdiff,1);
-    medshift=median(sdiff,1);
-    shifterr=std(sdiff)/sqrt(n_shift);
-    
-    if isnan(medshift)
-        medshift=[];
-    end
-
-    disp(['median of Shift correction [px]: ', num2str(medshift),' deviation: ', num2str(shifterr),' number of points: ', num2str(n_shift)]);
-    disp('---  ---  ---  ---  ---  ---  ---  ---  ---');
-    % disp(['Shift correction in pixel: ', num2str(medshift)]);
-    %corrects for median shift of bleed-thru beads
-    bpint2=bpint;
-    bpint=bpint-repmat(medshift,[numspots,1]);
-    show=[bpint(:,2) bpint(:,1);bpint2(:,2) bpint2(:,1)];
-    end
-    
-    switch fluorsel
-        case 'GFP'
-            medshift_GFP=medshift;
-        case 'RFP'
-            medshift_RFP=medshift;
-        otherwise
-            medshift_other=medshift;
-    end    
-else
     medshift_GFP=[];
     medshift_RFP=[];
-end
 
 
 
