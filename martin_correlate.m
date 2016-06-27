@@ -321,8 +321,6 @@ else
     bpint1=bpint;
 end
 
-
-
 % 324 reshows point of interest
 
 [ipint,bpint]=cpselect(em,im_view,ipint,bpint1,'Wait',true) ;
