@@ -1,8 +1,23 @@
 function martin_correlate(varargin)
 
-
-% % version MartinSchorb 160321
-% % Copyright EMBL 2016, All rights reserved
+% % version MartinSchorb 160627
+% % Copyright EMBL 2011-2016, 
+% %
+%      EMBL script for high-accuracy CLEM.
+%  
+%      EMBL script for high-accuracy CLEM is free software: you can redistribute it and/or modify
+%      it under the terms of the GNU General Public License as published by
+%      the Free Software Foundation, either version 3 of the License, or
+%      (at your option) any later version.
+%  
+%      EMBL script for high-accuracy CLEM is distributed in the hope that it will be useful,
+%      but WITHOUT ANY WARRANTY; without even the implied warranty of
+%      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%      GNU General Public License for more details.
+%  
+%      You should have received a copy of the GNU General Public License
+%      along with EMBL script for high-accuracy CLEM.  If not, see <http://www.gnu.org/licenses/>.
+%  
 
 % %
 % =========================================================================
@@ -19,8 +34,6 @@ function martin_correlate(varargin)
 % % 
 % % calls cpselect for control point registration and uses cp2tform
 % % 
-% % corrects for image shift between channels using bleed-thru beads
-% % 
 % % uses martin_tfm_beads to suggest optimal transformation according to
 % % lowest error in predictions of a single "blind" bead
 % % 
@@ -33,7 +46,7 @@ function martin_correlate(varargin)
 % % outputs files in tif format containing (transformed) images
 % % outputs files in tif format representing positions of picked fiducials
 % % and predictions of the selected transform
-% % (output files easily overlayed in eg imagej)
+% % (output files can easily be overlayed in eg imagej)
 
 if exist('corr_init','file')==2
     corr_init();
@@ -89,8 +102,6 @@ end
 outfileroot = outfile;
 accuracy = init.accuracy/init.pixelsize_lm;
 
-
-
 % read images and pick beads
 em=martin_loadim(emf,slices.em);
 fm=martin_loadim(fmf,slices.fm);im=martin_loadim(imf,slices.im);
@@ -105,9 +116,6 @@ flip = init.flip;
 if flip==1
     fm=fm';im=im';om=om';
 end
-% adjust contrast of images according to init values
-% em=imadjust(em);
-
 
 if contr_fid==0
     fm_view=(fm);
@@ -141,7 +149,6 @@ if s_im(3)>1
     im=im(:,:,slices.im);
 end
    
-
 %generate filename
 file='';
 
@@ -163,8 +170,7 @@ pause(0.001)
             fm_ext=strfind(fmf,'.');
             fm_base=fmf(1:fm_ext(end)-1);
             fmxml = [fm_base,'.xml'];
-            bp = xml_ec_point_import(fmxml);
-            
+            bp = xml_ec_point_import(fmxml);            
             
             [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true); 
         else          
@@ -177,10 +183,8 @@ else
     in1=load([outfileroot,file,'.pickspots1.mat']);
     clickskip=1;
     ip=in1.ip;
-    bp=in1.bp;
-    
+    bp=in1.bp;    
 end
-
 
 status=0;
 while status==0  
@@ -189,7 +193,6 @@ while status==0
 %     else
 %         ip2=ip;bp2=bp;
 %     end
-% 190
 
 while size(ip,1) < init.minbeads
     
@@ -223,17 +226,12 @@ for ispot=1:numfids
     else
         
     if check
-        bp1(ispot,:)=bp(ispot,:);
-        
-                   
-   % 178     
+        bp1(ispot,:)=bp(ispot,:);        
     else
         
         bp(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
-    end
-
-    
+    end    
 end
     nanidx=find(isnan(bp1(:,1)));
     bp(nanidx,:)=[];
