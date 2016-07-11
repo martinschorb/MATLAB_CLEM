@@ -58,7 +58,7 @@ elseif exist(in) == 2
         
         head=imfinfo(in);
         
-        if head.PhotometricInterpretation=='RGB'
+        if strcmp(head.PhotometricInterpretation,'RGB')
             im=imread(in);
         elseif v==0;
             im=imread(in);
