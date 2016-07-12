@@ -140,21 +140,20 @@ s_em=size(em);
 s_fm=size(fm);
 s_im=size(im);
 em=imadjust(em);
-
+if length(s_fm)>2
 if s_fm(3)>1
     fm=fm(:,:,slices.fm);
 end
-
+end
+if length(s_im)>2
 if s_im(3)>1
     im=im(:,:,slices.im);
 end
-   
+end   
 %generate filename
 file='';
-
 %check if already previously picked
 filecheck=exist([outfileroot,file,'.pickspots1.mat'],'file');
-
 if filecheck==0 
   %import previously clicked positions
 pause(0.001)
