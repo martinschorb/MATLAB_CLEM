@@ -38,7 +38,7 @@ elseif exist(in) == 2
         
         head=imfinfo(in);
         
-        if head.PhotometricInterpretation=='RGB'
+        if head(1).PhotometricInterpretation=='RGB'
             im=imread(in);
         elseif v==0;
             im=imread(in);
@@ -54,3 +54,4 @@ else
     a=msgbox('Please provide either an image matrix or a valid file name!','Error','modal');
     error('Please provide either an image matrix or a valid file name!')    ;
 end
+
