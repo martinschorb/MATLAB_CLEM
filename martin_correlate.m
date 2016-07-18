@@ -165,7 +165,8 @@ pause(0.001)
             [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true); 
             else
             [ip,bp]=cpselect(em,fm_view,'Wait',true); 
-            end            
+            end   
+        end
 else
     in1=load([outfileroot,file,'.pickspots1.mat']);
     clickskip=1;
