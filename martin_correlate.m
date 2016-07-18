@@ -165,13 +165,15 @@ pause(0.001)
             em_base=emf(1:em_ext(end)-1);
             emxml = [em_base,'.xml'];
             ip = xml_ec_point_import(emxml);
-            
             fm_ext=strfind(fmf,'.');
             fm_base=fmf(1:fm_ext(end)-1);
             fmxml = [fm_base,'.xml'];
             bp = xml_ec_point_import(fmxml);            
-            
+            if (~isempty(ip))&(~isempty(bp))
             [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true); 
+            else
+            [ip,bp]=cpselect(em,fm_view,'Wait',true); 
+            end
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
