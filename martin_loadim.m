@@ -25,6 +25,7 @@ elseif exist(in) == 2
     if ~isempty([strfind(in,'.mrc'),strfind(in,'.st'),strfind(in,'.rec')])
         imf=tom_mrcread(in);
         head=imf.Header;
+        if length(head.Size)>2
         if head.Size(3)>1
             if v==0
                 kk=1:head.Size(3);
@@ -34,11 +35,12 @@ elseif exist(in) == 2
         else    
             im=rot90(imf.Value);
         end
+        end
     elseif ~isempty(strfind(in,'tif'))
         
         head=imfinfo(in);
         
-        if head(1).PhotometricInterpretation=='RGB'
+        if strcmp(head(1).PhotometricInterpretation,'RGB')
             im=imread(in);
         elseif v==0;
             im=imread(in);
