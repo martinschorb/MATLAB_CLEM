@@ -229,7 +229,7 @@ for ispot=1:numfids
     if check
         bp1(ispot,:)=bp(ispot,:);        
     else
-        
+        corr_init_orig
         bp(ispot,:)=floor(bp(ispot,:))+mu(1:2)-[1 1]-[imsir imsir];
     end
     end    
