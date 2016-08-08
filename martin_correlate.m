@@ -168,25 +168,17 @@ pause(0.001)
             fm_ext=strfind(fmf,'.');
             fm_base=fmf(1:fm_ext(end)-1);
             fmxml = [fm_base,'.xml'];
-<<<<<<< HEAD
-            bp = xml_ec_point_import(fmxml);            
-=======
             bp = xml_ec_point_import(fmxml);
->>>>>>> master
             if (~isempty(ip))&(~isempty(bp))
             [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true); 
             else
             [ip,bp]=cpselect(em,fm_view,'Wait',true); 
-<<<<<<< HEAD
             end
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
                 [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
             clickskip=0;%1;
-=======
-            end   
->>>>>>> master
         end
 else
     in1=load([outfileroot,file,'.pickspots1.mat']);
@@ -521,19 +513,37 @@ if init.hmauto>0
    if isempty(hmf)
       hmf = [emf(1:end-8),'.mrc'];
    end
-    
-           
+   
+   
+% checks EM image file names for MRC extension
+
+
+ext={'mrc','st','rec'};
+lm_check=0;
+hm_check=0;
+
+    for i=1:lenght(ext)
+        lm_check=or(lm_check,~isempty(findstr(upper(ext{i},emf))));
+        hm_check=or(hm_check,~isempty(findstr(upper(ext{i},hmf))));
+    end
+
+   if and(lm_check,hm_check)
+   
+   magx=0;
+   
+   else
+       magx=init.pixelsize_lm/init.pixelsize_hm;
+   end
    hm=martin_loadim(hmf,slices.hm);
-   
    hm=uint8(imadjust(uint16(hm))/256);
-   
    hmslices=[slices.em,slices.hm];
-   
+  
+
    switch init.hmauto
        case 1
-           spotpos=martin_LM2HMauto(impos,emf,hmf,init.hmcrop,0,0,hmslices); 
+           spotpos=martin_LM2HMauto(impos,emf,hmf,init.hmcrop,magx,0,hmslices); 
        case 2
-           spotpos=martin_LM2HMauto(impos,emf,hmf,init.hmcrop,0,1,hmslices);
+           spotpos=martin_LM2HMauto(impos,emf,hmf,init.hmcrop,magx,1,hmslices);
    end
     
    hmaccuracy=init.accuracy/init.pixelsize_hm;

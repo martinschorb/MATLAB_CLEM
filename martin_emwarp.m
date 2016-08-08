@@ -53,6 +53,8 @@ end
 [hm,hmheader]=martin_loadim(inhm,slices(2));
 
 
+
+
 if isempty(lmheader) | isempty(hmheader)
    if  nargin<4 | ~isnumeric(magx) | magx==0
        a=msgbox('Please provide magnification difference or a mrc image with valid header!','Error','modal');

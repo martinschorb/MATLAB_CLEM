@@ -53,6 +53,7 @@ outfile = varargin{2};
 end
 
 pxs = init.pixelsize_lm;
+h_pxs = init.pixelsize_hm;
 slices = struct;
 % minbeads = 3;
 slices.em = 1;
@@ -321,6 +322,13 @@ t_hmslice = uipanel('Title','Slice number','FontSize',10,'BackgroundColor',backc
            'Position',[0.88,0.3,0.1,0.08], 'Visible', hmvis);
 ct_hmslice = uicontrol('Parent',t_hmslice,'Style','edit','BackgroundColor',backcol2,...
            'Position',[10,10,50,40],'String',slices.hm);       
+
+%   ---      
+      
+t_h_px = uipanel('Title','HighMag EM pixel size [nm]','FontSize',12,'BackgroundColor',backcol1,...
+          'Position',[0.48,0.22,0.4,0.08], 'Visible', hmvis);
+ct_h_px = uicontrol('Parent',t_h_px,'Style','edit','BackgroundColor',backcol2,...
+          'Position',[10,10,300,40],'String',h_pxs, 'Visible', hmvis); 
        
      
 %   ---
@@ -347,7 +355,7 @@ set(g_hm,'SelectionChangeFcn',@hmselcbk);
     end    
 
   
-
+set(t_hmdir,'Visible',hmvis);
 
 
 %   ---
@@ -419,7 +427,7 @@ end
 function but_emdir_Callback(source,eventdata)
     emf = get(ct_emdir,'String');
     dirpos = strfind(emf,filesep);
-    
+    set(t_hmdir,'Visible',hmvis);
     if and(~isempty(emf),~isempty(dirpos))      
         emdir = emf(1:dirpos(end));
     else
@@ -573,16 +581,22 @@ function  hmselcbk(source,eventdata)
             hmvis='off';
             set(t_hmdir,'Visible',hmvis);
             set(t_hmslice,'Visible',hmvis);
+            set(t_h_px,'Visible',hmvis);
+            set(ct_h_px,'Visible',hmvis);
         case 'yes'
             init.hmauto = 1;
             hmvis='on';
             set(t_hmdir,'Visible',hmvis);
             set(t_hmslice,'Visible',hmvis);
+            set(t_h_px,'Visible',hmvis);
+            set(ct_h_px,'Visible',hmvis);
         case 'interative'
             init.hmauto = 2;
             hmvis='on';
             set(t_hmdir,'Visible',hmvis);
             set(t_hmslice,'Visible',hmvis);
+            set(t_h_px,'Visible',hmvis);
+            set(ct_h_px,'Visible',hmvis);
     end
 end
 
@@ -643,6 +657,7 @@ function evalfields(source,eventdata)
     end
     
     init.pixelsize_lm = str2double(get(ct_px,'String'));
+    init.pixelsize_hm = str2double(get(ct_h_px,'String'));
     init.minbeads = str2double(get(ct_bds,'String'));   
     
 end
