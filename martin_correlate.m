@@ -168,17 +168,25 @@ pause(0.001)
             fm_ext=strfind(fmf,'.');
             fm_base=fmf(1:fm_ext(end)-1);
             fmxml = [fm_base,'.xml'];
+<<<<<<< HEAD
             bp = xml_ec_point_import(fmxml);            
+=======
+            bp = xml_ec_point_import(fmxml);
+>>>>>>> master
             if (~isempty(ip))&(~isempty(bp))
             [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true); 
             else
             [ip,bp]=cpselect(em,fm_view,'Wait',true); 
+<<<<<<< HEAD
             end
         else          
                a=open([pathname,filename]);
                ip=a.ip;bp=a.bp;
                 [ip,bp]=cpselect(em,fm_view,ip,bp,'Wait',true);
             clickskip=0;%1;
+=======
+            end   
+>>>>>>> master
         end
 else
     in1=load([outfileroot,file,'.pickspots1.mat']);

@@ -45,14 +45,16 @@ elseif exist(in) == 2
     if ~isempty([strfind(in,'.mrc'),strfind(in,'.st'),strfind(in,'.rec')])
         imf=tom_mrcread(in);
         head=imf.Header;
+        if length(head.Size)>2
         if head.Size(3)>1
             if v==0
                 kk=1:head.Size(3);
-                [s,v]=listdlg('PromptString', 'Select slice','SelectionMode', 'single', 'ListString', num2str(kk') , 'Name' , imf);
+                [v,s]=listdlg('PromptString', 'Select slice','SelectionMode', 'single', 'ListString', num2str(kk') , 'Name' , imf);
             end
             im=rot90((imf.Value(:,:,v)));
         else    
             im=rot90(imf.Value);
+        end
         end
     elseif ~isempty(strfind(in,'tif'))
         
@@ -61,7 +63,11 @@ elseif exist(in) == 2
         if strcmp(head(1).PhotometricInterpretation,'RGB')
             im=imread(in);
         elseif v==0;
-            im=imread(in);
+            kk=size(head);v=1;
+            if kk(1)>1
+            [v,s]=listdlg('PromptString', 'Select slice','SelectionMode', 'single', 'ListString', num2str((1:kk(1))') , 'Name' , in);
+            end
+            im=imread(in,v);
         else
             im=imread(in,v);
         end
@@ -74,3 +80,4 @@ else
     a=msgbox('Please provide either an image matrix or a valid file name!','Error','modal');
     error('Please provide either an image matrix or a valid file name!')    ;
 end
+
