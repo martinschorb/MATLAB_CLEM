@@ -42,8 +42,7 @@ if numspots>1
     set(gca,'units','pixels','position',[1 1 200 200],'visible','off');
     orig_mode = get(hf, 'PaperPositionMode');
     set(hf, 'PaperPositionMode', 'auto');
-    cdata = hardcopy(hf, '-Dzbuffer', '-r0');
-    
+    cdata = print('-RGBImage');  
     
 %     tim = getframe(gca,[80 85 57 41]);
     close all;
